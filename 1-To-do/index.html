@@ -24,14 +24,19 @@
           I’m the calm in chaos, the fire behind silence.
         </p>
       </div>
-      <div
-        class="content gap-6 flex-grow bg-gray-800 mt-4 p-16 rounded-t-3xl justify-end flex flex-col"
-      >
-        <div class="text-center gap-2 mb-2 mr-24">
+      <div class="grid grid-cols-[20%_80%]  h-screen ">
+
+        <div class="sideBar h-screen bg-yellow-600">
+         <div class="clock h-32 w-22 bg-green-500"></div>
+         <div class="ongoing bg-black h-24 w-24 "></div>
+       </div>
+
+        <div class="content gap-6 flex-grow bg-gray-800 mt-4 p-16 rounded-t-3xl justify-end flex flex-col">
+              <div class="text-center gap-2 mb-2 mr-24">
           <h1 class="text-4xl font-bold">Task Bar</h1>
           <p class="text-sm text-red-300 font-bold">
             // Keep track of Your Task
-          </p>
+        </p>
           <i class="ri-dashboard-line"></i>
           <button href="" class="h-8 w-12 hover:underline rounded">
             Board
@@ -72,9 +77,11 @@
             </div>
             <footer class="h-8 bg-green-600 mt-auto">+ Add New Task</footer>
           </div>
+         </div>
+         <div class=" eventTracker bg-black h-12"></div>
         </div>
-      </div>
       
+      </div>
     </div>
 
     <script src="script.js"></script>
