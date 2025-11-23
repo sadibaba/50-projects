@@ -10,8 +10,10 @@
       rel="stylesheet"
     />
   </head>
-  <body>
-    <div class="main flex flex-col h-full w-full relative bg-gray-900">
+  <body
+    class="bg-[url('https://plus.unsplash.com/premium_vector-1722950274237-580f74ace94a?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')]"
+  >
+    <div class="main flex flex-col h-full w-full relative">
       <nav
         class="nav h-24 bg-[url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyFBKKx_7wgUXmQadI8WkhAtoA2aBMVxB-_OzFvAmyzv82SDxMgb04CLrbgyevxaWxU5s&usqp=CAU')] relative inset-0 w-screen object-fit bg-top"
       ></nav>
@@ -19,76 +21,216 @@
         <svg
           class="logo h-24 w-24 bg-[url('https://images.unsplash.com/photo-1609505848912-b7c3b8b4beda?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGdpcmx8ZW58MHx8MHx8fDA%3D')] bg-cover rounded-full z-10 absolute -m-12 ml-12"
         ></svg>
-        <h1 class="mt-16 ml-16 font-bold text-2xl">Alisha</h1>
-        <p class="ml-4 text-gray-700 text-base font-semibold">
+        <h1 class="mt-16 ml-16 font-bold text-white text-2xl">Alisha</h1>
+        <p class="ml-4 text-[#67289E] text-base font-semibold">
           I’m the calm in chaos, the fire behind silence.
         </p>
       </div>
-      <div class="grid grid-cols-[20%_80%]  h-screen ">
-
-        <div class="sideBar h-screen bg-yellow-600">
-         <div class="clock h-54  bg-green-500"></div>
-         <div class="ongoing bg-black h-54 "></div>
-         <div class="ongoing bg-green-600 h-54 "></div>
-         <div class="ongoing bg-blue-300 h-54 "></div>
-       </div>
-
-        <div class="content gap-6 flex-grow bg-gray-800 mt-4 p-16 rounded-t-3xl justify-end flex flex-col">
-              <div class="text-center gap-2 mb-2 mr-24">
-          <h1 class="text-4xl font-bold">Task Bar</h1>
-          <p class="text-sm text-red-300 font-bold">
-            // Keep track of Your Task
-        </p>
-          <i class="ri-dashboard-line"></i>
-          <button href="" class="h-8 w-12 hover:underline rounded">
-            Board
-          </button>
-          <i class="ri-table-alt-line"></i>
-          <button href="" class="h-8 w-12 hover:underline rounded">
-            table
-          </button>
+      <div class="grid grid-cols-[20%_80%] h-screen">
+        <div
+          class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-screen"
+        >
+          <div class="clock h-54">
+            <h1>yahan clock aye gi</h1>
+          </div>
+          <div class="ongoing text-white h-54">
+            <div class="bg-gray-700 h-12">
+              <i class="ri-arrow-up-double-fill"></i>
+              ongoing_projects
+            </div>
+            <h1><i class="ri-computer-fill"></i>Project 1</h1>
+            <h1><i class="ri-computer-fill"></i>Project 2</h1>
+            <h1><i class="ri-computer-fill"></i>Project 3</h1>
+            <h1><i class="ri-computer-fill"></i>Project 4</h1>
+            <h1><i class="ri-computer-fill"></i>Project 5</h1>
+          </div>
+          <div class="ongoing h-54"></div>
+          <div class="ongoing h-54"></div>
         </div>
-        <div class="Task flex gap-6 overflow-x-auto justify-end">
-          <div class="h-64 w-64 bg-yellow-700 flex flex-col justify-between">
-            <nav class="h-8 bg-blue-800">To-Do (3)</nav>
-            <div class="overflow-y-auto flex-grow scrollbar-hide bg-black">
-              <h1>task:1</h1>
-              <h1>task:2</h1>
-              <h1>task:3</h1>
-              <p>here are task to complete</p>
-            </div>
-            <footer class="h-8 bg-green-600 mt-auto">+ Add New Task</footer>
+
+        <div
+          class="content gap-6 flex-grow bg-white/10 backdrop-blur-sm mt-4 p-16 rounded-t-3xl justify-end flex flex-col"
+        >
+          <div class="text-center gap-2 mb-2 mr-24">
+            <h1 class="text-4xl font-bold">Task Bar</h1>
+            <p class="text-sm text-[#67289E] font-bold">
+              // Keep track of Your Task
+            </p>
+            <i class="ri-dashboard-line"></i>
+            <button href="" class="h-8 w-12 hover:underline rounded">
+              Board
+            </button>
+            <i class="ri-table-alt-line"></i>
+            <button href="" class="h-8 w-12 hover:underline rounded">
+              table
+            </button>
           </div>
-          <div class="h-64 w-64 bg-yellow-700 flex flex-col justify-between">
-            <nav class="h-8 bg-blue-800">In Progress (3)</nav>
-            <div class="overflow-y-auto flex-grow scrollbar-hide bg-black">
-              <h1>progress:1</h1>
-              <h1>progress:2</h1>
-              <h1>progress:3</h1>
-              <p>here progressing Task's</p>
+          <div class="Task flex gap-6 overflow-x-auto justify-end">
+            <div
+              class="h-64 w-64 border-white space-y-1 flex flex-col justify-between"
+            >
+              <nav class="h-8 flex gap-6 text-white bg-purple-600/20">
+                <h1 class="bg-purple-400/10 w-18 rounded-r">TO-DO</h1>
+                <h2 id="counter" class="text-purple-400/70">(3)</h2>
+              </nav>
+              <div
+                class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-purple-900/10"
+              >
+                <h1 class="bg-purple-900/50">task:1</h1>
+                <h1 class="bg-purple-900/50">task:2</h1>
+                <h1 class="bg-purple-900/50">task:3</h1>
+              </div>
+              <footer
+                class="h-8 bg-purple-600/20 hover:bg-purple-600/60 mt-auto"
+              >
+                + New
+              </footer>
             </div>
-            <footer class="h-8 bg-green-600 mt-auto">+ Add New Task</footer>
-          </div>
-          <div class="h-64 w-64 bg-yellow-700 flex flex-col justify-between">
-            <nav class="h-8 bg-blue-800">Finished (3)</nav>
-            <div class="overflow-y-auto flex-grow scrollbar-hide bg-black">
-              <h1>Finished:1</h1>
-              <h1>Finished:2</h1>
-              <h1>Finished:3</h1>
-              <p>here are completed Task</p>
+
+            <div
+              class="h-64 w-64 border-white space-y-1 flex flex-col justify-between"
+            >
+              <nav class="h-8 flex gap-6 text-white bg-red-600/20">
+                <h1 class="bg-red-400/20 w-32 rounded-r">In Progress</h1>
+                <h2 id="counter" class="">(3)</h2>
+              </nav>
+              <div
+                class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-red-900/10"
+              >
+                <h1 class="bg-red-900/50">Progress:1</h1>
+                <h1 class="bg-red-900/50">Progress:2</h1>
+                <h1 class="bg-red-900/50">Progress:3</h1>
+              </div>
+              <footer class="h-8 bg-red-600/20 hover:bg-red-600/60 mt-auto">
+                + New
+              </footer>
             </div>
-            <footer class="h-8 bg-green-600 mt-auto">+ Add New Task</footer>
+
+            <div
+              class="h-64 w-64 border-white flex space-y-1 flex-col justify-between"
+            >
+              <nav class="h-8 flex gap-6 text-white bg-emerald-700/30">
+                <h1 class="bg-emerald-400/20 w-18 rounded-r">Finished</h1>
+                <h2 id="counter" class="">(3)</h2>
+              </nav>
+              <div
+                class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-emerald-900/10"
+              >
+                <h1 class="bg-emerald-900">Finished:1</h1>
+                <h1 class="bg-emerald-900">Finished:2</h1>
+                <h1 class="bg-emerald-900">Finished:3</h1>
+              </div>
+              <footer
+                class="h-8 bg-emerald-600/20 hover:bg-emerald-600/60 mt-auto"
+              >
+                + Add New Task
+              </footer>
+            </div>
           </div>
-         </div>
-         <div class="flex gap-6 mt-8 justify-end">
-             <div class=" eventTracker bg-black h-[600px] w-[800px]"></div>
-             <div class=" flex flex-col gap-16">
-                 <div class="bg-violet-800 h-54 w-[200px]"> </div>
-                 <div class="bg-violet-500 h-54 w-[200px]"> </div>
-             </div>
-         </div>
+          <div class="flex gap-6 mt-8 justify-end">
+            <div
+              id="eventTracker"
+              class="bg-white/30 backdrop-blur-sm h-[600px] w-[800px]"
+            >
+              <div>
+                <h1 class="font-bold-2xl">Events Tracker</h1>
+                <p class="text-purple-700">//Keep track of your activities</p>
+              </div>
+              <div id="calendar" class="mt-10">
+                <!-- Header -->
+                <div class="text-white flex gap-2 mb-2">
+                  <i class="ri-calendar-2-line"></i>
+                  <h1>Calendar</h1>
+                </div>
+                <div class="h-[4px] bg-white/70 rounded-full mb-2"></div>
+                <div class="flex justify-between text-white mb-4">
+                  <h1 class="font-bold">October 2025</h1>
+                  <h1>< Today ></h1>
+                </div>
+
+                <!-- Weekdays -->
+                <div class="grid grid-cols-7 text-center text-white/80 mb-2">
+                  <div>Sun</div>
+                  <div>Mon</div>
+                  <div>Tue</div>
+                  <div>Wed</div>
+                  <div>Thu</div>
+                  <div>Fri</div>
+                  <div>Sat</div>
+                </div>
+
+                <!-- Dates Grid -->
+                <div class="grid grid-cols-7 gap-2 text-white text-center">
+                  <!-- Previous month tail -->
+                  <div class="opacity-30">28</div>
+                  <div class="opacity-30">29</div>
+                  <div class="opacity-30">30</div>
+                  <div class="opacity-30">1</div>
+                  <div class="opacity-30">2</div>
+                  <div class="opacity-30">3</div>
+                  <div class="opacity-30">4</div>
+
+                  <!-- October dates -->
+                  <div class="bg-white/10 rounded-md py-2">5</div>
+                  <div class="bg-white/10 rounded-md py-2">6</div>
+                  <div class="bg-white/10 rounded-md py-2">7</div>
+                  <div class="bg-white/10 rounded-md py-2">8</div>
+                  <div class="bg-white/10 rounded-md py-2">9</div>
+                  <div class="bg-white/10 rounded-md py-2">10</div>
+                  <div class="bg-white/10 rounded-md py-2">11</div>
+
+                  <div class="bg-white/10 rounded-md py-2">12</div>
+                  <div class="bg-white/10 rounded-md py-2">13</div>
+                  <div class="bg-white/10 rounded-md py-2">14</div>
+                  <div class="bg-white/10 rounded-md py-2">15</div>
+                  <div class="bg-white/10 rounded-md py-2">16</div>
+                  <div class="bg-white/10 rounded-md py-2">17</div>
+                  <div class="bg-white/10 rounded-md py-2">18</div>
+
+                  <div class="bg-white/10 rounded-md py-2">19</div>
+                  <div class="bg-white/10 rounded-md py-2">20</div>
+                  <div class="bg-white/10 rounded-md py-2">21</div>
+                  <div class="bg-white/10 rounded-md py-2">22</div>
+                  <div class="bg-white/10 rounded-md py-2">23</div>
+                  <div class="bg-white/10 rounded-md py-2">24</div>
+                  <div class="bg-white/10 rounded-md py-2">25</div>
+
+                  <div class="bg-red-500 text-white rounded-md py-2 font-bold">
+                    26
+                  </div>
+                  <!-- Highlighted date -->
+                  <div class="bg-white/10 rounded-md py-2">27</div>
+                  <div class="bg-white/10 rounded-md py-2">28</div>
+                  <div class="bg-white/10 rounded-md py-2">29</div>
+                  <div class="opacity-30">30</div>
+                  <div class="opacity-30">31</div>
+                  <div class="opacity-30">1</div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col gap-16">
+              <div
+                id="wallpaper"
+                class="rounded-md h-96 w-[200px]  overflow-hidden relative"
+              >
+                <video
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  class="absolute top-0 left-0 w-full h-full object-cover"
+                >
+                  <source src="video.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <div
+                id="songs "
+                class="bg-violet-500 h-54 rounded-md w-[200px]"
+              ></div>
+            </div>
+          </div>
         </div>
-      
       </div>
     </div>
 
