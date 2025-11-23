@@ -211,7 +211,7 @@
             <div class="flex flex-col gap-16">
               <div
                 id="wallpaper"
-                class="rounded-md h-96 w-[200px]  overflow-hidden relative"
+                class="rounded-md h-96 w-[200px] overflow-hidden relative"
               >
                 <video
                   autoplay
@@ -220,14 +220,50 @@
                   playsinline
                   class="absolute top-0 left-0 w-full h-full object-cover"
                 >
-                  <source src="video.mp4" type="video/mp4" />
+                  <source src="stuff/video.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
               <div
-                id="songs "
-                class="bg-violet-500 h-54 rounded-md w-[200px]"
-              ></div>
+  id="music"
+  class="bg-violet-500/20 h-56 w-[220px] rounded-md p-3 flex flex-col"
+>
+  <!-- Header -->
+  <nav class="flex items-center gap-2 mb-2">
+    <img
+      src="https://cdn.pixabay.com/photo/2022/12/01/04/42/ai-generated-7628305_960_720.jpg"
+      alt="cover"
+      class="h-12 w-12 rounded object-cover"
+    />
+    <div class="flex-1">
+      <audio controls class="w-full h-8">
+        <source src="stuff/background-music-438663.mp3" type="audio/mp3" />
+      </audio>
+    </div>
+  </nav>
+
+  <!-- Divider -->
+  <div class="h-[1px] bg-white/50 mb-2"></div>
+
+  <!-- Now Playing -->
+  <div class="text-white text-xs mb-2">🎵 Now Playing: Background Music</div>
+
+  <!-- Scrollable Playlist -->
+  <div
+    class="flex flex-col gap-2 overflow-y-auto scrollbar-hide"
+    style="max-height: 120px"
+  >
+    <audio controls class="w-full h-7">
+      <source src="stuff/dancing-with-your-ghost-234950.mp3" type="audio/mp3" />
+    </audio>
+    <audio controls class="w-full h-7">
+      <source src="stuff/magiksolo-granny-wallpaper-421868.mp3" type="audio/mp3" />
+    </audio>
+    <audio controls class="w-full h-7">
+      <source src="stuff/wallpaper-lofi-chill-260802.mp3" type="audio/mp3" />
+    </audio>
+  </div>
+</div>
             </div>
           </div>
         </div>
