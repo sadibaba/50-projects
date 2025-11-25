@@ -28,11 +28,65 @@
       </div>
       <div class="grid grid-cols-[20%_80%] h-screen">
         <div
-          class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-screen"
+          class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-auto"
         >
           <!-- CLOCK SECTION -->
-          <div class="clock h-54">
-            <h1>yahan clock aye gi</h1>
+          <div class="clock flex items-center justify-center h-64">
+            <div
+              class="relative w-48 h-48 rounded-full border-4 border-white flex items-center justify-center bg-black text-white"
+            >
+              <!-- Hour hand -->
+              <div
+              id="hour"
+                class="absolute w-2 h-16 bg-white rounded"
+                style="
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -100%) rotate(180deg);
+                  transform-origin: bottom;
+                "
+              ></div>
+
+              <!-- Minute hand -->
+              <div
+              id="mintue"
+                class="absolute w-1 h-20 bg-gray-300 rounded"
+                style="
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -100%) rotate(270deg);
+                  transform-origin: bottom;
+                "
+              ></div>
+
+              <!-- Second hand -->
+              <div
+              id="second"
+                class="absolute w-0.5 h-24 bg-red-500 rounded"
+                style="
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -100%) rotate(60deg);
+                  transform-origin: bottom;
+                "
+              ></div>
+              <!-- Numbers -->
+              <span class="absolute top-2 left-1/2 transform -translate-x-1/2"
+                >12</span
+              >
+              <span class="absolute right-2 top-1/2 transform -translate-y-1/2"
+                >3</span
+              >
+              <span
+                class="absolute bottom-2 left-1/2 transform -translate-x-1/2"
+                >6</span
+              >
+              <span class="absolute left-2 top-1/2 transform -translate-y-1/2"
+                >9</span
+              >
+              <!-- Center dot -->
+              <div class="absolute w-4 h-4 bg-white rounded-full"></div>
+            </div>
           </div>
 
           <!-- ONGOING PROJECTS -->
@@ -40,17 +94,18 @@
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-arrow-up-double-fill"></i>
               <span>ongoing_projects</span>
-              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
-  <i class="ri-add-fill"></i>
-  Add
-</button>
+              <button
+                class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900"
+              >
+                <i class="ri-add-fill"></i>
+                Add
+              </button>
             </div>
             <h1><i class="ri-computer-fill"></i> Project 1</h1>
             <h1><i class="ri-computer-fill"></i> Project 2</h1>
             <h1><i class="ri-computer-fill"></i> Project 3</h1>
             <h1><i class="ri-computer-fill"></i> Project 4</h1>
             <h1><i class="ri-computer-fill"></i> Project 5</h1>
-           
           </div>
 
           <!-- DIRECTIONS SECTION -->
@@ -58,15 +113,16 @@
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-compass-3-fill"></i>
               <span>_directions</span>
-              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
-  <i class="ri-add-fill"></i>
-  Add
-</button>
+              <button
+                class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900"
+              >
+                <i class="ri-add-fill"></i>
+                Add
+              </button>
             </div>
             <h1><i class="ri-folder-archive-fill"></i> Projects archive</h1>
             <h1><i class="ri-lightbulb-flash-fill"></i> Problem-solving</h1>
             <h1><i class="ri-graduation-cap-fill"></i> Learning hub</h1>
-            
           </div>
 
           <!-- NOTES SECTION -->
@@ -74,10 +130,12 @@
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-sticky-note-fill"></i>
               <span>_notes</span>
-              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
-  <i class="ri-add-fill"></i>
-  Add
-</button>
+              <button
+                class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900"
+              >
+                <i class="ri-add-fill"></i>
+                Add
+              </button>
             </div>
             <p class="px-2 py-1 text-sm">
               &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -94,7 +152,6 @@
               Mauris metus nulla, hendrerit quis velit ut, gravida molestie
               enim.
             </p>
-            
           </div>
         </div>
         <div
