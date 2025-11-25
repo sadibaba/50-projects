@@ -37,7 +37,7 @@
             >
               <!-- Hour hand -->
               <div
-              id="hour"
+                id="hour"
                 class="absolute w-2 h-16 bg-white rounded"
                 style="
                   top: 50%;
@@ -49,7 +49,7 @@
 
               <!-- Minute hand -->
               <div
-              id="mintue"
+                id="mintue"
                 class="absolute w-1 h-20 bg-gray-300 rounded"
                 style="
                   top: 50%;
@@ -61,7 +61,7 @@
 
               <!-- Second hand -->
               <div
-              id="second"
+                id="second"
                 class="absolute w-0.5 h-24 bg-red-500 rounded"
                 style="
                   top: 50%;
@@ -164,21 +164,18 @@
             </p>
           </div>
           <div class="Task flex gap-6 overflow-x-auto justify-end">
-            <div
-              class="h-64 w-64 border-white space-y-1 flex flex-col justify-between"
-            >
+            <div class="w-64 border-white space-y-1 flex flex-col">
               <nav class="h-8 flex gap-6 text-white bg-purple-600/20">
                 <h1 class="bg-purple-400/10 w-18 rounded-r">TO-DO</h1>
-                <h2 id="counter" class="text-purple-400/70">(3)</h2>
+                <h2 id="counter" class="text-purple-400/70">(0)</h2>
               </nav>
-              <div
-                class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-purple-900/10"
-              >
-                <h1 class="bg-purple-900/50">task:1</h1>
-                <h1 class="bg-purple-900/50">task:2</h1>
-                <h1 class="bg-purple-900/50">task:3</h1>
+
+              <div id="tasks" class="flex-grow space-y-1 bg-purple-900/10 p-2">
+                
               </div>
+
               <footer
+                id="addNewTask"
                 class="h-8 bg-purple-600/20 hover:bg-purple-600/60 mt-auto"
               >
                 + New
@@ -190,14 +187,11 @@
             >
               <nav class="h-8 flex gap-6 text-white bg-red-600/20">
                 <h1 class="bg-red-400/20 w-32 rounded-r">In Progress</h1>
-                <h2 id="counter" class="">(3)</h2>
+                <h2 id="counter" class="">(0)</h2>
               </nav>
               <div
                 class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-red-900/10"
               >
-                <h1 class="bg-red-900/50">Progress:1</h1>
-                <h1 class="bg-red-900/50">Progress:2</h1>
-                <h1 class="bg-red-900/50">Progress:3</h1>
               </div>
               <footer class="h-8 bg-red-600/20 hover:bg-red-600/60 mt-auto">
                 + New
@@ -209,14 +203,11 @@
             >
               <nav class="h-8 flex gap-6 text-white bg-emerald-700/30">
                 <h1 class="bg-emerald-400/20 w-18 rounded-r">Finished</h1>
-                <h2 id="counter" class="">(3)</h2>
+                <h2 id="counter" class="">(0)</h2>
               </nav>
               <div
                 class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-emerald-900/10"
               >
-                <h1 class="bg-emerald-900">Finished:1</h1>
-                <h1 class="bg-emerald-900">Finished:2</h1>
-                <h1 class="bg-emerald-900">Finished:3</h1>
               </div>
               <footer
                 class="h-8 bg-emerald-600/20 hover:bg-emerald-600/60 mt-auto"
