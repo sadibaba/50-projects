@@ -30,24 +30,73 @@
         <div
           class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-screen"
         >
+          <!-- CLOCK SECTION -->
           <div class="clock h-54">
             <h1>yahan clock aye gi</h1>
           </div>
-          <div class="ongoing text-white h-54">
-            <div class="bg-gray-700 h-12">
-              <i class="ri-arrow-up-double-fill"></i>
-              ongoing_projects
-            </div>
-            <h1><i class="ri-computer-fill"></i>Project 1</h1>
-            <h1><i class="ri-computer-fill"></i>Project 2</h1>
-            <h1><i class="ri-computer-fill"></i>Project 3</h1>
-            <h1><i class="ri-computer-fill"></i>Project 4</h1>
-            <h1><i class="ri-computer-fill"></i>Project 5</h1>
-          </div>
-          <div class="ongoing h-54"></div>
-          <div class="ongoing h-54"></div>
-        </div>
 
+          <!-- ONGOING PROJECTS -->
+          <div class="ongoing text-white h-54">
+            <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
+              <i class="ri-arrow-up-double-fill"></i>
+              <span>ongoing_projects</span>
+              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
+  <i class="ri-add-fill"></i>
+  Add
+</button>
+            </div>
+            <h1><i class="ri-computer-fill"></i> Project 1</h1>
+            <h1><i class="ri-computer-fill"></i> Project 2</h1>
+            <h1><i class="ri-computer-fill"></i> Project 3</h1>
+            <h1><i class="ri-computer-fill"></i> Project 4</h1>
+            <h1><i class="ri-computer-fill"></i> Project 5</h1>
+           
+          </div>
+
+          <!-- DIRECTIONS SECTION -->
+          <div class="ongoing text-white h-54">
+            <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
+              <i class="ri-compass-3-fill"></i>
+              <span>_directions</span>
+              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
+  <i class="ri-add-fill"></i>
+  Add
+</button>
+            </div>
+            <h1><i class="ri-folder-archive-fill"></i> Projects archive</h1>
+            <h1><i class="ri-lightbulb-flash-fill"></i> Problem-solving</h1>
+            <h1><i class="ri-graduation-cap-fill"></i> Learning hub</h1>
+            
+          </div>
+
+          <!-- NOTES SECTION -->
+          <div class="ongoing text-white h-54">
+            <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
+              <i class="ri-sticky-note-fill"></i>
+              <span>_notes</span>
+              <button class="flex items-center gap-2 px-3 py-1 bg-gray-800 text-white rounded hover:bg-gray-900">
+  <i class="ri-add-fill"></i>
+  Add
+</button>
+            </div>
+            <p class="px-2 py-1 text-sm">
+              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
+              enim.
+            </p>
+            <p class="px-2 py-1 text-sm">
+              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
+              enim.
+            </p>
+            <p class="px-2 py-1 text-sm">
+              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
+              enim.
+            </p>
+            
+          </div>
+        </div>
         <div
           class="content gap-6 flex-grow bg-white/10 backdrop-blur-sm mt-4 p-16 rounded-t-3xl justify-end flex flex-col"
         >
@@ -56,14 +105,6 @@
             <p class="text-sm text-[#67289E] font-bold">
               // Keep track of Your Task
             </p>
-            <i class="ri-dashboard-line"></i>
-            <button href="" class="h-8 w-12 hover:underline rounded">
-              Board
-            </button>
-            <i class="ri-table-alt-line"></i>
-            <button href="" class="h-8 w-12 hover:underline rounded">
-              table
-            </button>
           </div>
           <div class="Task flex gap-6 overflow-x-auto justify-end">
             <div
@@ -225,45 +266,59 @@
                 </video>
               </div>
               <div
-  id="music"
-  class="bg-violet-500/20 h-56 w-[220px] rounded-md p-3 flex flex-col"
->
-  <!-- Header -->
-  <nav class="flex items-center gap-2 mb-2">
-    <img
-      src="https://cdn.pixabay.com/photo/2022/12/01/04/42/ai-generated-7628305_960_720.jpg"
-      alt="cover"
-      class="h-12 w-12 rounded object-cover"
-    />
-    <div class="flex-1">
-      <audio controls class="w-full h-8">
-        <source src="stuff/background-music-438663.mp3" type="audio/mp3" />
-      </audio>
-    </div>
-  </nav>
+                id="music"
+                class="bg-violet-500/20 h-56 w-[220px] rounded-md p-3 flex flex-col"
+              >
+                <!-- Header -->
+                <nav class="flex items-center gap-2 mb-2">
+                  <img
+                    src="https://cdn.pixabay.com/photo/2022/12/01/04/42/ai-generated-7628305_960_720.jpg"
+                    alt="cover"
+                    class="h-12 w-12 rounded object-cover"
+                  />
+                  <div class="flex-1">
+                    <audio controls class="w-full h-8">
+                      <source
+                        src="stuff/background-music-438663.mp3"
+                        type="audio/mp3"
+                      />
+                    </audio>
+                  </div>
+                </nav>
 
-  <!-- Divider -->
-  <div class="h-[1px] bg-white/50 mb-2"></div>
+                <!-- Divider -->
+                <div class="h-[1px] bg-white/50 mb-2"></div>
 
-  <!-- Now Playing -->
-  <div class="text-white text-xs mb-2">🎵 Now Playing: Background Music</div>
+                <!-- Now Playing -->
+                <div class="text-white text-xs mb-2">
+                  🎵 Now Playing: Background Music
+                </div>
 
-  <!-- Scrollable Playlist -->
-  <div
-    class="flex flex-col gap-2 overflow-y-auto scrollbar-hide"
-    style="max-height: 120px"
-  >
-    <audio controls class="w-full h-7">
-      <source src="stuff/dancing-with-your-ghost-234950.mp3" type="audio/mp3" />
-    </audio>
-    <audio controls class="w-full h-7">
-      <source src="stuff/magiksolo-granny-wallpaper-421868.mp3" type="audio/mp3" />
-    </audio>
-    <audio controls class="w-full h-7">
-      <source src="stuff/wallpaper-lofi-chill-260802.mp3" type="audio/mp3" />
-    </audio>
-  </div>
-</div>
+                <!-- Scrollable Playlist -->
+                <div
+                  class="flex flex-col gap-2 overflow-y-auto scrollbar-hide"
+                  style="max-height: 120px"
+                >
+                  <audio controls class="w-full h-7">
+                    <source
+                      src="stuff/dancing-with-your-ghost-234950.mp3"
+                      type="audio/mp3"
+                    />
+                  </audio>
+                  <audio controls class="w-full h-7">
+                    <source
+                      src="stuff/magiksolo-granny-wallpaper-421868.mp3"
+                      type="audio/mp3"
+                    />
+                  </audio>
+                  <audio controls class="w-full h-7">
+                    <source
+                      src="stuff/wallpaper-lofi-chill-260802.mp3"
+                      type="audio/mp3"
+                    />
+                  </audio>
+                </div>
+              </div>
             </div>
           </div>
         </div>
