@@ -30,12 +30,10 @@
         <div
           class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-auto"
         >
-          <!-- CLOCK SECTION -->
           <div class="clock flex items-center justify-center h-64">
             <div
               class="relative w-48 h-48 rounded-full border-4 border-white flex items-center justify-center bg-black text-white"
             >
-              <!-- Hour hand -->
               <div
                 id="hour"
                 class="absolute w-2 h-16 bg-white rounded"
@@ -47,7 +45,6 @@
                 "
               ></div>
 
-              <!-- Minute hand -->
               <div
                 id="mintue"
                 class="absolute w-1 h-20 bg-gray-300 rounded"
@@ -59,7 +56,6 @@
                 "
               ></div>
 
-              <!-- Second hand -->
               <div
                 id="second"
                 class="absolute w-0.5 h-24 bg-red-500 rounded"
@@ -70,7 +66,6 @@
                   transform-origin: bottom;
                 "
               ></div>
-              <!-- Numbers -->
               <span class="absolute top-2 left-1/2 transform -translate-x-1/2"
                 >12</span
               >
@@ -84,12 +79,10 @@
               <span class="absolute left-2 top-1/2 transform -translate-y-1/2"
                 >9</span
               >
-              <!-- Center dot -->
               <div class="absolute w-4 h-4 bg-white rounded-full"></div>
             </div>
           </div>
 
-          <!-- ONGOING PROJECTS -->
           <div class="ongoing text-white h-54">
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-arrow-up-double-fill"></i>
@@ -108,7 +101,6 @@
             <h1><i class="ri-computer-fill"></i> Project 5</h1>
           </div>
 
-          <!-- DIRECTIONS SECTION -->
           <div class="ongoing text-white h-54">
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-compass-3-fill"></i>
@@ -125,7 +117,6 @@
             <h1><i class="ri-graduation-cap-fill"></i> Learning hub</h1>
           </div>
 
-          <!-- NOTES SECTION -->
           <div class="ongoing text-white h-54">
             <div class="bg-gray-700 h-12 flex items-center px-2 gap-2">
               <i class="ri-sticky-note-fill"></i>
@@ -167,7 +158,7 @@
             <div class="w-64 border-white space-y-1 flex flex-col">
               <nav class="h-8 flex gap-6 text-white bg-purple-600/20">
                 <h1 class="bg-purple-400/10 w-18 rounded-r">TO-DO</h1>
-                <h2 id="counter" class="text-purple-400/70">(0)</h2>
+                <h2 id="todoCounter" class="text-purple-400/70">(0)</h2>
               </nav>
 
               <div id="tasks" class="flex-grow space-y-1 bg-purple-900/10 p-2">
@@ -183,27 +174,31 @@
             </div>
 
             <div
-              class="h-64 w-64 border-white space-y-1 flex flex-col justify-between"
+              class=" w-64 border-white space-y-1 flex flex-col "
             >
               <nav class="h-8 flex gap-6 text-white bg-red-600/20">
                 <h1 class="bg-red-400/20 w-32 rounded-r">In Progress</h1>
-                <h2 id="counter" class="">(0)</h2>
+                <h2 id="progressCounter"  class="">(0)</h2>
               </nav>
               <div
-                class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-red-900/10"
+              id="progressTask"
+                class=" flex-grow space-y-1 scrollbar-hide bg-red-900/10 p-2"
               >
               </div>
-              <footer class="h-8 bg-red-600/20 hover:bg-red-600/60 mt-auto">
+              <footer 
+              id="addProgress"
+              class="h-8 bg-red-600/20 hover:bg-red-600/60 mt-auto">
                 + New
               </footer>
             </div>
 
             <div
+            id="finishedTask"
               class="h-64 w-64 border-white flex space-y-1 flex-col justify-between"
             >
               <nav class="h-8 flex gap-6 text-white bg-emerald-700/30">
                 <h1 class="bg-emerald-400/20 w-18 rounded-r">Finished</h1>
-                <h2 id="counter" class="">(0)</h2>
+                <h2 id="finishedCounter" class="">(0)</h2>
               </nav>
               <div
                 class="overflow-y-auto flex-grow space-y-1 scrollbar-hide bg-emerald-900/10"
@@ -299,10 +294,11 @@
             </div>
             <div class="flex flex-col gap-16">
               <div
-                id="wallpaper"
+                id="video"
                 class="rounded-md h-96 w-[200px] overflow-hidden relative"
               >
                 <video
+                id="video"
                   autoplay
                   muted
                   loop
