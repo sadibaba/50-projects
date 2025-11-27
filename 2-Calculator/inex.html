@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="min-h-screen bg-neutral-100 flex items-center justify-center p-4"
+  >
+    <div class="w-full max-w-md">
+      <label class="flex items-center justify-between mb-4 select-none">
+        <span class="text-sm font-medium text-neutral-700">Theme</span>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-neutral-600">Light</span>
+          <input id="themeToggle" type="checkbox" class="peer sr-only" />
+          <label
+            for="themeToggle"
+            class="relative inline-flex h-6 w-11 cursor-pointer rounded-full bg-neutral-300 transition-colors peer-checked:bg-neutral-700"
+          >
+            <span
+              class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+            ></span>
+          </label>
+          <span class="text-xs text-neutral-600 peer-checked:text-neutral-300"
+            >Dark</span
+          >
+        </div>
+      </label>
+
+      <div
+        id="calculatorCard"
+        class="rounded-3xl p-4 shadow-xl transition-colors bg-white peer-checked:bg-neutral-900"
+      >
+        <div
+          id="displayArea"
+          class="mb-3 rounded-2xl p-4 transition-colors bg-neutral-100 text-right peer-checked:bg-neutral-800"
+        >
+          <div
+            class="text-xs tracking-wide text-neutral-500 leading-tight peer-checked:text-neutral-300"
+          >
+            6000 / (2 + 3227) * 2
+          </div>
+          <div
+            class="mt-2 text-4xl font-semibold tabular-nums text-neutral-900 peer-checked:text-neutral-100"
+          >
+            = 12,454
+          </div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 mb-2">
+          <button
+            id="btnAC"
+            class="rounded-2xl py-3 text-sm font-semibold transition bg-neutral-200 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-700 peer-checked:text-neutral-100"
+          >
+            AC
+          </button>
+          <button
+            id="btnPlusMinus"
+            class="rounded-2xl py-3 text-sm font-semibold transition bg-neutral-200 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-700 peer-checked:text-neutral-100"
+          >
+            ±
+          </button>
+          <button
+            id="btnPercent"
+            class="rounded-2xl py-3 text-sm font-semibold transition bg-neutral-200 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-700 peer-checked:text-neutral-100"
+          >
+            %
+          </button>
+          <button
+            id="btnDivide"
+            class="rounded-2xl py-3 text-sm font-semibold transition bg-orange-500 text-white active:scale-[0.98] peer-checked:bg-orange-400"
+          >
+            ÷
+          </button>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2">
+          <button
+            id="btn7"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            7
+          </button>
+          <button
+           id="btn8"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            8
+          </button>
+          <button
+           id="btn9"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            9
+          </button>
+          <button
+          id="btnMultiply" 
+            class="rounded-2xl py-3 font-semibold bg-orange-500 text-white active:scale-[0.98] peer-checked:bg-orange-400"
+          >
+            ×
+          </button>
+
+          <button
+          id="btn4"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            4
+          </button>
+          <button
+          id="btn5"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            5
+          </button>
+          <button
+          id="btn6"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            6
+          </button>
+          <button
+          id="btnSubtract"
+            class="rounded-2xl py-3 font-semibold bg-orange-500 text-white active:scale-[0.98] peer-checked:bg-orange-400"
+          >
+            −
+          </button>
+
+          <button
+          id="btn1"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            1
+          </button>
+          <button
+          id="btn2"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            2
+          </button>
+          <button
+          id="btn3"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            3
+          </button>
+          <button
+          id="btnAdd"
+            class="rounded-2xl py-3 font-semibold bg-orange-500 text-white active:scale-[0.98] peer-checked:bg-orange-400"
+          >
+            +
+          </button>
+
+          <button
+          id="btn0"
+            class="col-span-2 rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            0
+          </button>
+          <button
+          id="btnDot"
+            class="rounded-2xl py-3 font-semibold bg-neutral-100 text-neutral-900 active:scale-[0.98] peer-checked:bg-neutral-800 peer-checked:text-neutral-100"
+          >
+            .
+          </button>
+          <button
+          id="btnEquals"
+            class="rounded-2xl py-3 font-semibold bg-orange-600 text-white active:scale-[0.98] peer-checked:bg-orange-500"
+          >
+            =
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
