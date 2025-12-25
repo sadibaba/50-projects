@@ -3,9 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Weather</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
 </head>
-<body>
+<body class="h-screen w-screen bg-[url('https://plus.unsplash.com/premium_vector-1744039444725-b0f5f2a6fcc0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-auto bg-fixed">
+    <div class="main flex">
+        <div  class="logo ml-24 mt-12 h-14 w-14 m-8  rounded-full overflow-hidden ">
+            <img src="https://plus.unsplash.com/premium_vector-1683121254296-15e9db71c45f?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt=""
+            class="h-full w-full object-cover "
+            >
+        </div>
+        <div class="side h-screen w-1/3  backdrop-blur-md ml-auto border-2 border-gray-600">
+            <div class="flex items-center px-8 py-2 text-2xl mt-8 h-1/6 w-1/3 text-white">
+                <input type="text" placeholder="Search Location..."
+                class="grow outline-none text-gray-700 placeholder-gray-400 bg-transparent "
+                >
+                <button class="text-gray-500 hover:text-blue-500">
+                    <i class="ri-search-line"></i>
+                </button>
+            </div>
+            <div class="border-t-[0.5px] ml-12 border-b-[0.5px] border-white h-1/2 w-[65%] px-8 py-2  text-white">
+                <h1 class="text-white/30 mb-4">Weather Details...</h1>
+                <p class="font-bold text-white/40">ThunderStorm with light Drills</p>
+                <div class="flex justify-between mt-12">
+                    <div>
+                    <h1>Temp-max </h1>
+                    <h1>Tem-min</h1>
+                    <h1>Humidity</h1>
+                    <h1>Cloudy</h1>
+                    <h1>Wind</h1>
+                    </div>
+                    <div>
+                        <h1>19 <i class="ri-temp-hot-line text-red-500"></i></h1>
+                        <h1>18 <i class="ri-temp-hot-line text-blue-500"></i></h1>
+                        <h1>58% <i class="ri-drop-line text-white"></i></h1>
+                        <h1>86% <i class="ri-sun-cloudy-line"></i></h1>
+                        <h1>5km/h <i class="ri-windy-line"></i></h1>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+    
     
     
 
