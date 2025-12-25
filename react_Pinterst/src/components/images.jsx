@@ -45,7 +45,7 @@ function PinterestGallery() {
         {images.map((img) => (
           <div key={img.id} className="mb-4">
             <img
-              src={img.webformatURL}
+              src={img.webFormatURL}
               alt={img.tags}
               className="w-full h-auto rounded-lg shadow"
             />
