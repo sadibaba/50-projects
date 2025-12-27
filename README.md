@@ -12,6 +12,7 @@ Phase 1: Simple Web Projects (JS / Vanilla)
 11. Tip Calculator — Restaurant tip calculator
 12. BMI Calculator — Health calculator in JS
 
+---
 Phase 2: Intermediate Projects (React + Backend + API)
 
 backend + API, CRUD operations
@@ -31,6 +32,7 @@ backend + API, CRUD operations
 25. Image Gallery — Use Image API like Unsplash, React + backend caching
 26. Blog Comments System — Comments API + React comments section
 
+---
 Phase 3: Advanced Projects (Next.js, Real-time, Full Stack)
 
 27. Pinterest Clone — Next.js frontend, backend with image upload, pins, boards
@@ -58,22 +60,22 @@ Phase 3: Advanced Projects (Next.js, Real-time, Full Stack)
 49. Calendar Booking + Payment — Users book slots, pay (mock)
 50. Image Editing App — Basic filters, crop, rotate, via JS + backend
 
-
-Phase 3: ultra Advanced Projects with AWS and microservices architecture
+---
+Phase 4: ultra Advanced Projects with AWS and microservices architecture
 1) “DevCommerce Hub”
 🔹 Concept
 A developer‑focused e-commerce platform that sells products (hardware, software licenses, dev gear, courses, etc.) but also embeds hidden productivity layers:
 - Product Listings → Error Log Integration
-Each product page doubles as a “log tracker.” For example, buying a server package automatically gives you a dashboard to track uptime/errors. It looks like a product feature, but it’s actually your error logging system.
+Each product page doubles as a “log tracker.” For example, buying a server package automatically gives you a dashboard to track uptime/errors. It looks like a
+product feature, but it’s actually your error logging system.
 - Shopping Cart → Developer Vault
-Instead of just storing items, the cart can also store your reusable snippets, fixes, or templates. It feels like “saved items,” but it’s actually your personal vault.
+Instead of just storing items, the cart can also store your reusable snippets, fixes, or templates. It feels like “saved items,” but it’s actually your personal
+vault.
 - Order History → Debugging Timeline
 Past purchases show not only receipts but also linked fixes, patches, or documentation you’ve added. It looks like commerce history, but it’s a recovery ritual log.
 - Reviews & Ratings → Knowledge Sharing
-Reviews aren’t just stars—they’re mini cheat sheets where developers share fixes, workflows, or mnemonics. It feels like community feedback, but it’s actually collaborative debugging wisdom.
-
-
----
+Reviews aren’t just stars—they’re mini cheat sheets where developers share fixes, workflows, or mnemonics. It feels like community feedback, but it’s actually
+collaborative debugging wisdom.
 
 🔹 Core Features
 1. E-Commerce Layer
@@ -100,8 +102,6 @@ Reviews aren’t just stars—they’re mini cheat sheets where developers share
    - Dockerized microservices (auth, products, chat, logs).
    - CI/CD pipeline (GitHub Actions).
    - AWS deployment (EC2, RDS, S3, CloudWatch).
-
----
 
 🔹 Tech Stack
 - Frontend: React + TypeScript + TailwindCSS  
