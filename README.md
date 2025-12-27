@@ -13,7 +13,9 @@ Phase 1: Simple Web Projects (JS / Vanilla)
 12. BMI Calculator — Health calculator in JS
 
 Phase 2: Intermediate Projects (React + Backend + API)
+
 backend + API, CRUD operations
+
 13. Task Manager App — React frontend, Node/Express backend, database (MongoDB)
 14. Authentication System — Signup/Login/logout with JWT
 15. Blog Platform — CRUD posts, React frontend, Express + Mongo backend
