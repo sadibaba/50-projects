@@ -11,7 +11,7 @@ const cloudy = document.querySelector('.cloudy');
 const windEl = document.querySelector('.wind');
 
 let api;
-let apiKey = "b190a0605344cc4f3af08d0dd473dd25";
+let apiKey = "b190a0605344cc4f3af08d0dd473dd25"; // that's a public api so that's why i didn't hide it .env LoL 
 
 // Trigger by button click
 elButton.addEventListener('click', () => {
