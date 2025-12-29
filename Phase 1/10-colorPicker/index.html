@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Color Picker Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900 antialiased">
+  <div class="max-w-3xl mx-auto px-6 py-10">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold tracking-tight">Color Picker Tool</h1>
+      <p class="text-sm text-gray-600">Pick a color, see it live, and copy HEX/RGB/HSL.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+      <div class="space-y-4">
+        <label for="colorInput" class="block text-sm font-medium text-gray-700">Pick color</label>
+        <input
+          id="colorInput"
+          type="color"
+          class="h-12 w-24 p-0 border border-gray-300 rounded shadow-sm cursor-pointer"
+          value="#4f46e5"
+        />
+
+        <label for="hexInput" class="block text-sm font-medium text-gray-700">HEX</label>
+        <div class="flex gap-2">
+          <input
+            id="hexInput"
+            type="text"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value="#4f46e5"
+            placeholder="#000000"
+          />
+          <button
+            id="copyHex"
+            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
+          >
+            Copy
+          </button>
+        </div>
+
+        <label class="block text-sm font-medium text-gray-700">RGB</label>
+        <div class="flex gap-2">
+          <input
+            id="rgbOutput"
+            type="text"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-100"
+            readonly
+          />
+          <button
+            id="copyRgb"
+            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
+          >
+            Copy
+          </button>
+        </div>
+
+        <label class="block text-sm font-medium text-gray-700">HSL</label>
+        <div class="flex gap-2">
+          <input
+            id="hslOutput"
+            type="text"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-100"
+            readonly
+          />
+          <button
+            id="copyHsl"
+            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
+        <div class="p-6">
+               class="h-40 rounded-lg border-2 border-white shadow-inner"
+               style="background-color: #4f46e5;">
+          </div>
+          <p id="contrastNote" class="mt-3 text-xs text-gray-600"></p>
+        </div>
+      </div>
+    </div>
+      Built with HTML + JS + Tailwind. Edit HEX or use the color picker—everything stays in sync.
+    </footer>
+  </div>
+
+  <script src="index.js"></script>

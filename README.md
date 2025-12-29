@@ -6,9 +6,9 @@ Phase 1: Simple Web Projects (JS / Vanilla)
 5. Random Quote Generator — Quote API ✅
 6. Currency Converter — Free currency rate API ✅
 7. Countdown Timer — Date pick ✅
-8. Image Slider / Carousel — JS + CSS
-9. Simple Blog Frontend** — Static React app, dummy posts
-10. Color Picker Tool — JS + HTML + CSS
+8. Image Slider / Carousel — JS + CSS ✅
+9. Simple Blog Frontend— Static React app, dummy posts
+10. Color Picker Tool — JS + HTML + CSS ✅
 11. Tip Calculator — Restaurant tip calculator
 12. BMI Calculator — Health calculator in JS
 
