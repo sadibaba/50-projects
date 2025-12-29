@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <title>Count Down</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-b from-[#1e7fdc] to-[#0f4fa8] text-white">
+    <div class="min-h-screen flex items-center justify-center px-6">
+      <div class="w-full max-w-3xl text-center">
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-wide mb-8">
+          COMING SOON
+        </h1>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
+          <div class="flex flex-col items-center">
+            <div class="w-full bg-white/10 border border-white/20 rounded-md py-6">
+              <div id="day" class="text-4xl md:text-5xl font-semibold">365</div>
+            </div>
+            <span class="mt-3 text-sm tracking-widest">DAYS</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-full bg-white/10 border border-white/20 rounded-md py-6">
+              <div id="hours" class="text-4xl md:text-5xl font-semibold">0</div>
+            </div>
+            <span class="mt-3 text-sm tracking-widest">HOURS</span>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="w-full bg-white/10 border border-white/20 rounded-md py-6">
+              <div id="minutes" class="text-4xl md:text-5xl font-semibold">0</div>
+            </div>
+            <span class="mt-3 text-sm tracking-widest">MINUTES</span>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="w-full bg-white/10 border border-white/20 rounded-md py-6">
+              <div id="sec" class="text-4xl md:text-5xl font-semibold">0</div>
+            </div>
+            <span class="mt-3 text-sm tracking-widest">SECONDS</span>
+          </div>
+        </div>
+        <div class="flex gap-4 justify-center mb-8">
+            <button id="start" class="px-8 py-3 bg-white text-blue-600 font-semibold rounded-md hover:bg-gray-100 transition">
+                START
+            </button>
+            <button id="reset" class="px-8 py-3 bg-white/20 border border-white text-white font-semibold rounded-md hover:bg-white/30 transition">
+                RESET
+            </button>
+        </div>
+
+        <p class="max-w-2xl mx-auto text-sm md:text-base leading-relaxed text-white/90">
+        Get ready to experience something extraordinary. We're putting the final touches on an amazing new experience designed just for you. Stay tuned for the big reveal!
+        </p>
+      </div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>

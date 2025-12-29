@@ -4,8 +4,8 @@ Phase 1: Simple Web Projects (JS / Vanilla)
 3. Weather Widget — Public weather API ✅
 4. Quiz App — JS-based quiz app, questions APIs ✅
 5. Random Quote Generator — Quote API ✅
-6. Currency Converter — Free currency rate API
-7. Countdown Timer — Date pick 
+6. Currency Converter — Free currency rate API ✅
+7. Countdown Timer — Date pick ✅
 8. Image Slider / Carousel — JS + CSS
 9. Simple Blog Frontend** — Static React app, dummy posts
 10. Color Picker Tool — JS + HTML + CSS
