@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ColorGallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen bg-neutral-900 text-white bg-gradient-to-b from-pink-400 to-pink-600">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <header class="flex items-center justify-between">
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">ColorGallery</h1>
+
+      <div class="relative w-64 max-w-full">
+        <input
+          type="text"
+          placeholder="Search"
+          class="w-full rounded-full bg-neutral-800/80 border border-neutral-700/60 focus:border-neutral-500 focus:ring-0 px-4 py-2 placeholder-neutral-400 text-sm"
+        />
+        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none">
+          <path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" stroke="currentColor" stroke-width="2"/>
+          <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </header>
+    <section class="relative">
+      <div id="main" class="relative overflow-hidden rounded-xl shadow-2xl">
+        <img
+          src="https://plus.unsplash.com/premium_photo-1661878091370-4ccb8763756a?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Mount Fuji panorama at sunrise"
+          class="w-full h-[42vh] sm:h-[50vh] object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none"></div>
+      </div>
+    </section>
+    <section>
+      <div id="other" class="flex gap-4 overflow-x-auto no-scrollbar py-2">
+        <button class="group relative shrink-0 w-40 sm:w-48 h-28 sm:h-32 overflow-hidden rounded-lg border border-neutral-700/60 hover:border-neutral-500 transition">
+          <img
+            src="https://images.unsplash.com/photo-1551685314-8167cf1cba72?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Traditional architecture"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform"
+          />
+        </button>
+
+        <button class="group relative shrink-0 w-40 sm:w-48 h-28 sm:h-32 overflow-hidden rounded-lg border border-neutral-700/60 hover:border-neutral-500 transition">
+          <img
+            src="https://images.unsplash.com/photo-1526344966-89049886b28d?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Cherry blossoms"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform"
+          />
+        </button>
+
+        <button class="group relative shrink-0 w-40 sm:w-48 h-28 sm:h-32 overflow-hidden rounded-lg border border-neutral-700/60 hover:border-neutral-500 transition">
+          <img
+            src="https://images.unsplash.com/photo-1553996530-a73ac9783179?q=80&w=936&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Cityscape evening"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform"
+          />
+        </button>
+
+        <button class="group relative shrink-0 w-40 sm:w-48 h-28 sm:h-32 overflow-hidden rounded-lg border border-neutral-700/60 hover:border-neutral-500 transition">
+          <img
+            src="https://plus.unsplash.com/premium_photo-1671807185041-f87439dfd82d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Lake reflections"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform"
+          />
+        </button>
+
+        <button class="group relative shrink-0 w-40 sm:w-48 h-28 sm:h-32 overflow-hidden rounded-lg border border-neutral-700/60 hover:border-neutral-500 transition">
+          <img
+            src="https://plus.unsplash.com/premium_photo-1677347335458-a9840a5c917c?q=80&w=899&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Mountain trail"
+            class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform"
+          />
+        </button>
+      </div>
+    </section>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>
