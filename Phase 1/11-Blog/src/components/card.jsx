@@ -67,7 +67,7 @@ const Card = () => {
       ref={scrollRef}
       className="h-screen w-screen flex flex-row gap-2 overflow-x-auto scroll-container"
     >
-      {Array.from({ length:1 }).map((_, i) => (
+      {Array.from({ length:3 }).map((_, i) => (
         <div
           key={i}
           className=" flex flex-col justify-start p-4 m-4 items-center h-3/5 w-1/4 bg-gray-300 rounded-3xl  shrink-0"
