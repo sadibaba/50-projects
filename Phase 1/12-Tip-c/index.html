@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-neutral-900 text-white min-h-screen flex items-center justify-center"
+  >
+    <div class="w-full max-w-sm px-5 py-6">
+      <div class="bg-neutral-800 rounded-2xl shadow-lg p-5 space-y-5">
+        <div class="text-center space-y-1">
+          <h1 class="text-lg font-semibold">Tip Calculator</h1>
+          <p class="text-neutral-400 text-sm">
+            Quickly split your bill with tip
+          </p>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-neutral-300">Bill total</span>
+            <div class="text-right">
+              <span class="text-neutral-400 text-sm mr-1">PKR</span>
+              <span id="billDisplay" class="text-xl font-semibold tracking-wide"
+                >0.00</span
+              >
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-neutral-700 rounded-xl p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300">Tip</span>
+                <div class="flex items-center gap-2">
+                  <button
+                    id="tipMinus"
+                    class="rounded-lg bg-neutral-600 hover:bg-neutral-500 px-2 py-1"
+                  >
+                    −
+                  </button>
+                  <span id="tipPercent" class="min-w-10 text-center font-medium"
+                    >10%</span
+                  >
+                  <button
+                    id="tipPlus"
+                    class="rounded-lg bg-neutral-600 hover:bg-neutral-500 px-2 py-1"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="bg-neutral-700 rounded-xl p-3">
+              <div class="flex items-center justify-between">
+                <span class="text-neutral-300">Split</span>
+                <div class="flex items-center gap-2">
+                  <button
+                    id="splitMinus"
+                    class="rounded-lg bg-neutral-600 hover:bg-neutral-500 px-2 py-1"
+                  >
+                    −
+                  </button>
+                  <span id="splitCount" class="min-w-8 text-center font-medium"
+                    >1</span
+                  >
+                  <button
+                    id="splitPlus"
+                    class="rounded-lg bg-neutral-600 hover:bg-neutral-500 px-2 py-1"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-between bg-neutral-700 rounded-xl p-3"
+          >
+            <span class="text-neutral-300">Split total</span>
+            <div class="text-right">
+              <span class="text-neutral-400 text-sm mr-1">PKR</span>
+              <span id="splitTotal" class="text-xl font-semibold tracking-wide"
+                >0.00</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 no-select">
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="7"
+          >
+            7
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="8"
+          >
+            8
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="9"
+          >
+            9
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="4"
+          >
+            4
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="5"
+          >
+            5
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="6"
+          >
+            6
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="1"
+          >
+            1
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="2"
+          >
+            2
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="3"
+          >
+            3
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="0"
+          >
+            0
+          </button>
+          <button
+            class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+            data-key="."
+          >
+            .
+          </button>
+          <button
+            id="keyBack"
+            class="rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium"
+          >
+            ⌫
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            id="clearAll"
+            class="rounded-xl bg-neutral-700 hover:bg-neutral-600 p-3 font-medium"
+          >
+            Clear
+          </button>
+          <button
+            id="confirm"
+            class="rounded-xl bg-emerald-600 hover:bg-emerald-500 p-3 font-semibold"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
