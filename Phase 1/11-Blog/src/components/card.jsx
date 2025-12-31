@@ -1,4 +1,5 @@
-import Lenis from "lenis";
+import { Link } from "react-router-dom";
+
 
 const Card = ({name,image,description}) => {
   return (
@@ -15,9 +16,12 @@ const Card = ({name,image,description}) => {
           <h1 className="text-2xl font-bold ">{name}</h1>
           <p className="text-sm break-all text-center">{description}</p>
         </div>
-        <button className="bg-[#9b7b63] h-8 w-24 rounded-2xl hover:bg-[#815c3f]">
+        <Link to={`/profile/${name}`}>
+        <button 
+         className="bg-[#9b7b63] h-8 w-24 rounded-2xl hover:bg-[#815c3f]">
           Read More
         </button>
+        </Link>
       </div>
     // </div>
   );
