@@ -1,9 +1,20 @@
-import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 
 const App = () => {
-  return (
-    <div className='bg-amber-800 text-red-500 '>hello</div>
-  )
-}
+  const token = localStorage.getItem("token");
 
-export default App
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default App;
