@@ -12,7 +12,7 @@ export default function TodoPanel() {
   };
 
   return (
-    <div className="flex-1 p-6  bg-[#d3e2e9] rounded-bl-2xl">
+    <div className="flex-1 p-6  bg-[#bad1db] rounded-4xl">
       <h2 className="text-xl font-bold mb-4 text-gray-800">Todo's</h2>
 
       {/* Input */}

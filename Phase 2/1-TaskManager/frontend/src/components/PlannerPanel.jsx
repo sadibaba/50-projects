@@ -24,7 +24,7 @@ export default function PlannerPanel() {
   });
 
   return (
-    <div className="flex-1 p-6">
+    <div className="flex-1  p-6">
       <h2 className="text-xl font-bold mb-4 text-gray-800">Planner</h2>
 
       <div className="flex items-center justify-between mb-4">

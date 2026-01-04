@@ -24,7 +24,7 @@ export default function Home() {
         </div>
 
         {/* Right Panel: Todo + Extras */}
-        <div className="w-1/2 p-6 space-y-6 border-l">
+        <div className="w-1/2 p-6 space-y-6 bg-[#ccdde7] ">
           <TodoPanel />
           <ProjectCard />
         </div>
