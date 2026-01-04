@@ -16,7 +16,6 @@ export default function Register() {
     e.preventDefault();
     const res = await api.post("/users/register", formData);
     localStorage.setItem("token", res.data.token);
-    alert("Registration successful!");
     navigate("/");
   };
   

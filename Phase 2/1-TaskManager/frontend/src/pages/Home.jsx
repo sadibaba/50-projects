@@ -3,17 +3,15 @@ import PlannerPanel from "../components/PlannerPanel";
 import TodoPanel from "../components/TodoPanel";
 import Clock from "../components/Clock";
 import ProjectCard from "../components/ProjectCard";
-import MusicPlayer from "../components/MusicPlayer";
-import UploadBar from "../components/UploadBar";
-import LogoutButton from "../components/LogoutButton";
+
 
 
 export default function Home() {
   return (
-    <div className="h-screen w-screen flex bg-gray-100">
+    <div className="h-screen w-full flex bg-[#d8e3e9]">
       {/* Sidebar */}
-       <div className="p-4">
-        <LogoutButton />
+       <div className="p-2">
+       
       </div>
 
       <Sidebar />
@@ -23,15 +21,13 @@ export default function Home() {
         {/* Left Panel: Planner */}
         <div className="w-1/2 p-6">
           <PlannerPanel />
+          <Clock />
         </div>
 
         {/* Right Panel: Todo + Extras */}
         <div className="w-1/2 p-6 space-y-6 border-l">
           <TodoPanel />
-          <Clock />
           <ProjectCard />
-          <MusicPlayer />
-          <UploadBar />
         </div>
       </div>
     </div>
