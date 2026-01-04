@@ -1,14 +1,13 @@
 import Sidebar from "../components/Sidebar";
 import PlannerPanel from "../components/PlannerPanel";
 import TodoPanel from "../components/TodoPanel";
-import Clock from "../components/Clock";
 import ProjectCard from "../components/ProjectCard";
 
 
 
 export default function Home() {
   return (
-    <div className="h-screen w-full flex bg-[#d8e3e9]">
+    <div className="h-full w-full flex bg-[#d8e3e9]">
       {/* Sidebar */}
        <div className="p-2">
        
@@ -21,7 +20,7 @@ export default function Home() {
         {/* Left Panel: Planner */}
         <div className="w-1/2 p-6">
           <PlannerPanel />
-          <Clock />
+          
         </div>
 
         {/* Right Panel: Todo + Extras */}
