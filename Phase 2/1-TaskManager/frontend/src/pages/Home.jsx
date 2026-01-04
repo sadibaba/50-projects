@@ -5,11 +5,17 @@ import Clock from "../components/Clock";
 import ProjectCard from "../components/ProjectCard";
 import MusicPlayer from "../components/MusicPlayer";
 import UploadBar from "../components/UploadBar";
+import LogoutButton from "../components/LogoutButton";
+
 
 export default function Home() {
   return (
     <div className="h-screen w-screen flex bg-gray-100">
       {/* Sidebar */}
+       <div className="p-4">
+        <LogoutButton />
+      </div>
+
       <Sidebar />
 
       {/* Main Content Area */}

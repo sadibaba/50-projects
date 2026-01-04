@@ -10,16 +10,13 @@ export default function Login() {
   
 const navigate = useNavigate();
 
-// after successful login/register
-localStorage.setItem("token", res.data.token);
-navigate("/");
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const res = await api.post("/users/login", formData);
     localStorage.setItem("token", res.data.token);
     alert("Login successful!");
+    navigate("/");
   };
 
   return <AuthForm type="login" onSubmit={handleLogin} formData={formData} setFormData={setFormData} />;

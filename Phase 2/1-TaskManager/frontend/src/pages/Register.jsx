@@ -19,13 +19,14 @@ export default function Register() {
     alert("Registration successful!");
     navigate("/");
   };
-
+  
   return (
     <AuthForm
-      type="register"
-      onSubmit={handleRegister}
-      formData={formData}
-      setFormData={setFormData}
+    type="register"
+    onSubmit={handleRegister}
+    formData={formData}
+    setFormData={setFormData}
     />
   );
+
 }
