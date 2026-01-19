@@ -17,8 +17,8 @@ Phase 2: Intermediate Projects (React + Backend + API)
 
 backend + API, CRUD operations
 
-13. Task Manager App — React frontend, Node/Express backend, database (MongoDB)
-14. Authentication System — Signup/Login/logout with JWT
+13. Task Manager App — React frontend, Node/Express backend, database (MongoDB) (some issue has ben for some reason this project has not accepting there own file idk why i try 1 week to fixed that but nothing worked we've have to fix that later inshallah for now we have to focus on other stuff other project in the end we will give it another try if not gone something we should made this again from scratch )
+14. Authentication System — SignUp/Login/logout with JWT
 15. Blog Platform — CRUD posts, React frontend, Express + Mongo backend
 16. Recipe App — Public recipe API ya apna backend + search feature
 17. Movie Browser — Use OMDB API ya TMDB API
