@@ -12,4 +12,14 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default api;
+// Example: Fetch todos using the api instance
+const fetchTodos = async () => {
+  try {
+    const res = await api.get("/todos"); // use api instead of axios
+    setTodos(res.data);
+  } catch (err) {
+    console.error("Error fetching todos:", err);
+  }
+};
+
+export { api, fetchTodos };
