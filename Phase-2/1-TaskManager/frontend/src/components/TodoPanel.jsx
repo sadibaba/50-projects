@@ -1,23 +1,31 @@
 import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-export default function TodoPanel() {
-  const [todos, setTodos] = useState(() => {
-    const saved = localStorage.getItem("todos");
-    return saved ? JSON.parse(saved) : [];
-  });
+export default function TodoPanel({ todos, setTodos, activeFilter }) {
+  // const [todos, setTodos] = useState(() => {
+  //   const saved = localStorage.getItem("todos");
+  //   return saved ? JSON.parse(saved) : [];
+  // });
   const [input, setInput] = useState("");
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  const addTodo = (e) => {
-    if (e.key === "Enter" && input.trim()) {
-      setTodos([...todos, { label: input.trim(), done: false, category: "unplanned" }]);
-      setInput("");
-    }
-  };
+ const addTodo = (e) => {
+  if (e.key === "Enter" && input.trim()) {
+    setTodos([
+      ...todos,
+      { label: input.trim(), done: false, category: "unplanned" },
+    ]);
+    setInput("");
+  }
+};
+
+  const filteredTodos =
+  activeFilter === "All"
+    ? todos
+    : todos.filter((t) => t.category === activeFilter.toLowerCase());
 
   const toggleDone = (index) => {
     const updated = [...todos];
@@ -58,6 +66,7 @@ export default function TodoPanel() {
         <TodoList
           title="Unplanned"
           droppableId="unplanned"
+          todos={filteredTodos.filter((t) => t.category === "unplanned")}
           todos={todos.filter((t) => t.category === "unplanned")}
           toggleDone={toggleDone}
           deleteTodo={deleteTodo}
@@ -167,3 +176,4 @@ function Summary({ todos }) {
     </div>
   );
 }
+

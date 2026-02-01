@@ -1,18 +1,21 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import 'remixicon/fonts/remixicon.css';
 import Clock from "../components/Clock";
 import Calendar from "./Calendar";
 
-export default function PlannerPanel() {
-  const [time, setTime] = useState(new Date());
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+export default function PlannerPanel({ todos, activeFilter, setActiveFilter }) {
+  const unplannedCount = todos.filter((t) => t.category === "unplanned").length;
+  const plannedCount = todos.filter((t) => t.category === "scheduled").length;
+  const allCount = todos.length;
 
+  const filters = [
+    { label: "Unplanned", icon: "ri-download-2-line", count: unplannedCount },
+    { label: "Planned", icon: "ri-checkbox-circle-line", count: plannedCount },
+    { label: "All", icon: "ri-stack-line", count: allCount },
+  ];
+
+  const time = new Date();
   const hours = time.getHours();
   const digitalHours = hours % 12 || 12;
   const ampm = hours >= 12 ? "PM" : "AM";
@@ -24,20 +27,22 @@ export default function PlannerPanel() {
   });
 
   return (
-    <div className="flex-1  p-6">
+    <div className="flex-1 p-6">
       <h2 className="text-xl font-bold mb-4 text-gray-800">Planner</h2>
 
       <div className="flex items-center justify-between mb-4">
         {/* Filters */}
-        <div className="flex flex-col space-y-4 space-x-4">
-          <Filter
-            label="Unplanned"
-            count={2}
-            icon="ri-download-2-line"
-            active={true}
-          />
-          <Filter label="Planned" icon="ri-checkbox-circle-line" active={false}/>
-          <Filter label="All" icon="ri-stack-line" active={false} />
+        <div className="flex flex-col space-y-4">
+          {filters.map((f) => (
+            <Filter
+              key={f.label}
+              label={f.label}
+              icon={f.icon}
+              count={f.count}
+              active={activeFilter === f.label}
+              onClick={() => setActiveFilter(f.label)}
+            />
+          ))}
         </div>
 
         {/* Dynamic Time */}
@@ -45,17 +50,19 @@ export default function PlannerPanel() {
           🕓 {formattedTime} | {formattedDate}
         </div>
       </div>
- <div className="my-6">
-      <Clock />
-    </div>
+
+      <div className="my-6">
+        <Clock />
+      </div>
       <Calendar />
     </div>
   );
 }
 
-function Filter({ label, count, icon, active }) {
+function Filter({ label, count, icon, active, onClick }) {
   return (
     <button
+      onClick={onClick}
       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition ${
         active
           ? "bg-[#d8e3e9] text-gray-800 shadow-inner"
