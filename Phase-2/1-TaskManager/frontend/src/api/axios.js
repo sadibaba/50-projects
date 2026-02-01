@@ -22,4 +22,5 @@ const fetchTodos = async () => {
   }
 };
 
-export { api, fetchTodos };
+export default api;
+export { fetchTodos }
