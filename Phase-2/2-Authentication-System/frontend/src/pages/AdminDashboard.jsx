@@ -70,7 +70,7 @@ const AdminDashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
+        <div className="bg-linear-to-br from-blue-500 to-indigo-600 text-white rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100">Total Users</p>
@@ -84,7 +84,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
+        <div className="bg-linear-to-br from-emerald-500 to-teal-600 text-white rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-emerald-100">Admin Users</p>
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-2xl p-6 shadow-lg">
+        <div className="bg-linear-to-br from-purple-500 to-pink-600 text-white rounded-2xl p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100">Active Users</p>
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
               </div>
               <button
                 onClick={fetchUsers}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                className="bg-linear-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
               >
                 Refresh
               </button>
@@ -180,7 +180,7 @@ const AdminDashboard = () => {
                 <tr key={user._id} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="shrink-0 h-10 w-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                         {user.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="ml-4">

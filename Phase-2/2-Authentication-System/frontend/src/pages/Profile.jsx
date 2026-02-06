@@ -34,8 +34,8 @@ const Profile = () => {
         <div className="lg:col-span-2 space-y-8">
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0">
-                <div className="h-24 w-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
+              <div className="shrink-0">
+                <div className="h-24 w-24 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
               </div>
@@ -61,7 +61,7 @@ const Profile = () => {
 
           {/* Account Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+            <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
               <div className="text-blue-600 mb-2">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -71,7 +71,7 @@ const Profile = () => {
               <p className="text-2xl font-bold text-gray-800 mt-2">{stats.accountType}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
+            <div className="bg-linear-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100">
               <div className="text-emerald-600 mb-2">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -81,7 +81,7 @@ const Profile = () => {
               <p className="text-2xl font-bold text-gray-800 mt-2">Active</p>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+            <div className="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
               <div className="text-purple-600 mb-2">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -119,10 +119,10 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100">
+          <div className="bg-linear-to-br from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-100">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Need Help?</h3>
             <p className="text-sm text-gray-600 mb-4">Contact our support team for assistance</p>
-            <button className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-2 rounded-lg font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200">
+            <button className="w-full bg-linear-to-r from-orange-500 to-amber-500 text-white py-2 rounded-lg font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200">
               Contact Support
             </button>
           </div>
