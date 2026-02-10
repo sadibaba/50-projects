@@ -1,19 +1,51 @@
+// BlogCard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const BlogCard = ({ blog }) => {
+  // Safe extraction of author name
+  const getAuthorName = () => {
+    if (!blog.author) return 'Anonymous';
+    if (typeof blog.author === 'string') return blog.author;
+    if (blog.author.name) return blog.author.name;
+    if (blog.author.username) return blog.author.username;
+    return 'Author';
+  };
+
+  const getAuthorInitial = () => {
+    const name = getAuthorName();
+    return name.charAt(0).toUpperCase();
+  };
+
+  const authorName = getAuthorName();
+  const authorInitial = getAuthorInitial();
+
+  // Safely handle other properties
+  const category = blog.category || 'Uncategorized';
+  const title = blog.title || 'Untitled Post';
+  const excerpt = blog.excerpt || 'No description available';
+  const image = blog.image || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
+  const date = blog.date || 'Unknown date';
+  const readTime = blog.readTime || '5 min read';
+  const likes = blog.likes || 0;
+  const comments = blog.comments || 0;
+  const blogId = blog.id || blog._id || '1';
+
   return (
     <div className="group bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-800 hover:border-purple-900/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-900/20">
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img 
-          src={blog.image} 
-          alt={blog.title}
+          src={image} 
+          alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.target.src = 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
+          }}
         />
         <div className="absolute top-4 left-4">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-purple-900/80 to-pink-900/80 text-purple-300 text-sm font-medium backdrop-blur-sm">
-            {blog.category}
+            {category}
           </span>
         </div>
         <div className="absolute bottom-4 right-4 flex items-center space-x-2">
@@ -31,12 +63,12 @@ const BlogCard = ({ blog }) => {
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
               <span className="text-white text-xs font-medium">
-                {blog.author?.charAt(0) || 'A'}
+                {authorInitial}
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">{blog.author}</p>
-              <p className="text-xs text-gray-500">{blog.date}</p>
+              <p className="text-sm font-medium text-white">{authorName}</p>
+              <p className="text-xs text-gray-500">{date}</p>
             </div>
           </div>
           
@@ -45,23 +77,23 @@ const BlogCard = ({ blog }) => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
               </svg>
-              <span>{blog.likes}</span>
+              <span>{likes}</span>
             </span>
             <span className="flex items-center space-x-1">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
               </svg>
-              <span>{blog.comments}</span>
+              <span>{comments}</span>
             </span>
           </div>
         </div>
 
-        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300">
-          {blog.title}
+        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400 transition-all duration-300 line-clamp-2">
+          {title}
         </h3>
         
         <p className="text-gray-300 mb-6 line-clamp-2">
-          {blog.excerpt}
+          {excerpt}
         </p>
 
         <div className="flex items-center justify-between">
@@ -69,11 +101,11 @@ const BlogCard = ({ blog }) => {
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            {blog.readTime}
+            {readTime}
           </span>
           
           <Link 
-            to={`/blog/${blog.id}`}
+            to={`/blog/${blogId}`}
             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-900/30 to-pink-900/30 hover:from-purple-900/50 hover:to-pink-900/50 text-purple-300 hover:text-white rounded-lg font-medium transition-all duration-300 group/btn"
           >
             Read Full Story
