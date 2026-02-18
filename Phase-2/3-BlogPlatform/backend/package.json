@@ -1,20 +1,53 @@
 {
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
   "name": "blog-backend",
   "version": "1.0.0",
   "type": "module",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prod": "NODE_ENV=production node server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json}\"",
+    "db:backup": "mongodump --uri $MONGODB_URI --out ./backups/$(date +%Y-%m-%d)",
+    "prepare": "husky install"
+  },
   "dependencies": {
+    "ajv": "^8.18.0",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.9.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
-    "express": "^5.2.1",
+    "express": "^4.22.1",
+    "express-async-errors": "^3.1.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.6",
     "morgan": "^1.10.1",
-    "nodemon": "^3.1.11"
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^8.0.1",
+    "nodemon": "^3.1.11",
+    "redis": "^5.11.0",
+    "sanitize-html": "^2.17.0",
+    "winston": "^3.19.0",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.1.1",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2"
   }
 }
