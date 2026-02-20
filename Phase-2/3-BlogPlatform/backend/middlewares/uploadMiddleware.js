@@ -1,6 +1,6 @@
 import multer from 'multer';
-import { storage } from '../config/cloudinary';
-import AppError from '../utils/AppError';
+import { storage } from '../config/cloudinary.js';
+import { AppError } from './errorMiddleware.js'; 
 
 const upload = multer({
     storage: storage,

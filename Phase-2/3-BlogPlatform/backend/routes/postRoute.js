@@ -1,16 +1,41 @@
 import express from 'express';
-import { protect, authorOnly } from '../middlewares/UserMiddleware.js';
-import { createPost, getPosts, getPostById, updatePost, deletePost } from '../controllers/postController.js';
+import { 
+    createPost, 
+    updatePost, 
+    deletePost,
+    getPosts,
+    getPost,
+    likePost,
+    unlikePost
+} from '../controllers/postController.js';
+import { protect } from '../middlewares/authMiddleware.js';
+import upload from '../middlewares/uploadMiddleware.js';
+import { postLimiter } from '../middlewares/rateLimiter.js';
 
 const router = express.Router();
 
-router.route('/')
-  .get(getPosts)
-  .post(protect, authorOnly, createPost);
+// Public routes
+router.get('/', getPosts);
+router.get('/:id', getPost);
 
-router.route('/:id')
-  .get(getPostById)
-  .put(protect, authorOnly, updatePost)
-  .delete(protect, authorOnly, deletePost);
+// Protected routes
+router.post('/', 
+    protect, 
+    postLimiter,
+    upload.single('image'), 
+    createPost
+);
+
+router.put('/:id', 
+    protect, 
+    upload.single('image'), 
+    updatePost
+);
+
+router.delete('/:id', protect, deletePost);
+
+// Like/Unlike routes
+router.put('/:id/like', protect, likePost);
+router.put('/:id/unlike', protect, unlikePost);
 
 export default router;
