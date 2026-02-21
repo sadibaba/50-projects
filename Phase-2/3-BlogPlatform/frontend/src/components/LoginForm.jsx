@@ -1,19 +1,48 @@
 import React, { useState } from 'react';
 
-const LoginForm = ({ onSubmit, loading }) => {
+const LoginForm = ({ onSubmit, loading, error }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'reader'
   });
+  const [formErrors, setFormErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear field error when user types
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Email is invalid';
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    
+    return errors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
     onSubmit(formData, true);
   };
 
@@ -25,7 +54,7 @@ const LoginForm = ({ onSubmit, loading }) => {
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
             </svg>
@@ -35,12 +64,18 @@ const LoginForm = ({ onSubmit, loading }) => {
             name="email"
             type="email"
             required
-            className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-white placeholder-gray-500"
+            className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
+              formErrors.email ? 'border-red-500' : 'border-gray-700'
+            } rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-white placeholder-gray-500`}
             placeholder="you@example.com"
             value={formData.email}
             onChange={handleChange}
+            disabled={loading}
           />
         </div>
+        {formErrors.email && (
+          <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>
+        )}
       </div>
       
       <div>
@@ -49,7 +84,7 @@ const LoginForm = ({ onSubmit, loading }) => {
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
             </svg>
           </div>
@@ -58,44 +93,18 @@ const LoginForm = ({ onSubmit, loading }) => {
             name="password"
             type="password"
             required
-            className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-white placeholder-gray-500"
+            className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
+              formErrors.password ? 'border-red-500' : 'border-gray-700'
+            } rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent text-white placeholder-gray-500`}
             placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
+            disabled={loading}
           />
         </div>
-      </div>
-      
-      <div>
-        <label className="block text-gray-400 mb-2">
-          Login as
-        </label>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            className={`py-3 px-4 rounded-lg border ${formData.role === 'reader' ? 'bg-purple-900 border-purple-600 text-white' : 'bg-gray-800 border-gray-700 text-gray-400'}`}
-            onClick={() => setFormData(prev => ({ ...prev, role: 'reader' }))}
-          >
-            <div className="flex items-center justify-center">
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path>
-              </svg>
-              Reader
-            </div>
-          </button>
-          <button
-            type="button"
-            className={`py-3 px-4 rounded-lg border ${formData.role === 'author' ? 'bg-pink-900 border-pink-600 text-white' : 'bg-gray-800 border-gray-700 text-gray-400'}`}
-            onClick={() => setFormData(prev => ({ ...prev, role: 'author' }))}
-          >
-            <div className="flex items-center justify-center">
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
-              </svg>
-              Author
-            </div>
-          </button>
-        </div>
+        {formErrors.password && (
+          <p className="mt-1 text-sm text-red-400">{formErrors.password}</p>
+        )}
       </div>
       
       <div className="flex items-center justify-between">
@@ -105,20 +114,25 @@ const LoginForm = ({ onSubmit, loading }) => {
             name="remember-me"
             type="checkbox"
             className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-700 rounded bg-gray-800"
+            disabled={loading}
           />
           <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-400">
             Remember me
           </label>
         </div>
-        <a href="#" className="text-sm text-purple-400 hover:text-purple-300">
-          Forgot your password?
-        </a>
+        <button 
+          type="button" 
+          className="text-sm text-purple-400 hover:text-purple-300 disabled:opacity-50"
+          disabled={loading}
+        >
+          Forgot password?
+        </button>
       </div>
       
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center"
+        className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition duration-300 flex items-center justify-center disabled:opacity-50"
       >
         {loading ? (
           <>
@@ -132,6 +146,13 @@ const LoginForm = ({ onSubmit, loading }) => {
           'Login to your account'
         )}
       </button>
+
+      {/* Demo credentials for testing */}
+      <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+        <p className="text-gray-400 text-sm mb-2">Demo Credentials:</p>
+        <p className="text-gray-300 text-xs">Email: test@example.com</p>
+        <p className="text-gray-300 text-xs">Password: password123</p>
+      </div>
     </form>
   );
 };

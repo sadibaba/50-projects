@@ -1,62 +1,113 @@
-import React, { useState, useEffect } from 'react';
-import { postData } from '../api/api';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { loginUser, registerUser } from '../api/api';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 
 const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   const handleAuthSubmit = async (formData, isLoginForm) => {
-  setLoading(true);
-  setMessage({ text: '', type: '' });
-  
-  try {
-    const endpoint = isLoginForm ? 'login' : 'signup';
-    const response = await postData(endpoint, formData);
+    setLoading(true);
+    setError('');
+    setSuccess('');
     
-    if (response.success) {
-      setMessage({ 
-        text: isLoginForm ? 'Login successful! Redirecting...' : 'Account created successfully!', 
-        type: 'success' 
-      });
+    try {
+      let response;
       
-      // Store user data
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('userName', response.user?.name || formData.name);
-      localStorage.setItem('userEmail', response.user?.email || formData.email);
-      localStorage.setItem('userRole', response.user?.role || formData.role || 'reader');
-      localStorage.setItem('userJoinDate', new Date().toISOString().split('T')[0]);
+      if (isLoginForm) {
+        // Login API call
+        response = await loginUser({
+          email: formData.email,
+          password: formData.password
+        });
+        
+        // Handle different response structures
+        const userData = response.data || response;
+        
+        if (userData.token) {
+          setSuccess('Login successful! Redirecting...');
+          
+          // Store user data in localStorage
+          localStorage.setItem('token', userData.token);
+          localStorage.setItem('userId', userData._id || userData.id);
+          localStorage.setItem('userName', userData.name);
+          localStorage.setItem('userEmail', userData.email);
+          localStorage.setItem('userRole', userData.role || 'reader');
+          localStorage.setItem('userJoinDate', new Date().toISOString());
+          
+          // Redirect to home page
+          setTimeout(() => {
+            navigate('/home');
+          }, 1500);
+        } else {
+          setError(userData.message || 'Login failed. Please try again.');
+        }
+      } else {
+        // Signup API call
+        // Validate passwords match
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match!');
+          setLoading(false);
+          return;
+        }
+
+        // Remove confirmPassword before sending to API
+        const { confirmPassword, ...signupData } = formData;
+        
+        response = await registerUser(signupData);
+        
+        // Handle different response structures
+        const userData = response.data || response;
+        
+        if (userData.token || userData._id) {
+          setSuccess('Account created successfully! Redirecting to login...');
+          
+          // Store user data if automatically logged in
+          if (userData.token) {
+            localStorage.setItem('token', userData.token);
+            localStorage.setItem('userId', userData._id || userData.id);
+            localStorage.setItem('userName', userData.name);
+            localStorage.setItem('userEmail', userData.email);
+            localStorage.setItem('userRole', userData.role || formData.role);
+            localStorage.setItem('userJoinDate', new Date().toISOString());
+            
+            setTimeout(() => {
+              navigate('/home');
+            }, 1500);
+          } else {
+            // If not automatically logged in, switch to login form
+            setTimeout(() => {
+              setIsLogin(true);
+              setSuccess('');
+            }, 2000);
+          }
+        } else {
+          setError(userData.message || 'Signup failed. Please try again.');
+        }
+      }
+    } catch (err) {
+      console.error('Auth error:', err);
       
-      // Redirect to HOME instead of DASHBOARD
-      setTimeout(() => {
-        window.location.href = '/home';
-      }, 1500);
-    } else {
-      setMessage({ text: response.message || 'Authentication failed', type: 'error' });
+      // Handle different error formats
+      if (err.message) {
+        try {
+          const errorData = JSON.parse(err.message);
+          setError(errorData.message || 'Authentication failed. Please try again.');
+        } catch {
+          setError(err.message || 'Authentication failed. Please try again.');
+        }
+      } else {
+        setError('Network error. Please check your connection and try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Auth error:', error);
-    // Even if there's an error, mock response should work
-    setMessage({ 
-      text: 'Server not responding. Using demo mode.', 
-      type: 'warning' 
-    });
-    
-    // Auto-login with mock data after delay
-    setTimeout(() => {
-      localStorage.setItem('token', 'mock-token');
-      localStorage.setItem('userName', formData.name || 'Demo User');
-      localStorage.setItem('userEmail', formData.email || 'demo@example.com');
-      localStorage.setItem('userRole', formData.role || 'reader');
-      localStorage.setItem('userJoinDate', new Date().toISOString().split('T')[0]);
-      window.location.href = '/home'; // Redirect to home
-    }, 2000);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black p-4 relative overflow-hidden">
@@ -95,31 +146,11 @@ const LoginSignup = () => {
             </div>
           </div>
           
-          {/* Animated writing GIF simulation */}
-          <div className="hidden md:block relative h-48 rounded-xl overflow-hidden border border-gray-700">
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-              <div className="text-center">
-                <div className="inline-block mb-4">
-                  <div className="w-16 h-16 mx-auto flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-500 rounded-full">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <p className="text-gray-300 font-medium">Write. Share. Inspire.</p>
-                <p className="text-gray-500 text-sm">Join as an author to start your blogging journey</p>
-              </div>
-            </div>
-            
-            {/* Animated cursor effect */}
-            <div className="absolute top-1/2 left-1/4 w-0.5 h-8 bg-pink-500 animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/3 w-0.5 h-6 bg-blue-500 animate-pulse delay-300"></div>
-          </div>
-          
+          {/* Features list */}
           <div className="mt-8">
             <div className="flex items-center text-gray-400">
               <div className="w-8 h-8 mr-3 flex items-center justify-center rounded-full bg-gray-800">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                 </svg>
               </div>
@@ -127,7 +158,7 @@ const LoginSignup = () => {
             </div>
             <div className="flex items-center text-gray-400 mt-3">
               <div className="w-8 h-8 mr-3 flex items-center justify-center rounded-full bg-gray-800">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                 </svg>
               </div>
@@ -135,7 +166,7 @@ const LoginSignup = () => {
             </div>
             <div className="flex items-center text-gray-400 mt-3">
               <div className="w-8 h-8 mr-3 flex items-center justify-center rounded-full bg-gray-800">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                 </svg>
               </div>
@@ -149,28 +180,54 @@ const LoginSignup = () => {
           <div className="flex mb-8">
             <button 
               className={`flex-1 py-3 font-medium text-lg ${isLogin ? 'text-white border-b-2 border-purple-500' : 'text-gray-500'}`}
-              onClick={() => setIsLogin(true)}
+              onClick={() => {
+                setIsLogin(true);
+                setError('');
+                setSuccess('');
+              }}
             >
               Login
             </button>
             <button 
               className={`flex-1 py-3 font-medium text-lg ${!isLogin ? 'text-white border-b-2 border-pink-500' : 'text-gray-500'}`}
-              onClick={() => setIsLogin(false)}
+              onClick={() => {
+                setIsLogin(false);
+                setError('');
+                setSuccess('');
+              }}
             >
               Sign Up
             </button>
           </div>
           
-          {message.text && (
-            <div className={`mb-6 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
-              {message.text}
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-900/30 border border-red-800 rounded-lg">
+              <div className="flex items-center text-red-400">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>{error}</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Success Message */}
+          {success && (
+            <div className="mb-6 p-4 bg-green-900/30 border border-green-800 rounded-lg">
+              <div className="flex items-center text-green-400">
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>{success}</span>
+              </div>
             </div>
           )}
           
           {isLogin ? (
-            <LoginForm onSubmit={handleAuthSubmit} loading={loading} />
+            <LoginForm onSubmit={handleAuthSubmit} loading={loading} error={error} />
           ) : (
-            <SignupForm onSubmit={handleAuthSubmit} loading={loading} />
+            <SignupForm onSubmit={handleAuthSubmit} loading={loading} error={error} />
           )}
           
           <div className="mt-8 pt-6 border-t border-gray-800">
@@ -178,7 +235,11 @@ const LoginSignup = () => {
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button 
                 className="text-purple-400 hover:text-purple-300 font-medium"
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError('');
+                  setSuccess('');
+                }}
               >
                 {isLogin ? 'Sign Up' : 'Login'}
               </button>
