@@ -204,7 +204,7 @@ const EditProfileModal = ({ user, onClose, onSave }) => {
             <button
               type="submit"
               disabled={loading}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
+              className="px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (
                 <>
