@@ -8,23 +8,64 @@ import { cloudinary } from '../config/cloudinary.js';
 // @access  Private
 export const createPost = async (req, res, next) => {
     try {
-        const { title, content, category, tags } = req.body;
+        console.log('========== CREATE POST DEBUG ==========');
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file);
+        console.log('Request user:', req.user);
+        console.log('=======================================');
         
-        // Check if user exists
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return next(new AppError('User not found', 404));
+        const { title, content, category, tags, excerpt } = req.body;
+        
+        // Check if required fields are present
+        if (!title) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title is required'
+            });
+        }
+        
+        if (!content) {
+            return res.status(400).json({
+                success: false,
+                message: 'Content is required'
+            });
+        }
+        
+        if (!category) {
+            return res.status(400).json({
+                success: false,
+                message: 'Category is required'
+            });
         }
 
-        // Prepare post data
+        // Check if user exists
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Prepare post data - REMOVED slug
         const postData = {
             title,
             content,
+            excerpt: excerpt || content.substring(0, 150),
             author: req.user.id,
             authorName: user.name,
             category,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : []
+            tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim())) : []
         };
+
+        console.log('Post data to save:', postData);
 
         // If image is uploaded
         if (req.file) {
@@ -32,9 +73,11 @@ export const createPost = async (req, res, next) => {
                 url: req.file.path,
                 publicId: req.file.filename
             };
+            console.log('Image data:', postData.image);
         }
 
         const post = await Post.create(postData);
+        console.log('Post created successfully:', post._id);
 
         res.status(201).json({
             success: true,
@@ -43,10 +86,19 @@ export const createPost = async (req, res, next) => {
             }
         });
     } catch (error) {
-        next(error);
+        console.error('========== CREATE POST ERROR ==========');
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        console.error('=======================================');
+        
+        // Send proper error response
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Something went wrong!'
+        });
     }
 };
-
 // @desc    Update post with image
 // @route   PUT /api/posts/:id
 // @access  Private
@@ -224,3 +276,4 @@ export const unlikePost = async (req, res, next) => {
     next(error);
   }
 };
+

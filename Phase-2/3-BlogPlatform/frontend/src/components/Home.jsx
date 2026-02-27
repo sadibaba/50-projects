@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getPosts, createPost, getCategories } from '../api/api';
+import { getPosts, getCategories } from '../api/api';
 import BlogCard from './BlogCard';
 import CategoryFilter from './CategoryFilter';
 import CreateBlogModal from './CreateBlogModal';
@@ -18,15 +18,22 @@ const Home = () => {
 
   // Fetch user from localStorage
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
     const userName = localStorage.getItem('userName');
     const userEmail = localStorage.getItem('userEmail');
-    if (userRole || userName) {
+    
+    if (token && (userRole || userName)) {
       setUser({ 
         role: userRole || 'reader', 
         name: userName,
-        email: userEmail 
+        email: userEmail,
+        token: token
       });
+    } else {
+      // If no user data, redirect to login after a short delay
+      // But don't redirect immediately to allow viewing posts as guest
+      console.log('User not logged in - guest mode');
     }
   }, []);
 
@@ -49,11 +56,12 @@ const Home = () => {
     
     // Apply search filter
     if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
       results = results.filter(blog =>
-        blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        blog.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        blog.authorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        blog.category?.toLowerCase().includes(searchTerm.toLowerCase())
+        blog.title?.toLowerCase().includes(searchLower) ||
+        blog.content?.toLowerCase().includes(searchLower) ||
+        blog.authorName?.toLowerCase().includes(searchLower) ||
+        blog.category?.toLowerCase().includes(searchLower)
       );
     }
     
@@ -63,53 +71,89 @@ const Home = () => {
   const fetchCategories = async () => {
     try {
       const data = await getCategories();
-      const categoriesData = Array.isArray(data) ? data : [];
+      // Handle different response structures
+      const categoriesData = data.data || data || [];
       
-      // Add "All" category and count posts per category
-      const categoryCounts = {};
-      blogs.forEach(blog => {
-        const cat = blog.category;
-        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-      });
+      if (Array.isArray(categoriesData)) {
+        // Count posts per category
+        const categoryCounts = {};
+        blogs.forEach(blog => {
+          const cat = blog.category;
+          if (cat) {
+            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+          }
+        });
 
-      const categoryList = [
-        { name: 'All', value: 'all', count: blogs.length },
-        ...categoriesData.map(cat => ({
-          name: cat.name,
-          value: cat.name.toLowerCase(),
-          count: categoryCounts[cat.name] || 0
-        }))
-      ];
-      
-      setCategories(categoryList);
+        const categoryList = [
+          { name: 'All', value: 'all', count: blogs.length },
+          ...categoriesData.map(cat => ({
+            name: cat.name,
+            value: cat.name.toLowerCase(),
+            count: categoryCounts[cat.name] || 0
+          }))
+        ];
+        
+        setCategories(categoryList);
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      // Fallback categories
+      setCategories([
+        { name: 'All', value: 'all', count: blogs.length },
+        { name: 'Technology', value: 'technology', count: blogs.filter(b => b.category === 'Technology').length },
+        { name: 'Lifestyle', value: 'lifestyle', count: blogs.filter(b => b.category === 'Lifestyle').length },
+        { name: 'Travel', value: 'travel', count: blogs.filter(b => b.category === 'Travel').length },
+      ]);
     }
   };
 
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const data = await getPosts();
+      const response = await getPosts();
+      
+      // Handle different response structures
+      const postsData = response.data || response || [];
       
       // Process the data to ensure proper structure
-      const processedBlogs = data.map(blog => ({
-        ...blog,
-        id: blog._id,
-        author: blog.authorName || 'Anonymous',
-        date: new Date(blog.createdAt).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }),
-        readTime: `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 5} min read`,
-        likes: blog.likes?.length || 0,
-        comments: blog.comments || 0,
-        excerpt: blog.content?.substring(0, 150) + '...' || 'No description available',
-        image: blog.image?.url || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974'
-      }));
+      const processedBlogs = postsData.map(blog => {
+        // Handle author name safely
+        let authorName = 'Anonymous';
+        if (blog.authorName) {
+          authorName = blog.authorName;
+        } else if (blog.author) {
+          if (typeof blog.author === 'object') {
+            authorName = blog.author.name || blog.author.username || 'Author';
+          } else {
+            authorName = blog.author;
+          }
+        }
+
+        return {
+          id: blog._id || blog.id,
+          _id: blog._id || blog.id,
+          title: blog.title || 'Untitled Post',
+          content: blog.content || '',
+          excerpt: blog.excerpt || (blog.content ? blog.content.substring(0, 150) + '...' : 'No description available'),
+          authorName: authorName,
+          author: blog.author,
+          date: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }) : 'Unknown date',
+          category: blog.category || 'Uncategorized',
+          image: blog.image?.url || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974',
+          readTime: blog.readTime || `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 3} min read`,
+          likes: blog.likes?.length || 0,
+          comments: blog.comments?.length || 0,
+          views: blog.views || 0,
+          createdAt: blog.createdAt
+        };
+      });
       
       setBlogs(processedBlogs);
+      setFilteredBlogs(processedBlogs);
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
@@ -117,34 +161,30 @@ const Home = () => {
     }
   };
 
-  const handleCreateBlog = async (blogData) => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      // Create FormData for image upload
-      const formData = new FormData();
-      formData.append('title', blogData.title);
-      formData.append('content', blogData.content);
-      formData.append('category', blogData.category);
-      formData.append('excerpt', blogData.excerpt);
-      
-      if (blogData.image) {
-        formData.append('image', blogData.image); // This should be a File object
-      }
-
-      const response = await createPost(formData, token);
-      
-      if (response) {
-        // Refresh blogs list
-        await fetchBlogs();
-        setShowCreateModal(false);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error creating blog:', error);
-      return false;
+  const handleCreateBlog = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login if not logged in
+      navigate('/auth');
+      return;
     }
+    
+    // Check if user has author role
+    const userRole = localStorage.getItem('userRole');
+    if (userRole !== 'author' && userRole !== 'admin') {
+      alert('Only authors can create posts. Please register as an author.');
+      return;
+    }
+    
+    // Open create modal
+    setShowCreateModal(true);
+  };
+
+  const handleCreateSuccess = async () => {
+    // Refresh blogs after successful creation
+    await fetchBlogs();
+    await fetchCategories();
   };
 
   const handleSearch = (e) => {
@@ -153,7 +193,12 @@ const Home = () => {
 
   const handleLogout = () => {
     localStorage.clear();
+    setUser(null);
     navigate('/auth');
+  };
+
+  const handleReadMore = (blogId) => {
+    navigate(`/blog/${blogId}`);
   };
 
   return (
@@ -172,6 +217,17 @@ const Home = () => {
             </Link>
 
             <div className="flex items-center space-x-4">
+              {/* Create Post Button - Always visible but checks auth on click */}
+              <button
+                onClick={handleCreateBlog}
+                className="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Write</span>
+              </button>
+
               {/* Search Bar */}
               <div className="hidden md:block relative">
                 <input
@@ -189,20 +245,20 @@ const Home = () => {
                   <button className="flex items-center space-x-3 bg-gray-800/50 px-4 py-2 rounded-lg hover:bg-gray-800">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
                       <span className="text-white font-medium text-sm">
-                        {user.name?.charAt(0) || 'U'}
+                        {user.name?.charAt(0).toUpperCase() || 'U'}
                       </span>
                     </div>
-                    <span className="text-white text-sm">{user.name}</span>
+                    <span className="text-white text-sm hidden md:inline">{user.name}</span>
                   </button>
                   
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200">
+                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 z-50">
                     <div className="py-2">
                       <Link to="/profile" className="block px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">
                         My Profile
                       </Link>
-                      {user.role === 'author' && (
+                      {(user.role === 'author' || user.role === 'admin') && (
                         <button 
-                          onClick={() => setShowCreateModal(true)}
+                          onClick={handleCreateBlog}
                           className="block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
                         >
                           Write Blog
@@ -218,16 +274,58 @@ const Home = () => {
                   </div>
                 </div>
               ) : (
-                <Link to="/auth" className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg">
-                  Login
-                </Link>
+                <div className="flex items-center space-x-2">
+                  <Link 
+                    to="/auth" 
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/auth" 
+                    className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 hidden md:block"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
               )}
             </div>
+          </div>
+
+          {/* Mobile Search */}
+          <div className="mt-4 md:hidden">
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+              placeholder="Search blogs..."
+            />
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Welcome Banner for Guests */}
+        {!user && (
+          <div className="mb-8 p-6 bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-800/50">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">Welcome to BlogSphere!</h2>
+                <p className="text-gray-300">Join our community to start writing and engaging with amazing content.</p>
+              </div>
+              <div className="flex space-x-4 mt-4 md:mt-0">
+                <Link to="/auth" className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg">
+                  Login
+                </Link>
+                <Link to="/auth" className="px-6 py-2 bg-gray-800 text-gray-300 rounded-lg">
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Categories Filter */}
         {categories.length > 0 && (
           <CategoryFilter
@@ -260,12 +358,22 @@ const Home = () => {
           ) : filteredBlogs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredBlogs.map(blog => (
-                <BlogCard key={blog.id} blog={blog} />
+                <BlogCard 
+                  key={blog.id} 
+                  blog={blog} 
+                  onReadMore={() => handleReadMore(blog.id)}
+                />
               ))}
             </div>
           ) : (
             <div className="text-center py-16">
-              <p className="text-gray-400 mb-4">No stories found</p>
+              <div className="w-24 h-24 mx-auto mb-6 text-gray-700">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">No stories found</h3>
+              <p className="text-gray-400 mb-6">Try changing your search or filter criteria</p>
               <button 
                 onClick={() => {
                   setSelectedCategory('all');
@@ -278,14 +386,23 @@ const Home = () => {
             </div>
           )}
         </div>
+
+        {/* Floating Action Button for Mobile */}
+        <button
+          onClick={handleCreateBlog}
+          className="fixed bottom-6 right-6 md:hidden z-40 w-14 h-14 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full shadow-lg flex items-center justify-center hover:from-purple-700 hover:to-pink-700 transition-all duration-300"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </button>
       </main>
 
       {/* Create Blog Modal */}
       {showCreateModal && (
         <CreateBlogModal
           onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateBlog}
-          user={user}
+          onSuccess={handleCreateSuccess}
         />
       )}
     </div>

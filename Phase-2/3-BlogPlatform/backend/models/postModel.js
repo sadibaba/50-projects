@@ -11,6 +11,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Post content is required']
     },
+    excerpt: {
+        type: String,
+        default: ''
+    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -40,25 +44,13 @@ const postSchema = new mongoose.Schema({
     views: {
         type: Number,
         default: 0
-    },
-    slug: {
-        type: String,
-        unique: true
     }
+    // NO SLUG FIELD - completely removed
 }, {
     timestamps: true
 });
 
-// Create slug from title
-postSchema.pre('save', function(next) {
-    if (this.isModified('title')) {
-        this.slug = this.title
-            .toLowerCase()
-            .replace(/[^a-zA-Z0-9]/g, '-')
-            .replace(/-+/g, '-');
-    }
-    next();
-});
+// NO MIDDLEWARE - completely removed
 
 const Post = mongoose.model('Post', postSchema);
 export default Post;

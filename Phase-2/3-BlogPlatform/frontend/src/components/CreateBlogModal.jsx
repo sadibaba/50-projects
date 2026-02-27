@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { createPost } from '../api/api';
 
-const CreateBlogModal = ({ onClose, onSubmit, user }) => {
+const CreateBlogModal = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -10,37 +11,7 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
   });
   const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({ ...prev, image: file }));
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const success = await onSubmit(formData);
-      if (success) {
-        onClose();
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState('');
 
   const categories = [
     'Technology',
@@ -53,11 +24,128 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
     'Education'
   ];
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size should be less than 5MB');
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please upload an image file');
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, image: file }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      setError('Title is required');
+      return false;
+    }
+    if (!formData.content.trim()) {
+      setError('Content is required');
+      return false;
+    }
+    if (!formData.category) {
+      setError('Please select a category');
+      return false;
+    }
+    if (!formData.excerpt.trim()) {
+      setError('Excerpt is required');
+      return false;
+    }
+    return true;
+  };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+  setError('');
+
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('You must be logged in to create a post');
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 2000);
+      return;
+    }
+
+    // Create FormData for file upload
+    const postFormData = new FormData();
+    postFormData.append('title', formData.title);
+    postFormData.append('content', formData.content);
+    postFormData.append('category', formData.category);
+    postFormData.append('excerpt', formData.excerpt);
+    
+    if (formData.image) {
+      postFormData.append('image', formData.image);
+    }
+
+    console.log('Sending data to API...');
+    const response = await createPost(postFormData, token);
+    console.log('API Response:', response);
+    
+    // Check the response structure - your backend sends { post: {...} }
+    // But your code expects response.success or response.data
+    if (response && response.post) {
+      alert('Post created successfully!');
+      if (onSuccess) {
+        await onSuccess();
+      }
+      onClose();
+    } else if (response && response.data) {
+      alert('Post created successfully!');
+      if (onSuccess) {
+        await onSuccess();
+      }
+      onClose();
+    } else if (response && response.success) {
+      alert('Post created successfully!');
+      if (onSuccess) {
+        await onSuccess();
+      }
+      onClose();
+    } else {
+      console.error('Unexpected response format:', response);
+      setError('Failed to create post. Unexpected response format.');
+    }
+  } catch (err) {
+    console.error('Full error object:', err);
+    setError(err.message || 'Failed to create post. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-2xl border border-gray-800 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-gray-900 rounded-2xl border border-gray-800 w-full max-w-4xl my-8">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800 p-6">
+        <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-800 p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-white">Write Your Story</h2>
@@ -74,45 +162,66 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mx-6 mt-6 p-4 bg-red-900/30 border border-red-800 rounded-lg">
+            <p className="text-red-400">{error}</p>
+          </div>
+        )}
+
         {/* Form */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+        <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label className="block text-white font-medium mb-2">Story Title</label>
+              <label className="block text-white font-medium mb-2">
+                Story Title <span className="text-red-400">*</span>
+              </label>
               <input
                 name="title"
                 type="text"
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                 placeholder="Catchy title that grabs attention..."
                 value={formData.title}
                 onChange={handleChange}
+                maxLength="200"
               />
+              <p className="text-right text-sm text-gray-500 mt-1">
+                {formData.title.length}/200
+              </p>
             </div>
 
             {/* Excerpt */}
             <div>
-              <label className="block text-white font-medium mb-2">Short Description</label>
+              <label className="block text-white font-medium mb-2">
+                Short Description <span className="text-red-400">*</span>
+              </label>
               <textarea
                 name="excerpt"
                 rows="2"
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                 placeholder="Brief summary of your story..."
                 value={formData.excerpt}
                 onChange={handleChange}
+                maxLength="300"
               />
+              <p className="text-right text-sm text-gray-500 mt-1">
+                {formData.excerpt.length}/300
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Category */}
               <div>
-                <label className="block text-white font-medium mb-2">Category</label>
+                <label className="block text-white font-medium mb-2">
+                  Category <span className="text-red-400">*</span>
+                </label>
                 <select
                   name="category"
                   required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-600"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                   value={formData.category}
                   onChange={handleChange}
                 >
@@ -125,13 +234,16 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
 
               {/* Cover Image Upload */}
               <div>
-                <label className="block text-white font-medium mb-2">Cover Image</label>
+                <label className="block text-white font-medium mb-2">
+                  Cover Image
+                </label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-600 file:text-white hover:file:bg-purple-700"
                 />
+                <p className="text-sm text-gray-500 mt-1">Max size: 5MB (Optional)</p>
               </div>
             </div>
 
@@ -151,19 +263,21 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
 
             {/* Content */}
             <div>
-              <label className="block text-white font-medium mb-2">Your Story</label>
+              <label className="block text-white font-medium mb-2">
+                Your Story <span className="text-red-400">*</span>
+              </label>
               <textarea
                 name="content"
                 rows="12"
                 required
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600 font-mono"
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-600 focus:border-transparent font-mono"
                 placeholder="Start writing your amazing story here..."
                 value={formData.content}
                 onChange={handleChange}
               />
-              <div className="text-right mt-2 text-sm text-gray-500">
+              <p className="text-right mt-2 text-sm text-gray-500">
                 {formData.content.length} characters
-              </div>
+              </p>
             </div>
 
             {/* Actions */}
@@ -172,13 +286,14 @@ const CreateBlogModal = ({ onClose, onSubmit, user }) => {
                 type="button"
                 onClick={onClose}
                 className="px-6 py-3 text-gray-400 hover:text-white font-medium"
+                disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium disabled:opacity-50 flex items-center space-x-2"
+                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium disabled:opacity-50 flex items-center gap-2"
               >
                 {loading ? (
                   <>
