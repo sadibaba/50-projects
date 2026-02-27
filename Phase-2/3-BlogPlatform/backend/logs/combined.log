@@ -216,3 +216,11 @@
 {"level":"info","message":"::1 - - [21/Feb/2026:10:39:14 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\"","timestamp":"2026-02-21 15:39:14"}
 {"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-21 15:39:14"}
 {"level":"info","message":"::1 - - [21/Feb/2026:10:39:14 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\"","timestamp":"2026-02-21 15:39:14"}
+{"level":"info","message":"✅ Connected to MongoDB successfully","timestamp":"2026-02-26 17:12:42"}
+{"level":"info","message":"🚀 Server running on port 5000 in undefined mode","timestamp":"2026-02-26 17:12:42"}
+{"level":"info","message":"POST /api/users/login - ::1","timestamp":"2026-02-26 17:17:48"}
+{"level":"info","message":"::1 - - [26/Feb/2026:12:17:48 +0000] \"POST /api/users/login HTTP/1.1\" 400 33 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\"","timestamp":"2026-02-26 17:17:48"}
+{"level":"info","message":"POST /api/users/login - ::1","timestamp":"2026-02-26 17:17:57"}
+{"level":"info","message":"::1 - - [26/Feb/2026:12:17:57 +0000] \"POST /api/users/login HTTP/1.1\" 400 33 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\"","timestamp":"2026-02-26 17:17:57"}
+{"level":"info","message":"POST /api/users/login - ::1","timestamp":"2026-02-26 17:17:58"}
+{"level":"info","message":"::1 - - [26/Feb/2026:12:17:58 +0000] \"POST /api/users/login HTTP/1.1\" 400 33 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 Edg/145.0.0.0\"","timestamp":"2026-02-26 17:17:58"}

@@ -110,13 +110,13 @@ export const deleteData = async (endpoint) => {
 };
 
 // Auth endpoints
-export const loginUser = async (credentials) => {
-  return postData('users/login', credentials);
-};
+// export const loginUser = async (credentials) => {
+//   return postData('users/login', credentials);
+// };
 
-export const registerUser = async (userData) => {
-  return postData('users/signup', userData);
-};
+// export const registerUser = async (userData) => {
+//   return postData('users/signup', userData);
+// };
 
 export const getUserProfile = async () => {
   return getData('users/profile');
