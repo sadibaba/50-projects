@@ -563,3 +563,127 @@
 {"level":"info","message":"::1 - - [27/Feb/2026:10:28:17 +0000] \"POST /api/posts HTTP/1.1\" 500 119 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:28:17"}
 {"level":"info","message":"✅ Connected to MongoDB successfully","timestamp":"2026-02-27 15:32:22"}
 {"level":"info","message":"🚀 Server running on port 5000 in undefined mode","timestamp":"2026-02-27 15:32:22"}
+{"level":"info","message":"✅ Connected to MongoDB successfully","timestamp":"2026-02-27 15:32:40"}
+{"level":"info","message":"🚀 Server running on port 5000 in undefined mode","timestamp":"2026-02-27 15:32:40"}
+{"level":"info","message":"POST /api/posts - ::1","timestamp":"2026-02-27 15:32:49"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:32:54 +0000] \"POST /api/posts HTTP/1.1\" 201 494 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:32:54"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:51 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:51 +0000] \"GET /api/posts HTTP/1.1\" 200 545 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:51 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:51 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:51"}
+{"level":"info","message":"GET /api/posts/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"GET /api/comments/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:59 +0000] \"GET /api/posts/69a172d63e0bd044c71bf856 HTTP/1.1\" 200 533 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:59 +0000] \"GET /api/comments/69a172d63e0bd044c71bf856 HTTP/1.1\" 200 2 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"GET /api/posts/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"GET /api/comments/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:59 +0000] \"GET /api/comments/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:34:59 +0000] \"GET /api/posts/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:34:59"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:35:07 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:35:07 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:35:07"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:35:08 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:35:08"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:35:08 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:35:08"}
+{"level":"info","message":"POST /api/posts - ::1","timestamp":"2026-02-27 15:35:18"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:35:24 +0000] \"POST /api/posts HTTP/1.1\" 201 497 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:35:24"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:51 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:51 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:51 +0000] \"GET /api/posts HTTP/1.1\" 200 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:51 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:51"}
+{"level":"info","message":"GET /api/comments/69a1736c3e0bd044c71bf86c - ::1","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"GET /api/posts/69a1736c3e0bd044c71bf86c - ::1","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:58 +0000] \"GET /api/comments/69a1736c3e0bd044c71bf86c HTTP/1.1\" 200 2 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"GET /api/comments/69a1736c3e0bd044c71bf86c - ::1","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:58 +0000] \"GET /api/posts/69a1736c3e0bd044c71bf86c HTTP/1.1\" 200 536 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:58 +0000] \"GET /api/comments/69a1736c3e0bd044c71bf86c HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"GET /api/posts/69a1736c3e0bd044c71bf86c - ::1","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:38:58 +0000] \"GET /api/posts/69a1736c3e0bd044c71bf86c HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:38:58"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:03"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:39:03"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:03 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:03"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:04 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:04"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:39:04"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:04"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:04 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:04"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:04 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:04"}
+{"level":"info","message":"POST /api/posts - ::1","timestamp":"2026-02-27 15:39:24"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:28 +0000] \"POST /api/posts HTTP/1.1\" 201 495 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:28"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:30"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:30 +0000] \"GET /api/posts HTTP/1.1\" 200 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:30"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:39:30"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:30 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:30"}
+{"level":"info","message":"GET /api/posts/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"GET /api/comments/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:35 +0000] \"GET /api/posts/69a174603e0bd044c71bf882 HTTP/1.1\" 200 534 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:35 +0000] \"GET /api/comments/69a174603e0bd044c71bf882 HTTP/1.1\" 200 2 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"GET /api/posts/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"GET /api/comments/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:35 +0000] \"GET /api/comments/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:35 +0000] \"GET /api/posts/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:35"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:40"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:39:40"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:41 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:41 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:41 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:41 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:41"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:55"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:55 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:55"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:39:55"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:39:55 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:39:55"}
+{"level":"info","message":"GET /api/posts/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"GET /api/comments/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:01 +0000] \"GET /api/comments/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:01 +0000] \"GET /api/posts/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"GET /api/comments/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"GET /api/posts/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:01 +0000] \"GET /api/comments/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:01 +0000] \"GET /api/posts/69a172d63e0bd044c71bf856 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:01"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:40:05"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:05 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:05"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:40:05"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:05 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:05"}
+{"level":"info","message":"DELETE /api/posts/69a172d63e0bd044c71bf856 - ::1","timestamp":"2026-02-27 15:40:07"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:10 +0000] \"DELETE /api/posts/69a172d63e0bd044c71bf856 HTTP/1.1\" 200 54 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:10"}
+{"level":"info","message":"DELETE /api/posts/69a1736c3e0bd044c71bf86c - ::1","timestamp":"2026-02-27 15:40:13"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:40:14 +0000] \"DELETE /api/posts/69a1736c3e0bd044c71bf86c HTTP/1.1\" 200 54 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:40:14"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:41:48"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:48 +0000] \"GET /api/posts HTTP/1.1\" 200 546 \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:48"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:41:48"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:48 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:48"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:50 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:50 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:50 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:50 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:50"}
+{"level":"info","message":"GET /api/posts/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"GET /api/comments/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:53 +0000] \"GET /api/comments/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:53 +0000] \"GET /api/posts/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"GET /api/comments/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"GET /api/posts/69a174603e0bd044c71bf882 - ::1","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:53 +0000] \"GET /api/comments/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:41:53 +0000] \"GET /api/posts/69a174603e0bd044c71bf882 HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:41:53"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:42:31 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:42:31 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"GET /api/categories - ::1","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"GET /api/posts - ::1","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:42:31 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:42:31"}
+{"level":"info","message":"::1 - - [27/Feb/2026:10:42:31 +0000] \"GET /api/posts HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36\"","timestamp":"2026-02-27 15:42:31"}
