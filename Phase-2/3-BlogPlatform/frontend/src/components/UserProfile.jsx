@@ -1,10 +1,137 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getPosts, getUserProfile } from '../api/api';
-import UserDashboard from './UserDashboard';
-import PublicProfile from './PublicProfile';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { getPosts } from '../api/api';
 import EditProfileModal from './EditProfileModal';
 
+/* ─── Inline UserDashboard (replaces missing component) ─────────────── */
+const UserDashboard = ({ activeTab, blogs, loading, user, onCreatePost }) => {
+  const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-gray-800/50 rounded-xl p-6 animate-pulse">
+            <div className="h-40 bg-gray-700 rounded-lg mb-4" />
+            <div className="h-4 bg-gray-700 rounded w-1/3 mb-3" />
+            <div className="h-5 bg-gray-700 rounded mb-2" />
+            <div className="h-4 bg-gray-700 rounded w-2/3" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (activeTab === 'posts') {
+    return (
+      <div>
+        {blogs.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogs.map(blog => (
+              <div
+                key={blog.id}
+                className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-900/50 transition-all duration-300 cursor-pointer group"
+                onClick={() => navigate(`/blog/${blog.id}`)}
+              >
+                <div className="relative h-44 overflow-hidden">
+                  <img
+                    src={blog.image || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800'}
+                    alt={blog.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={e => { e.target.src = 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800'; }}
+                  />
+                  <span className="absolute top-3 left-3 px-2.5 py-1 bg-purple-900/80 text-purple-300 text-xs font-medium rounded-full backdrop-blur-sm">
+                    {blog.category}
+                  </span>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-white font-bold mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">{blog.title}</h3>
+                  <p className="text-gray-400 text-sm line-clamp-2 mb-4">{blog.excerpt}</p>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{blog.date}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        </svg>
+                        {blog.likes}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        {blog.comments}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 mx-auto mb-5 text-gray-700">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">No posts yet</h3>
+            <p className="text-gray-400 mb-6 text-sm">Start sharing your thoughts with the world.</p>
+            <button
+              onClick={onCreatePost}
+              className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all"
+            >
+              Write Your First Post
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (activeTab === 'account') {
+    return (
+      <div className="max-w-2xl space-y-6">
+        <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-800">
+          <h3 className="text-lg font-semibold text-white mb-4">Account Information</h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center py-3 border-b border-gray-700">
+              <span className="text-gray-400 text-sm">Name</span>
+              <span className="text-white font-medium text-sm">{user.name}</span>
+            </div>
+            <div className="flex justify-between items-center py-3 border-b border-gray-700">
+              <span className="text-gray-400 text-sm">Email</span>
+              <span className="text-white font-medium text-sm">{user.email}</span>
+            </div>
+            <div className="flex justify-between items-center py-3 border-b border-gray-700">
+              <span className="text-gray-400 text-sm">Role</span>
+              <span className="px-3 py-1 bg-purple-900/40 text-purple-300 rounded-full text-xs font-medium capitalize">{user.role || 'reader'}</span>
+            </div>
+            <div className="flex justify-between items-center py-3">
+              <span className="text-gray-400 text-sm">Member Since</span>
+              <span className="text-white text-sm">{new Date(user.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Liked / comments / saved tabs placeholder
+  return (
+    <div className="text-center py-16">
+      <div className="w-20 h-20 mx-auto mb-5 text-gray-700">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-white mb-2 capitalize">{activeTab}</h3>
+      <p className="text-gray-400 text-sm">This section will be available soon.</p>
+    </div>
+  );
+};
+
+/* ─── Main UserProfile Component ────────────────────────────────────── */
 const UserProfile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
@@ -15,98 +142,57 @@ const UserProfile = () => {
   const [activeTab, setActiveTab] = useState('posts');
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
-  useEffect(() => {
-    fetchUserData();
-  }, [username]);
+  useEffect(() => { fetchUserData(); }, [username]);
 
   const fetchUserData = async () => {
     setLoading(true);
     setError('');
-
     try {
-      // Get current logged in user from localStorage
       const currentUserId = localStorage.getItem('userId');
       const currentUserName = localStorage.getItem('userName');
       const currentUserEmail = localStorage.getItem('userEmail');
       const currentUserRole = localStorage.getItem('userRole');
 
-      // If viewing a specific user profile by username
+      const buildCurrentUser = () => ({
+        _id: currentUserId,
+        name: currentUserName,
+        email: currentUserEmail,
+        role: currentUserRole || 'reader',
+        joinDate: localStorage.getItem('userJoinDate') || new Date().toISOString(),
+        bio: localStorage.getItem('userBio') || 'Passionate writer and reader. Exploring the world one story at a time.',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || 'User')}&background=8b5cf6&color=fff&size=200`,
+        stats: { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 }
+      });
+
       if (username) {
-        // Check if viewing own profile
         if (username.toLowerCase() === currentUserName?.toLowerCase()) {
-          // This is current user's profile
           setIsCurrentUser(true);
-          setUser({
-            _id: currentUserId,
-            name: currentUserName,
-            email: currentUserEmail,
-            role: currentUserRole,
-            joinDate: localStorage.getItem('userJoinDate') || new Date().toISOString(),
-            bio: localStorage.getItem('userBio') || 'Passionate writer and reader. Exploring the world one story at a time.',
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || 'User')}&background=8b5cf6&color=fff&size=200`,
-            stats: {
-              posts: 0,
-              likes: 0,
-              comments: 0,
-              followers: 0,
-              following: 0
-            }
-          });
-          await fetchUserBlogs(currentUserName);
+          const u = buildCurrentUser();
+          setUser(u);
+          await fetchUserBlogs(currentUserName, true);
         } else {
-          // This is someone else's profile - fetch from API
-          try {
-            // You'll need to create an API endpoint to get user by username
-            // For now, we'll use mock data but with real structure
-            setIsCurrentUser(false);
-            const mockUser = {
-              _id: `user-${Date.now()}`,
-              name: username.charAt(0).toUpperCase() + username.slice(1),
-              email: `${username}@example.com`,
-              role: Math.random() > 0.5 ? 'author' : 'reader',
-              joinDate: '2023-08-15T00:00:00.000Z',
-              bio: 'Passionate writer and reader. Exploring the world one story at a time.',
-              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=8b5cf6&color=fff&size=200`,
-              stats: {
-                posts: Math.floor(Math.random() * 20),
-                likes: Math.floor(Math.random() * 500),
-                comments: Math.floor(Math.random() * 100),
-                followers: Math.floor(Math.random() * 300),
-                following: Math.floor(Math.random() * 150)
-              }
-            };
-            setUser(mockUser);
-            await fetchUserBlogs(username);
-          } catch (err) {
-            setError('User not found');
-          }
+          setIsCurrentUser(false);
+          const mockUser = {
+            _id: `user-${username}`,
+            name: username.charAt(0).toUpperCase() + username.slice(1),
+            email: `${username}@example.com`,
+            role: 'author',
+            joinDate: '2023-08-15T00:00:00.000Z',
+            bio: 'Passionate writer and reader. Exploring the world one story at a time.',
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=8b5cf6&color=fff&size=200`,
+            stats: { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 }
+          };
+          setUser(mockUser);
+          await fetchUserBlogs(username, false);
         }
       } else {
-        // No username in URL - show current user's profile
-        if (!currentUserId) {
-          navigate('/auth');
-          return;
-        }
-
+        if (!currentUserId) { navigate('/auth'); return; }
         setIsCurrentUser(true);
-        setUser({
-          _id: currentUserId,
-          name: currentUserName,
-          email: currentUserEmail,
-          role: currentUserRole,
-          joinDate: localStorage.getItem('userJoinDate') || new Date().toISOString(),
-          bio: localStorage.getItem('userBio') || 'Passionate writer and reader. Exploring the world one story at a time.',
-          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || 'User')}&background=8b5cf6&color=fff&size=200`,
-          stats: {
-            posts: 0,
-            likes: 0,
-            comments: 0,
-            followers: 0,
-            following: 0
-          }
-        });
-        await fetchUserBlogs(currentUserName);
+        const u = buildCurrentUser();
+        setUser(u);
+        await fetchUserBlogs(currentUserName, true);
       }
     } catch (err) {
       setError(err.message || 'Failed to load profile');
@@ -115,34 +201,26 @@ const UserProfile = () => {
     }
   };
 
-  const fetchUserBlogs = async (authorName) => {
+  const fetchUserBlogs = async (authorName, updateStats = false) => {
     try {
       const data = await getPosts();
-      
-      // Handle different response structures
-      const postsArray = data.data || data || [];
-      
-      // Filter blogs by author name (case insensitive)
-      const userBlogs = postsArray.filter(blog => 
+      const postsArray = Array.isArray(data) ? data : (data?.data || data || []);
+
+      const userBlogs = postsArray.filter(blog =>
         blog.authorName?.toLowerCase() === authorName?.toLowerCase() ||
         blog.author?.name?.toLowerCase() === authorName?.toLowerCase() ||
         blog.author?.toLowerCase() === authorName?.toLowerCase()
       );
 
-      // Process blogs with proper formatting
       const processedBlogs = userBlogs.map(blog => ({
         id: blog._id || blog.id,
         title: blog.title || 'Untitled Post',
         content: blog.content || '',
-        excerpt: blog.excerpt || (blog.content?.substring(0, 150) + '...') || 'No description available',
+        excerpt: blog.excerpt || (blog.content?.substring(0, 150) + '...') || '',
         author: blog.authorName || blog.author?.name || blog.author || 'Anonymous',
-        date: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }) : 'Unknown date',
+        date: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date',
         category: blog.category || 'Uncategorized',
-        image: blog.image?.url || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974',
+        image: blog.image?.url || null,
         readTime: blog.readTime || `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 5} min read`,
         likes: blog.likes?.length || 0,
         comments: blog.comments?.length || 0,
@@ -152,84 +230,58 @@ const UserProfile = () => {
 
       setBlogs(processedBlogs);
 
-      // Update user stats with real data
-      if (user) {
-        const totalLikes = processedBlogs.reduce((sum, blog) => sum + blog.likes, 0);
-        const totalComments = processedBlogs.reduce((sum, blog) => sum + blog.comments, 0);
-        
-        setUser(prev => ({
+      if (updateStats) {
+        const totalLikes = processedBlogs.reduce((s, b) => s + b.likes, 0);
+        const totalComments = processedBlogs.reduce((s, b) => s + b.comments, 0);
+        setUser(prev => prev ? ({
           ...prev,
-          stats: {
-            ...prev.stats,
-            posts: processedBlogs.length,
-            likes: totalLikes,
-            comments: totalComments
-          }
-        }));
+          stats: { ...prev.stats, posts: processedBlogs.length, likes: totalLikes, comments: totalComments }
+        }) : prev);
       }
     } catch (err) {
       console.error('Error fetching user blogs:', err);
     }
   };
 
-  const handleEditProfile = () => {
-    setShowEditModal(true);
+  const handleSaveProfile = (updatedData) => {
+    if (updatedData.name) localStorage.setItem('userName', updatedData.name);
+    if (updatedData.email) localStorage.setItem('userEmail', updatedData.email);
+    if (updatedData.bio !== undefined) localStorage.setItem('userBio', updatedData.bio);
+    setUser(prev => ({
+      ...prev,
+      name: updatedData.name || prev.name,
+      email: updatedData.email || prev.email,
+      bio: updatedData.bio !== undefined ? updatedData.bio : prev.bio,
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedData.name || prev.name)}&background=8b5cf6&color=fff&size=200`
+    }));
+    setShowEditModal(false);
   };
 
-  const handleSaveProfile = async (updatedData) => {
-    try {
-      // Update localStorage
-      if (updatedData.name) {
-        localStorage.setItem('userName', updatedData.name);
-      }
-      if (updatedData.email) {
-        localStorage.setItem('userEmail', updatedData.email);
-      }
-      if (updatedData.bio) {
-        localStorage.setItem('userBio', updatedData.bio);
-      }
-
-      // Update user state
-      setUser(prev => ({
-        ...prev,
-        name: updatedData.name || prev.name,
-        email: updatedData.email || prev.email,
-        bio: updatedData.bio || prev.bio,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedData.name || prev.name)}&background=8b5cf6&color=fff&size=200`
-      }));
-
-      setShowEditModal(false);
-    } catch (err) {
-      console.error('Error updating profile:', err);
-    }
-  };
-
+  /* Loading */
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto mb-4" />
           <p className="text-gray-400">Loading profile...</p>
         </div>
       </div>
     );
   }
 
+  /* Error */
   if (error || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-6 text-gray-700">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <div className="w-20 h-20 mx-auto mb-5 text-gray-700">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <h3 className="text-xl font-semibold text-white mb-2">User not found</h3>
-          <p className="text-gray-400 mb-6">{error || 'The user you\'re looking for doesn\'t exist.'}</p>
-          <button 
-            onClick={() => navigate('/home')}
-            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium"
-          >
+          <p className="text-gray-400 mb-6 text-sm">{error || "The user you're looking for doesn't exist."}</p>
+          <button onClick={() => navigate('/home')} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium text-sm">
             Back to Home
           </button>
         </div>
@@ -237,71 +289,80 @@ const UserProfile = () => {
     );
   }
 
+  const tabs = isCurrentUser
+    ? ['posts', 'likes', 'comments', 'saved', 'account']
+    : ['posts'];
+
+  const tabColors = { posts: 'border-purple-500', likes: 'border-pink-500', comments: 'border-blue-500', saved: 'border-green-500', account: 'border-yellow-500' };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      {/* Profile Header */}
+      {/* Back + Nav */}
+      <div className="container mx-auto px-4 pt-4">
+        <button onClick={() => navigate('/home')} className="inline-flex items-center text-purple-400 hover:text-purple-300 text-sm group mb-4">
+          <svg className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Home
+        </button>
+      </div>
+
+      {/* Cover */}
       <div className="relative">
-        {/* Cover Photo */}
-        <div className="h-64 bg-gradient-to-r from-purple-900/30 via-pink-900/30 to-indigo-900/30">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-900 to-transparent"></div>
+        <div className="h-48 sm:h-64 bg-gradient-to-r from-purple-900/40 via-pink-900/30 to-indigo-900/40">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900" />
         </div>
 
         {/* Profile Info */}
-        <div className="container mx-auto px-4 relative -mt-32">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              {/* Avatar */}
-              <div className="relative">
-                <div className="w-40 h-40 rounded-full border-4 border-gray-900 overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600">
-                  <img 
-                    src={user.avatar} 
+        <div className="container mx-auto px-4 relative -mt-24 sm:-mt-28">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-6">
+            {/* Avatar + Info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+              <div className="relative flex-shrink-0">
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-gray-900 overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600">
+                  <img
+                    src={user.avatar}
                     alt={user.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=8b5cf6&color=fff&size=200`;
-                    }}
+                    onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=8b5cf6&color=fff&size=200`; }}
                   />
                 </div>
                 {isCurrentUser && (
-                  <button 
-                    onClick={handleEditProfile}
-                    className="absolute bottom-3 right-3 p-2 bg-gray-900 rounded-full hover:bg-gray-800 transition-colors"
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="absolute bottom-1 right-1 p-1.5 bg-gray-900 rounded-full hover:bg-gray-800 border border-gray-700"
+                    title="Edit profile"
                   >
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
                     </svg>
                   </button>
                 )}
               </div>
 
-              {/* User Info */}
-              <div className="text-white">
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold">{user.name}</h1>
+              <div className="text-white pb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
                   {user.role === 'author' && (
-                    <span className="px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-sm font-medium">
-                      ✍️ Author
-                    </span>
+                    <span className="px-2.5 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-xs font-medium">✍️ Author</span>
                   )}
                   {user.role === 'admin' && (
-                    <span className="px-3 py-1 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-sm font-medium">
-                      👑 Admin
-                    </span>
+                    <span className="px-2.5 py-0.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xs font-medium">👑 Admin</span>
                   )}
                 </div>
-                <p className="text-gray-300 mb-4 max-w-2xl">{user.bio}</p>
-                <div className="flex flex-wrap gap-4 text-gray-400 text-sm">
+                <p className="text-gray-300 text-sm mb-3 max-w-xl">{user.bio}</p>
+                <div className="flex flex-wrap gap-3 text-gray-400 text-xs">
+                  {isCurrentUser && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      {user.email}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    {user.email}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Joined {new Date(user.joinDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </span>
@@ -310,123 +371,129 @@ const UserProfile = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-2 self-start sm:self-end">
               {isCurrentUser ? (
                 <>
                   <button
-                    onClick={handleEditProfile}
-                    className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    onClick={() => setShowEditModal(true)}
+                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1.5"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Edit Profile
                   </button>
-                  <button 
+                  <button
                     onClick={() => navigate('/home')}
-                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-300"
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium text-sm transition-all"
                   >
                     Home
                   </button>
                 </>
               ) : (
                 <>
-                  <button className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all duration-300">
-                    Follow
-                  </button>
-                  <button className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors">
-                    Message
-                  </button>
+                  <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium text-sm transition-all">Follow</button>
+                  <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors">Message</button>
                 </>
               )}
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
-              <div className="text-2xl font-bold text-white mb-1">{user.stats.posts}</div>
-              <div className="text-gray-400 text-sm">Posts</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
-              <div className="text-2xl font-bold text-white mb-1">{user.stats.likes}</div>
-              <div className="text-gray-400 text-sm">Likes</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
-              <div className="text-2xl font-bold text-white mb-1">{user.stats.comments}</div>
-              <div className="text-gray-400 text-sm">Comments</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
-              <div className="text-2xl font-bold text-white mb-1">{user.stats.followers}</div>
-              <div className="text-gray-400 text-sm">Followers</div>
-            </div>
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
-              <div className="text-2xl font-bold text-white mb-1">{user.stats.following}</div>
-              <div className="text-gray-400 text-sm">Following</div>
-            </div>
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
+            {[
+              { label: 'Posts', value: user.stats.posts },
+              { label: 'Likes', value: user.stats.likes },
+              { label: 'Comments', value: user.stats.comments },
+              { label: 'Followers', value: user.stats.followers },
+              { label: 'Following', value: user.stats.following },
+            ].map(stat => (
+              <div key={stat.label} className="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-800 hover:border-purple-900/50 transition-colors">
+                <div className="text-xl sm:text-2xl font-bold text-white mb-0.5">{stat.value}</div>
+                <div className="text-gray-400 text-xs">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      {/* Content */}
+      <div className="container mx-auto px-4 pb-10">
         {/* Tabs */}
-        <div className="flex border-b border-gray-800 mb-8 overflow-x-auto">
-          <button
-            className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === 'posts' ? 'text-white border-b-2 border-purple-500' : 'text-gray-500 hover:text-gray-300'}`}
-            onClick={() => setActiveTab('posts')}
-          >
-            Posts ({user.stats.posts})
-          </button>
-          {isCurrentUser && (
-            <>
-              <button
-                className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === 'likes' ? 'text-white border-b-2 border-pink-500' : 'text-gray-500 hover:text-gray-300'}`}
-                onClick={() => setActiveTab('likes')}
-              >
-                Liked Posts
-              </button>
-              <button
-                className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === 'comments' ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-300'}`}
-                onClick={() => setActiveTab('comments')}
-              >
-                Comments
-              </button>
-              <button
-                className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === 'saved' ? 'text-white border-b-2 border-green-500' : 'text-gray-500 hover:text-gray-300'}`}
-                onClick={() => setActiveTab('saved')}
-              >
-                Saved
-              </button>
-              <button
-                className={`px-6 py-3 font-medium whitespace-nowrap ${activeTab === 'account' ? 'text-white border-b-2 border-yellow-500' : 'text-gray-500 hover:text-gray-300'}`}
-                onClick={() => setActiveTab('account')}
-              >
-                Account
-              </button>
-            </>
-          )}
+        <div className="flex border-b border-gray-800 mb-8 overflow-x-auto scrollbar-hide gap-1">
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-3 font-medium whitespace-nowrap text-sm capitalize transition-all ${
+                activeTab === tab
+                  ? `text-white border-b-2 ${tabColors[tab]}`
+                  : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {tab === 'posts' ? `Posts (${user.stats.posts})` : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         {isCurrentUser ? (
-          <UserDashboard 
+          <UserDashboard
             activeTab={activeTab}
             blogs={blogs}
-            loading={loading}
+            loading={false}
             user={user}
-            onTabChange={setActiveTab}
+            onCreatePost={() => navigate('/home')}
           />
         ) : (
-          <PublicProfile 
-            activeTab={activeTab}
-            blogs={blogs}
-            loading={loading}
-            user={user}
-          />
+          // Public profile — only posts tab
+          activeTab === 'posts' ? (
+            <div>
+              <h2 className="text-xl font-bold text-white mb-6">{user.name}'s Posts</h2>
+              {blogs.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {blogs.map(blog => (
+                    <div
+                      key={blog.id}
+                      className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-900/50 transition-all cursor-pointer group"
+                      onClick={() => navigate(`/blog/${blog.id}`)}
+                    >
+                      <div className="relative h-44 overflow-hidden">
+                        <img
+                          src={blog.image || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800'}
+                          alt={blog.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          onError={e => { e.target.src = 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800'; }}
+                        />
+                        <span className="absolute top-3 left-3 px-2.5 py-1 bg-purple-900/80 text-purple-300 text-xs font-medium rounded-full">
+                          {blog.category}
+                        </span>
+                      </div>
+                      <div className="p-5">
+                        <h3 className="text-white font-bold mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">{blog.title}</h3>
+                        <p className="text-gray-400 text-sm line-clamp-2 mb-3">{blog.excerpt}</p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{blog.date}</span>
+                          <span>{blog.readTime}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <p className="text-gray-400">{user.name} hasn't published any posts yet.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-400">Only {user.name} can view this section.</p>
+            </div>
+          )
         )}
       </div>
 
-      {/* Edit Profile Modal */}
+      {/* Edit Modal */}
       {showEditModal && (
         <EditProfileModal
           user={user}

@@ -1,17 +1,17 @@
 import multer from 'multer';
 import { storage } from '../config/cloudinary.js';
-import { AppError } from './errorMiddleware.js'; 
+import { AppError } from '../middlewares/errorMiddleware.js';
 
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 5 * 1024 * 1024 // 5MB
     },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image')) {
+        if (file.mimetype.startsWith('image/')) {
             cb(null, true);
         } else {
-            cb(new AppError('Not an image! Please upload only images.', 400), false);
+            cb(new AppError('Not an image. Please upload only images.', 400), false);
         }
     }
 });

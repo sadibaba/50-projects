@@ -54,29 +54,26 @@ const postSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// MIDDLEWARE - This goes AFTER the schema definition, not inside it
-postSchema.pre('save', async function(next) {
-    if (!this.isModified('title') && this.slug) return next();
-    
-    try {
-        if (this.title) {
-            let slug = this.title
-                .toLowerCase()
-                .replace(/[^a-zA-Z0-9]/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '');
-            
-            // Make sure slug is unique
-            const existingPost = await this.constructor.findOne({ slug });
-            if (existingPost && existingPost._id.toString() !== this._id?.toString()) {
-                slug = `${slug}-${Date.now()}`;
-            }
-            
-            this.slug = slug;
+// Generate unique slug from title before saving
+// NOTE: async pre-hooks in Mongoose 6+ do NOT receive `next` as a parameter.
+// Throw an error to signal failure, or just return to signal success.
+postSchema.pre('save', async function () {
+    if (!this.isModified('title') && this.slug) return;
+
+    if (this.title) {
+        let slug = this.title
+            .toLowerCase()
+            .replace(/[^a-zA-Z0-9]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+        // Ensure slug is unique
+        const existingPost = await this.constructor.findOne({ slug });
+        if (existingPost && existingPost._id.toString() !== this._id?.toString()) {
+            slug = `${slug}-${Date.now()}`;
         }
-        next();
-    } catch (error) {
-        next(error);
+
+        this.slug = slug;
     }
 });
 

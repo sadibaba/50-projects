@@ -1,49 +1,41 @@
+import dotenv from 'dotenv';
+dotenv.config(); // MUST be first before any other imports that use env vars
+
 import app from './app.js';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import logger from './config/logger.js';
-import connectDB from "./database/db.js";
-
-connectDB();
-// Load environment variables
-dotenv.config();
-
-// Handle uncaught exceptions
-process.on('uncaughtException', err => {
-    logger.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-    logger.error(err.name, err.message);
-    process.exit(1);
-});
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+// Handle uncaught exceptions
+process.on('uncaughtException', err => {
+    console.error('UNCAUGHT EXCEPTION! Shutting down...');
+    console.error(err.name, err.message);
+    process.exit(1);
+});
+
+// Connect to MongoDB then start server
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        logger.info('✅ Connected to MongoDB successfully');
+        console.log('✅ Connected to MongoDB');
+
+        const server = app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+        });
+
+        // Handle unhandled promise rejections
+        process.on('unhandledRejection', err => {
+            console.error('UNHANDLED REJECTION! Shutting down...');
+            console.error(err.name, err.message);
+            server.close(() => process.exit(1));
+        });
+
+        // Graceful shutdown
+        process.on('SIGTERM', () => {
+            console.log('SIGTERM received. Shutting down gracefully...');
+            server.close(() => console.log('Process terminated'));
+        });
     })
     .catch(err => {
-        logger.error('❌ MongoDB connection error:', err);
+        console.error('❌ MongoDB connection failed:', err.message);
         process.exit(1);
     });
-
-const server = app.listen(PORT, () => {
-    logger.info(`🚀 Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-});
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', err => {
-    logger.error('UNHANDLED REJECTION! 💥 Shutting down...');
-    logger.error(err.name, err.message);
-    server.close(() => {
-        process.exit(1);
-    });
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    logger.info('👋 SIGTERM received. Shutting down gracefully');
-    server.close(() => {
-        logger.info('💤 Process terminated');
-    });
-});
