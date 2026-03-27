@@ -216,7 +216,6 @@ export const getPost = async (id) => {
   }
 };
 
-// THIS IS THE CORRECT FRONTEND FUNCTION - it calls the backend API
 
 export const createPost = async (data, token) => {
   try {
@@ -332,5 +331,26 @@ export const createCategory = async (categoryData) => {
   } catch (error) {
     console.error('Create category error:', error);
     throw new Error(error.message || 'Failed to create category. Please try again.');
+  }
+};
+// ─── User profile update (name, bio, avatar) ──────────────────────────────
+export const updateUserProfile = async (data, isFormData = false) => {
+  try {
+    return await putData('users/profile', data, isFormData);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    throw new Error(error.message || 'Failed to update profile. Please try again.');
+  }
+};
+
+// ─── Upload avatar only ───────────────────────────────────────────────────
+export const uploadAvatar = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return await putData('users/avatar', formData, true);
+  } catch (error) {
+    console.error('Avatar upload error:', error);
+    throw new Error(error.message || 'Failed to upload avatar. Please try again.');
   }
 };
