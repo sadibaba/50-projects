@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:5000/api";
+import { requestQueue } from '../utils/requestQueue';
 
 // Helper function to handle API responses with better error handling
 const handleResponse = async (response) => {
@@ -11,9 +12,13 @@ const handleResponse = async (response) => {
   }
   
   if (!response.ok) {
-    // Handle specific error cases
+    // Handle rate limiting specifically
+    if (response.status === 429) {
+      throw new Error('Too many requests. Please wait a few minutes before trying again.');
+    }
+    
+    // Handle other specific error cases
     if (response.status === 401) {
-      // Unauthorized - clear local storage and redirect
       localStorage.clear();
       window.location.href = '/auth';
       throw new Error('Your session has expired. Please login again.');
@@ -28,18 +33,15 @@ const handleResponse = async (response) => {
     }
     
     if (response.status === 500) {
-      // Log the full error for debugging
       console.error('Server 500 Error:', data);
       throw new Error(data.message || 'Server error. Please try again later.');
     }
     
-    // Throw the error message from server or a default message
     throw new Error(data.message || data.error || `Request failed with status ${response.status}`);
   }
   
   return data;
 };
-
 // Helper to get auth token
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -49,93 +51,96 @@ const getAuthHeaders = () => {
 // GET request with error handling
 export const getData = async (endpoint) => {
   try {
-    console.log(`GET Request to: ${API_URL}/${endpoint}`);
+    console.log(`Queueing GET request to: ${API_URL}/${endpoint}`);
     
-    const res = await fetch(`${API_URL}/${endpoint}`, {
-      headers: {
-        'Accept': 'application/json',
-        ...getAuthHeaders(),
-      },
+    const result = await requestQueue.add(async () => {
+      console.log(`Executing GET request to: ${API_URL}/${endpoint}`);
+      
+      const res = await fetch(`${API_URL}/${endpoint}`, {
+        headers: {
+          'Accept': 'application/json',
+          ...getAuthHeaders(),
+        },
+      });
+      
+      return await handleResponse(res);
     });
     
-    return await handleResponse(res);
+    return result;
   } catch (error) {
     console.error(`API GET Error (${endpoint}):`, error);
-    
-    // Enhance error with endpoint info
     error.message = `Failed to fetch ${endpoint}: ${error.message}`;
     throw error;
   }
 };
 
-// POST request with error handling
+// Update postData function
 export const postData = async (endpoint, data, isFormData = false) => {
   try {
-    console.log(`POST Request to: ${API_URL}/${endpoint}`);
-    console.log('Request data:', isFormData ? 'FormData (see network tab)' : data);
+    console.log(`Queueing POST request to: ${API_URL}/${endpoint}`);
     
-    const headers = {
-      'Accept': 'application/json',
-      ...getAuthHeaders(),
-    };
-    
-    if (!isFormData) {
-      headers['Content-Type'] = 'application/json';
-    }
+    const result = await requestQueue.add(async () => {
+      console.log(`Executing POST request to: ${API_URL}/${endpoint}`);
+      
+      const headers = {
+        'Accept': 'application/json',
+        ...getAuthHeaders(),
+      };
+      
+      if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+      }
 
-    const body = isFormData ? data : JSON.stringify(data);
+      const body = isFormData ? data : JSON.stringify(data);
 
-    const res = await fetch(`${API_URL}/${endpoint}`, {
-      method: "POST",
-      headers,
-      body,
+      const res = await fetch(`${API_URL}/${endpoint}`, {
+        method: "POST",
+        headers,
+        body,
+      });
+      
+      return await handleResponse(res);
     });
     
-    return await handleResponse(res);
+    return result;
   } catch (error) {
     console.error(`API POST Error (${endpoint}):`, error);
-    
-    // Check if it's a network error
-    if (error.message === 'Failed to fetch') {
-      error.message = 'Network error: Could not connect to server. Please check if the backend is running.';
-    }
-    
-    // Enhance error with endpoint info
     error.message = `Failed to post to ${endpoint}: ${error.message}`;
     throw error;
   }
 };
 
-// PUT request with error handling
+// Update putData function
 export const putData = async (endpoint, data, isFormData = false) => {
   try {
-    console.log(`PUT Request to: ${API_URL}/${endpoint}`);
+    console.log(`Queueing PUT request to: ${API_URL}/${endpoint}`);
     
-    const headers = {
-      'Accept': 'application/json',
-      ...getAuthHeaders(),
-    };
-    
-    if (!isFormData) {
-      headers['Content-Type'] = 'application/json';
-    }
+    const result = await requestQueue.add(async () => {
+      console.log(`Executing PUT request to: ${API_URL}/${endpoint}`);
+      
+      const headers = {
+        'Accept': 'application/json',
+        ...getAuthHeaders(),
+      };
+      
+      if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+      }
 
-    const body = isFormData ? data : JSON.stringify(data);
+      const body = isFormData ? data : JSON.stringify(data);
 
-    const res = await fetch(`${API_URL}/${endpoint}`, {
-      method: "PUT",
-      headers,
-      body,
+      const res = await fetch(`${API_URL}/${endpoint}`, {
+        method: "PUT",
+        headers,
+        body,
+      });
+      
+      return await handleResponse(res);
     });
     
-    return await handleResponse(res);
+    return result;
   } catch (error) {
     console.error(`API PUT Error (${endpoint}):`, error);
-    
-    if (error.message === 'Failed to fetch') {
-      error.message = 'Network error: Could not connect to server.';
-    }
-    
     error.message = `Failed to update ${endpoint}: ${error.message}`;
     throw error;
   }
@@ -196,10 +201,25 @@ export const getUserProfile = async () => {
 };
 
 // Post endpoints
-export const getPosts = async () => {
+export const getPosts = async (forceRefresh = false) => {
   try {
-    const response = await getData('posts');
-    return response.data || response;
+    // Use deduplication to prevent multiple identical requests
+    return await requestDeduplicator.makeRequest('getPosts', async () => {
+      // Return cached data if still valid and not forcing refresh
+      if (!forceRefresh && postsCache && (Date.now() - postsCacheTime) < CACHE_DURATION) {
+        console.log('Returning cached posts');
+        return postsCache;
+      }
+      
+      const response = await getData('posts');
+      const data = response.data || response;
+      
+      // Update cache
+      postsCache = data;
+      postsCacheTime = Date.now();
+      
+      return data;
+    });
   } catch (error) {
     console.error('Get posts error:', error);
     throw new Error('Failed to load posts. Please refresh the page.');
@@ -343,14 +363,93 @@ export const updateUserProfile = async (data, isFormData = false) => {
   }
 };
 
-// ─── Upload avatar only ───────────────────────────────────────────────────
-export const uploadAvatar = async (file) => {
+// Update the uploadAvatar function in api.js
+export const uploadAvatar = async (file, retryCount = 0) => {
   try {
-    const formData = new FormData();
-    formData.append('avatar', file);
-    return await putData('users/avatar', formData, true);
+    // If file is already FormData, use it directly
+    let formData;
+    if (file instanceof FormData) {
+      formData = file;
+    } else {
+      formData = new FormData();
+      formData.append('avatar', file);
+    }
+    
+    // Add a delay for retries
+    if (retryCount > 0) {
+      await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
+    }
+    
+    console.log('Uploading avatar with FormData, file size:', file.size || 'unknown');
+    
+    const response = await putData('users/avatar', formData, true);
+    
+    // Extract avatar URL from response
+    let avatarUrl = null;
+    if (response && response.avatar) {
+      avatarUrl = response.avatar;
+    } else if (response && response.user && response.user.avatar) {
+      avatarUrl = response.user.avatar;
+    } else if (response && response.data && response.data.avatar) {
+      avatarUrl = response.data.avatar;
+    }
+    
+    return { success: true, avatar: avatarUrl, data: response };
   } catch (error) {
     console.error('Avatar upload error:', error);
-    throw new Error(error.message || 'Failed to upload avatar. Please try again.');
+    
+    // Retry once if rate limited
+    if (error.message.includes('Too many requests') && retryCount < 1) {
+      console.log('Rate limited, retrying after delay...');
+      return await uploadAvatar(file, retryCount + 1);
+    }
+    
+    throw new Error(error.message || 'Failed to upload avatar. Please try again later.');
+  }
+};
+
+// Follow/Unfollow endpoints
+export const followUser = async (userId) => {
+  try {
+    return await postData(`users/${userId}/follow`, {});
+  } catch (error) {
+    console.error('Follow user error:', error);
+    throw new Error(error.message || 'Failed to follow user');
+  }
+};
+
+export const unfollowUser = async (userId) => {
+  try {
+    return await postData(`users/${userId}/unfollow`, {});
+  } catch (error) {
+    console.error('Unfollow user error:', error);
+    throw new Error(error.message || 'Failed to unfollow user');
+  }
+};
+
+export const getFollowers = async (userId) => {
+  try {
+    return await getData(`users/${userId}/followers`);
+  } catch (error) {
+    console.error('Get followers error:', error);
+    throw error;
+  }
+};
+
+export const getFollowing = async (userId) => {
+  try {
+    return await getData(`users/${userId}/following`);
+  } catch (error) {
+    console.error('Get following error:', error);
+    throw error;
+  }
+};
+
+export const checkFollowing = async (userId) => {
+  try {
+    return await getData(`users/${userId}/is-following`);
+  } catch (error) {
+    console.error('Check following error:', error);
+    return { following: false };
   }
 };

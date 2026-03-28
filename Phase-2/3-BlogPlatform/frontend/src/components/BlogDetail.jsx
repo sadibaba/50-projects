@@ -91,68 +91,59 @@ const BlogDetail = () => {
     }
   };
 
+  const refreshBlogData = async () => {
+  try {
+    const response = await getPost(id);
+    const blogData = response?.data || response;
+    if (blogData) {
+      const userId = localStorage.getItem('userId');
+      if (userId && blogData.likes) setLiked(blogData.likes.includes(userId));
+      
+      setBlog(prev => ({
+        ...prev,
+        likesCount: blogData.likes?.length || 0,
+        commentsCount: blogData.comments?.length || 0,
+        likes: blogData.likes,
+      }));
+    }
+  } catch (err) {
+    console.error("Error refreshing blog:", err);
+  }
+};
+
   const handleLike = async () => {
-    if (!user) {
-      navigate(`/auth?redirect=/blog/${id}`);
-      return;
+  if (!user) { navigate(`/auth?redirect=/blog/${id}`); return; }
+  setLikeLoading(true);
+  try {
+    if (liked) {
+      await unlikePost(id);
+    } else {
+      await likePost(id);
     }
-    setLikeLoading(true);
-    try {
-      if (liked) {
-        await unlikePost(id);
-        setBlog((prev) => ({
-          ...prev,
-          likes: prev.likes?.filter((l) => l !== user.id) || [],
-          likesCount: prev.likesCount - 1,
-        }));
-      } else {
-        await likePost(id);
-        setBlog((prev) => ({
-          ...prev,
-          likes: [...(prev.likes || []), user.id],
-          likesCount: prev.likesCount + 1,
-        }));
-      }
-      setLiked(!liked);
-    } catch (err) {
-      console.error("Error toggling like:", err);
-    } finally {
-      setLikeLoading(false);
-    }
-  };
+    await refreshBlogData(); // Refresh to get latest counts
+  } catch (err) {
+    console.error("Error toggling like:", err);
+  } finally {
+    setLikeLoading(false);
+  }
+};
 
   const handleAddComment = async () => {
-    if (!user) {
-      navigate(`/auth?redirect=/blog/${id}`);
-      return;
-    }
-    if (!newComment.trim()) return;
-    setCommentLoading(true);
-    try {
-      const response = await addComment({
-        postId: id,
-        content: newComment.trim(),
-      });
-      const newCommentObj = response?.data || response;
-      setComments((prev) => [
-        {
-          ...newCommentObj,
-          id: newCommentObj._id || newCommentObj.id || Date.now(),
-          authorName: user.name,
-          date: "Just now",
-          content: newComment.trim(),
-        },
-        ...prev,
-      ]);
-      setNewComment("");
-      setBlog((prev) => ({ ...prev, commentsCount: prev.commentsCount + 1 }));
-    } catch (err) {
-      console.error("Error adding comment:", err);
-      alert("Failed to add comment. Please try again.");
-    } finally {
-      setCommentLoading(false);
-    }
-  };
+  if (!user) { navigate(`/auth?redirect=/blog/${id}`); return; }
+  if (!newComment.trim()) return;
+  setCommentLoading(true);
+  try {
+    await addComment({ postId: id, content: newComment.trim() });
+    setNewComment("");
+    await refreshBlogData(); // Refresh to get latest comments
+    await fetchComments(); // Refresh comments list
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    alert('Failed to add comment. Please try again.');
+  } finally {
+    setCommentLoading(false);
+  }
+};
 
   if (loading) {
     return (

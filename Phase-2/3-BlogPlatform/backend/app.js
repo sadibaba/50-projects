@@ -4,6 +4,8 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Routes
 import userRoutes from './routes/UserRoute.js';
@@ -15,23 +17,44 @@ import categoryRoutes from './routes/categoryRoute.js';
 import { apiLimiter, authLimiter } from './middlewares/rateLimiter.js';
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 // ── SECURITY ──────────────────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resource sharing
+}));
 
+// Updated CORS configuration
 app.use(cors({
     origin: process.env.FRONTEND_URL
         ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
         : ['http://localhost:3000', 'http://localhost:5173'],
     credentials: true,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    exposedHeaders: ['Content-Disposition'], // Expose headers for file downloads
 }));
 
 // ── BODY PARSERS ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+
+// ── STATIC FILES ──────────────────────────────────────────────────────────────
+// Serve uploaded files with proper CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('Access-Control-Allow-Origin', '*');
+  }
+}));
 
 // ── PERFORMANCE ───────────────────────────────────────────────────────────────
 app.use(compression());
