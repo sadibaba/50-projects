@@ -14,7 +14,20 @@ const BlogCard = ({ blog, onReadMore }) => {
   const readTime = blog.readTime || `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 3} min read`;
   const likes = blog.likesCount || blog.likes?.length || 0;
   const comments = blog.commentsCount || blog.comments?.length || 0;
-  const image = blog.image?.url || 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
+  
+  // FIX: Handle image in multiple formats
+  const image = (() => {
+    if (!blog.image) return 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
+    
+    // If it's a string (URL)
+    if (typeof blog.image === 'string') return blog.image;
+    // If it has url property
+    if (blog.image.url) return blog.image.url;
+    // If it has data property (base64)
+    if (blog.image.data) return blog.image.data;
+    // Fallback
+    return 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
+  })();
 
   const handleReadMore = () => {
     if (onReadMore) {
@@ -48,6 +61,7 @@ const BlogCard = ({ blog, onReadMore }) => {
         </div>
       </div>
 
+      {/* Rest of the component remains the same */}
       {/* Content */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
