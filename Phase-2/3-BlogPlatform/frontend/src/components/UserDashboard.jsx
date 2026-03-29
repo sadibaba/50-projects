@@ -528,6 +528,7 @@ const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(use
     );
   }
 
+  
   // ════════════════════════════════════════════════════════════════════════════
   // LIKES TAB — real data from post.likes array
   // ════════════════════════════════════════════════════════════════════════════

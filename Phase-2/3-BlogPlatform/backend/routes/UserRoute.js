@@ -71,5 +71,6 @@ router.post('/:userId/follow', protect, followUser);
 router.post('/:userId/unfollow', protect, unfollowUser);
 router.get('/:userId/followers', protect, getFollowers);
 router.get('/:userId/following', protect, getFollowing);
+router.get('/by-username/:username', protect, getUserByUsername);
 
 export default router;

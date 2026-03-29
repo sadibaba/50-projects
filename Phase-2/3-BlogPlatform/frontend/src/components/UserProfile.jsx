@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getPosts, followUser, unfollowUser, getUserProfile } from "../api/api";
+import { getPosts, followUser, unfollowUser, getUserProfile, getUserByUsername } from "../api/api";
 import EditProfileModal from "./EditProfileModal";
 
 /* ─── Inline UserDashboard ─────────────── */
@@ -254,87 +254,83 @@ const UserProfile = () => {
       const currentUserRole = localStorage.getItem("userRole");
       const currentUserAvatar = localStorage.getItem("userAvatar");
 
-      const buildCurrentUser = () => ({
-        _id: currentUserId,
-        name: currentUserName,
-        email: currentUserEmail,
-        role: currentUserRole || "reader",
-        joinDate:
-          localStorage.getItem("userJoinDate") || new Date().toISOString(),
-        bio:
-          localStorage.getItem("userBio") ||
-          "Passionate writer and reader. Exploring the world one story at a time.",
-        avatar:
-          currentUserAvatar ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || "User")}&background=8b5cf6&color=fff&size=200`,
-        stats: { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 },
-      });
-
-      if (username) {
-        if (username.toLowerCase() === currentUserName?.toLowerCase()) {
-          setIsCurrentUser(true);
-          const u = buildCurrentUser();
-          setUser(u);
-          await fetchUserBlogs(currentUserName, true);
-        } else {
-          setIsCurrentUser(false);
-          try {
-            const userData = await getUserProfile(username);
-            setUser({
-              _id: userData._id,
-              name: userData.name,
-              email: userData.email,
-              role: userData.role,
-              joinDate: userData.createdAt || "2023-08-15T00:00:00.000Z",
-              bio: userData.bio || "Passionate writer and reader.",
-              avatar:
-                userData.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=8b5cf6&color=fff&size=200`,
-              stats: userData.stats || {
-                posts: 0,
-                likes: 0,
-                comments: 0,
-                followers: 0,
-                following: 0,
-              },
-            });
-            if (userData.isFollowing !== undefined) {
-              setFollowing(userData.isFollowing);
-            }
-          } catch (err) {
-            const mockUser = {
-              _id: `user-${username}`,
-              name: username.charAt(0).toUpperCase() + username.slice(1),
-              email: `${username}@example.com`,
-              role: "author",
-              joinDate: "2023-08-15T00:00:00.000Z",
-              bio: "Passionate writer and reader. Exploring the world one story at a time.",
-              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=8b5cf6&color=fff&size=200`,
-              stats: {
-                posts: 0,
-                likes: 0,
-                comments: 0,
-                followers: 0,
-                following: 0,
-              },
-            };
-            setUser(mockUser);
-          }
-          await fetchUserBlogs(username, false);
-        }
-      } else {
+      // If no username in URL, it's the current user's profile
+      if (!username) {
         if (!currentUserId) {
           navigate("/auth");
           return;
         }
         setIsCurrentUser(true);
-        const u = buildCurrentUser();
-        setUser(u);
+        const currentUser = {
+          _id: currentUserId,
+          name: currentUserName,
+          email: currentUserEmail,
+          role: currentUserRole || "reader",
+          joinDate: localStorage.getItem("userJoinDate") || new Date().toISOString(),
+          bio: localStorage.getItem("userBio") || "Passionate writer and reader.",
+          avatar: currentUserAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || "User")}&background=8b5cf6&color=fff&size=200`,
+          stats: { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 },
+        };
+        setUser(currentUser);
         await fetchUserBlogs(currentUserName, true);
+        initialLoadDone.current = true;
+        setLoading(false);
+        fetchingRef.current = false;
+        return;
+      }
+
+      // Check if viewing own profile by username
+      if (username.toLowerCase() === currentUserName?.toLowerCase()) {
+        setIsCurrentUser(true);
+        const currentUser = {
+          _id: currentUserId,
+          name: currentUserName,
+          email: currentUserEmail,
+          role: currentUserRole || "reader",
+          joinDate: localStorage.getItem("userJoinDate") || new Date().toISOString(),
+          bio: localStorage.getItem("userBio") || "Passionate writer and reader.",
+          avatar: currentUserAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserName || "User")}&background=8b5cf6&color=fff&size=200`,
+          stats: { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 },
+        };
+        setUser(currentUser);
+        await fetchUserBlogs(currentUserName, true);
+      } else {
+        // Viewing someone else's profile
+        setIsCurrentUser(false);
+        
+        try {
+          // Fetch the user by username
+          const userData = await getUserByUsername(username);
+          console.log("Fetched user data:", userData);
+          
+          setUser({
+            _id: userData._id,
+            name: userData.name,
+            email: userData.email,
+            role: userData.role,
+            joinDate: userData.createdAt || new Date().toISOString(),
+            bio: userData.bio || "Passionate writer and reader.",
+            avatar: userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=8b5cf6&color=fff&size=200`,
+            stats: userData.stats || { posts: 0, likes: 0, comments: 0, followers: 0, following: 0 },
+          });
+          
+          // Set following status if available
+          if (userData.isFollowing !== undefined) {
+            setFollowing(userData.isFollowing);
+          }
+          
+          // Fetch this user's blogs using their username
+          await fetchUserBlogs(username, false);
+          
+        } catch (err) {
+          console.error("Error fetching user:", err);
+          setError("User not found");
+        }
       }
       
       initialLoadDone.current = true;
     } catch (err) {
+      console.error("Fetch user error:", err);
       setError(err.message || "Failed to load profile");
     } finally {
       setLoading(false);
@@ -342,36 +338,29 @@ const UserProfile = () => {
     }
   };
 
-  const fetchUserBlogs = useCallback(async (authorName, updateStats = false) => {
+  const fetchUserBlogs = useCallback(async (targetUsername, updateStats = false) => {
     try {
-      const data = await getPosts(true); // Force refresh to get latest posts
+      const data = await getPosts(true);
       const postsArray = Array.isArray(data) ? data : data?.data || data || [];
 
-      const currentUserId = localStorage.getItem("userId");
-      const currentUserName = localStorage.getItem("userName");
-
-      // Filter posts by current user
+      // Filter posts by the target username
       const userBlogs = postsArray.filter((blog) => {
-        // Match by authorId (most reliable)
-        if (blog.authorId && blog.authorId === currentUserId) {
+        // Match by authorName
+        if (blog.authorName && blog.authorName.toLowerCase() === targetUsername.toLowerCase()) {
           return true;
         }
         // Match by author object
-        if (blog.author && blog.author._id === currentUserId) {
+        if (blog.author && blog.author.name && blog.author.name.toLowerCase() === targetUsername.toLowerCase()) {
           return true;
         }
-        // Match by authorName (case insensitive) - fallback
-        if (
-          authorName &&
-          blog.authorName &&
-          blog.authorName.toLowerCase() === authorName.toLowerCase()
-        ) {
+        // Match by author string
+        if (typeof blog.author === 'string' && blog.author.toLowerCase() === targetUsername.toLowerCase()) {
           return true;
         }
         return false;
       });
 
-      console.log("Found user blogs:", userBlogs.length);
+      console.log(`Found ${userBlogs.length} blogs for user: ${targetUsername}`);
 
       const processedBlogs = userBlogs.map((blog) => ({
         id: blog._id || blog.id,
@@ -379,8 +368,7 @@ const UserProfile = () => {
         title: blog.title || "Untitled Post",
         content: blog.content || "",
         excerpt: blog.excerpt || blog.content?.substring(0, 150) + "..." || "",
-        authorName:
-          blog.authorName || blog.author?.name || blog.author || "Anonymous",
+        authorName: blog.authorName || blog.author?.name || blog.author || "Anonymous",
         authorId: blog.authorId || blog.author?._id,
         date: blog.createdAt
           ? new Date(blog.createdAt).toLocaleDateString("en-US", {
@@ -391,9 +379,7 @@ const UserProfile = () => {
           : "Unknown date",
         category: blog.category || "Uncategorized",
         image: blog.image?.url || blog.image || null,
-        readTime:
-          blog.readTime ||
-          `${Math.ceil((blog.content?.split(" ").length || 0) / 200) || 5} min read`,
+        readTime: blog.readTime || `${Math.ceil((blog.content?.split(" ").length || 0) / 200) || 5} min read`,
         likes: blog.likes?.length || 0,
         likesArray: blog.likes || [],
         comments: blog.comments?.length || 0,
@@ -405,10 +391,7 @@ const UserProfile = () => {
 
       if (updateStats) {
         const totalLikes = processedBlogs.reduce((s, b) => s + b.likes, 0);
-        const totalComments = processedBlogs.reduce(
-          (s, b) => s + b.comments,
-          0,
-        );
+        const totalComments = processedBlogs.reduce((s, b) => s + b.comments, 0);
         setUser((prev) =>
           prev
             ? {
@@ -442,25 +425,32 @@ const UserProfile = () => {
       return;
     }
 
+    const currentUserId = localStorage.getItem("userId");
+    if (user._id === currentUserId) {
+      alert("You cannot follow yourself");
+      return;
+    }
+
     setFollowLoading(true);
     try {
       if (following) {
         await unfollowUser(user._id);
         setUser((prev) => ({
           ...prev,
-          stats: { ...prev.stats, followers: prev.stats.followers - 1 },
+          stats: { ...prev.stats, followers: Math.max(0, prev.stats.followers - 1) },
         }));
+        setFollowing(false);
       } else {
         await followUser(user._id);
         setUser((prev) => ({
           ...prev,
           stats: { ...prev.stats, followers: prev.stats.followers + 1 },
         }));
+        setFollowing(true);
       }
-      setFollowing(!following);
     } catch (err) {
       console.error("Follow error:", err);
-      alert("Failed to update follow status. Please try again.");
+      alert(err.message || "Failed to update follow status. Please try again.");
     } finally {
       setFollowLoading(false);
     }

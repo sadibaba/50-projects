@@ -519,3 +519,13 @@ export const checkFollowing = async (userId) => {
     return { following: false };
   }
 };
+
+
+export const getUserByUsername = async (username) => {
+  try {
+    return await getData(`users/by-username/${username}`);
+  } catch (error) {
+    console.error('Get user by username error:', error);
+    throw error;
+  }
+};

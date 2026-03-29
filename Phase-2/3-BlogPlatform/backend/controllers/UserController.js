@@ -171,6 +171,37 @@ export const updateAvatar = async (req, res) => {
 };
 
 // Get user by username
+// export const getUserByUsername = async (req, res) => {
+//   try {
+//     const { username } = req.params;
+//     const user = await User.findOne({ 
+//       name: { $regex: new RegExp(`^${username}$`, 'i') }
+//     })
+//     .select('-password')
+//     .populate('followers', 'name email avatar')
+//     .populate('following', 'name email avatar');
+    
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+    
+//     // Check if current user is following this user
+//     let isFollowing = false;
+//     if (req.user && req.user._id) {
+//       isFollowing = user.followers.some(
+//         follower => follower._id.toString() === req.user._id.toString()
+//       );
+//     }
+    
+//     res.json({
+//       ...user.toObject(),
+//       isFollowing,
+//     });
+//   } catch (error) {
+//     console.error('Get user error:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 export const getUserByUsername = async (req, res) => {
   try {
     const { username } = req.params;
@@ -193,16 +224,34 @@ export const getUserByUsername = async (req, res) => {
       );
     }
     
+    // Get post count
+    const Post = (await import('../models/postModel.js')).default;
+    const postCount = await Post.countDocuments({ author: user._id });
+    
     res.json({
-      ...user.toObject(),
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      bio: user.bio,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      followers: user.followers,
+      following: user.following,
+      stats: {
+        posts: postCount,
+        likes: 0, // You can calculate this from posts
+        comments: 0, // You can calculate this from posts
+        followers: user.followers.length,
+        following: user.following.length,
+      },
       isFollowing,
     });
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error('Get user by username error:', error);
     res.status(500).json({ message: error.message });
   }
 };
-
 // Follow user
 export const followUser = async (req, res) => {
   try {
@@ -309,3 +358,6 @@ export const getFollowing = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+

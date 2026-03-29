@@ -265,3 +265,16 @@ export const unlikePost = async (req, res, next) => {
         return res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 };
+
+
+
+// export const postData = {
+//   title: title.trim(),
+//   content: content.trim(),
+//   excerpt: excerpt?.trim() || content.trim().substring(0, 150),
+//   author: req.user._id,
+//   authorId: req.user._id, // Add this line
+//   authorName: req.user.name,
+//   category: category.trim(),
+//   tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()).filter(Boolean)) : []
+// };
