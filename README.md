@@ -21,16 +21,16 @@ backend + API, CRUD operations
 14. Authentication System — SignUp/Login/logout with JWT✅
 15. Blog Platform — CRUD posts, React frontend, Express + Mongo backend ✅ done but error handle and other stuff are we fix later now it can handle 10-15 user at once for now
 16. Recipe App — Public recipe API ya apna backend + search feature ✅
-17. Movie Browser — Use OMDB API ya TMDB API
+17. Movie Browser — Use OMDB API ya TMDB API ✅
 18. Notes App with Tags — Tagging system + REST API
 19. Contact Book — Contacts CRUD, backend API, React frontend
 20. Chat App (Basic) — React + backend (polling API) for messages
-21. File Upload App — Upload files using backend (Express + Multer)
-22. Expense Tracker — Track income/expenses, REST API
-23. Weather Dashboard — Detailed weather + forecast, React + backend proxy
+21. File Upload App — Upload files using backend (Express + Multer) ✅ it's already in blog site
+22. Expense Tracker — Track income/expenses, REST API ✅✅ already did in phase one
+23. Weather Dashboard — Detailed weather + forecast, React + backend proxy ✅✅ already did in phase one
 24. Github Profile Viewer — React app that fetches Github API to show user repos
-25. Image Gallery — Use Image API like Unsplash, React + backend caching
-26. Blog Comments System — Comments API + React comments section
+25. Image Gallery — Use Image API like Unsplash, React + backend caching ✅ already in phase one
+26. Blog Comments System — Comments API + React comments section ✅ it's already in blog site
 
 ---
 Phase 3: Advanced Projects (Next.js, Real-time, Full Stack)
