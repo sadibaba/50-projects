@@ -21,28 +21,44 @@ const ReviewsPage = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const [movieData, reviewsData] = await Promise.all([
-      getMovieDetails(movieId),
-      getReviews(movieId)
-    ]);
-    setMovie(movieData);
-    setReviews(reviewsData);
-    setLoading(false);
+    try {
+      const [movieData, reviewsData] = await Promise.all([
+        getMovieDetails(movieId),
+        getReviews(movieId)
+      ]);
+      setMovie(movieData);
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!newReview.comment.trim()) return;
+    if (!newReview.comment.trim()) {
+      alert('Please enter a comment');
+      return;
+    }
 
     setSubmitting(true);
-    const review = await addReview({
-      movieId,
-      rating: newReview.rating,
-      comment: newReview.comment
-    });
-    setReviews([review, ...reviews]);
-    setNewReview({ rating: 5, comment: '' });
-    setSubmitting(false);
+    try {
+      const review = await addReview({
+        movieId,
+        rating: newReview.rating,
+        comment: newReview.comment
+      });
+      if (review) {
+        setReviews([review, ...reviews]);
+        setNewReview({ rating: 5, comment: '' });
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Failed to submit review');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) return <LoadingSpinner />;
@@ -62,7 +78,7 @@ const ReviewsPage = () => {
 
         <div className="reviews-header">
           <h1>
-            Reviews for <span className="movie-title">{movie?.Title}</span>
+            Reviews for <span className="movie-title">{movie?.Title || 'Movie'}</span>
           </h1>
           <p className="review-count">{reviews.length} Reviews</p>
         </div>
@@ -93,6 +109,7 @@ const ReviewsPage = () => {
               value={newReview.comment}
               onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
               rows="4"
+              required
             />
 
             <button type="submit" className="submit-review" disabled={submitting}>
@@ -110,7 +127,7 @@ const ReviewsPage = () => {
           ) : (
             reviews.map((review, index) => (
               <motion.div
-                key={review._id || index}
+                key={review.id || index}
                 className="review-card"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -12,19 +12,25 @@ const HomePage = () => {
   const [searched, setSearched] = useState(false);
 
   const handleSearch = async (query) => {
-    if (!query) {
-      setMovies([]);
-      setSearched(false);
-      return;
-    }
+  if (!query) {
+    setMovies([]);
+    setSearched(false);
+    return;
+  }
 
-    setLoading(true);
-    setSearched(true);
-    
+  setLoading(true);
+  setSearched(true);
+  
+  try {
     const results = await searchMovies(query);
     setMovies(results || []);
+  } catch (error) {
+    console.error('Search error:', error);
+    setMovies([]);
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div className="homepage">

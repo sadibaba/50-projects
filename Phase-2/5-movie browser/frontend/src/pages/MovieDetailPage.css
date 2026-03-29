@@ -191,3 +191,22 @@
     flex-direction: column;
   }
 }
+
+
+.error-message {
+  text-align: center;
+  padding: 4rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 20px;
+  margin: 2rem 0;
+}
+
+.error-message h2 {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.error-message p {
+  color: #cbd5e1;
+}

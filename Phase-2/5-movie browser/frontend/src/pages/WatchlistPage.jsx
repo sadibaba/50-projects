@@ -16,20 +16,30 @@ const WatchlistPage = () => {
 
   const fetchWatchlist = async () => {
     setLoading(true);
-    const watchlist = await getWatchlist();
-    const movies = await Promise.all(
-      watchlist.map(async (item) => {
-        const movie = await getMovieDetails(item.movieId);
-        return movie;
-      })
-    );
-    setWatchlistMovies(movies.filter(movie => movie !== null));
-    setLoading(false);
+    try {
+      const watchlist = await getWatchlist();
+      const movies = await Promise.all(
+        watchlist.map(async (item) => {
+          const movie = await getMovieDetails(item.movieId);
+          return movie;
+        })
+      );
+      setWatchlistMovies(movies.filter(movie => movie && movie.imdbID));
+    } catch (error) {
+      console.error('Error fetching watchlist:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRemove = async (movieId) => {
-    await removeFromWatchlist(movieId);
-    setWatchlistMovies(watchlistMovies.filter(movie => movie.imdbID !== movieId));
+    try {
+      await removeFromWatchlist(movieId);
+      setWatchlistMovies(watchlistMovies.filter(movie => movie.imdbID !== movieId));
+    } catch (error) {
+      console.error('Error removing from watchlist:', error);
+      alert('Failed to remove from watchlist');
+    }
   };
 
   if (loading) return <LoadingSpinner />;
