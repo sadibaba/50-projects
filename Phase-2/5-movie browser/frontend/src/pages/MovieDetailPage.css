@@ -1,0 +1,193 @@
+.movie-detail-page {
+  min-height: 100vh;
+  padding-top: 80px;
+  position: relative;
+}
+
+.movie-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px);
+  z-index: -2;
+}
+
+.backdrop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.back-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2rem 0;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: translateX(-5px);
+}
+
+.movie-detail-content {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+  padding: 2rem 0 4rem;
+}
+
+.movie-poster-large img {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.no-poster-large {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: #64748b;
+}
+
+.movie-title-large {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.movie-badges {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
+  font-size: 0.875rem;
+}
+
+.badge.rating {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.movie-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.watchlist-btn, .reviews-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.watchlist-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  color: white;
+}
+
+.watchlist-btn.added {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid #22c55e;
+  color: #22c55e;
+}
+
+.reviews-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+}
+
+.watchlist-btn:hover:not(:disabled), .reviews-btn:hover {
+  transform: translateY(-2px);
+}
+
+.movie-plot {
+  margin-bottom: 2rem;
+}
+
+.movie-plot h3 {
+  margin-bottom: 0.5rem;
+  color: #3b82f6;
+}
+
+.movie-plot p {
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.movie-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-item strong {
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+.detail-item span {
+  color: #cbd5e1;
+}
+
+@media (max-width: 768px) {
+  .movie-detail-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .movie-poster-large {
+    max-width: 250px;
+    margin: 0 auto;
+  }
+  
+  .movie-title-large {
+    font-size: 1.75rem;
+  }
+  
+  .movie-actions {
+    flex-direction: column;
+  }
+}

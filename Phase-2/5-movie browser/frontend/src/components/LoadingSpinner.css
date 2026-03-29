@@ -1,0 +1,27 @@
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.spinner-circle {
+  width: 100%;
+  height: 100%;
+  border: 4px solid rgba(59, 130, 246, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+}
+
+.spinner-text {
+  margin-top: 1rem;
+  color: #a0aec0;
+  font-size: 0.875rem;
+}
