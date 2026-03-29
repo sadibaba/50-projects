@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getPosts, followUser, unfollowUser, getUserProfile } from "../api/api";
 import EditProfileModal from "./EditProfileModal";
 
-/* ─── Inline UserDashboard (replaces missing component) ─────────────── */
+/* ─── Inline UserDashboard ─────────────── */
 const UserDashboard = ({
   activeTab,
   blogs,
@@ -13,14 +13,6 @@ const UserDashboard = ({
   onBlogUpdate,
 }) => {
   const navigate = useNavigate();
-
-  // Listen for blog updates
-  useEffect(() => {
-    if (onBlogUpdate) {
-      // This will be called when blogs are updated
-      onBlogUpdate();
-    }
-  }, [blogs]);
 
   if (loading) {
     return (
@@ -221,12 +213,38 @@ const UserProfile = () => {
   const [following, setFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now());
+  
+  // Add ref to prevent multiple calls
+  const fetchingRef = useRef(false);
+  const initialLoadDone = useRef(false);
+
+  // Listen for post creation events
+  useEffect(() => {
+    const handlePostCreated = () => {
+      console.log('Post created event received, refreshing blogs...');
+      if (isCurrentUser && user?.name) {
+        fetchUserBlogs(user.name, true);
+      }
+    };
+
+    // Add event listener for post creation
+    window.addEventListener('postCreated', handlePostCreated);
+    
+    return () => {
+      window.removeEventListener('postCreated', handlePostCreated);
+    };
+  }, [isCurrentUser, user?.name]);
 
   useEffect(() => {
-    fetchUserData();
+    if (!initialLoadDone.current) {
+      fetchUserData();
+    }
   }, [username]);
 
   const fetchUserData = async () => {
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
+    
     setLoading(true);
     setError("");
     try {
@@ -260,8 +278,6 @@ const UserProfile = () => {
           await fetchUserBlogs(currentUserName, true);
         } else {
           setIsCurrentUser(false);
-
-          // Try to fetch user from API (if you have a getUserByUsername endpoint)
           try {
             const userData = await getUserProfile(username);
             setUser({
@@ -282,12 +298,10 @@ const UserProfile = () => {
                 following: 0,
               },
             });
-            // Check if current user is following this user
             if (userData.isFollowing !== undefined) {
               setFollowing(userData.isFollowing);
             }
           } catch (err) {
-            // Fallback to mock data
             const mockUser = {
               _id: `user-${username}`,
               name: username.charAt(0).toUpperCase() + username.slice(1),
@@ -318,19 +332,21 @@ const UserProfile = () => {
         setUser(u);
         await fetchUserBlogs(currentUserName, true);
       }
+      
+      initialLoadDone.current = true;
     } catch (err) {
       setError(err.message || "Failed to load profile");
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
   };
 
-  const fetchUserBlogs = async (authorName, updateStats = false) => {
+  const fetchUserBlogs = useCallback(async (authorName, updateStats = false) => {
     try {
-      const data = await getPosts();
+      const data = await getPosts(true); // Force refresh to get latest posts
       const postsArray = Array.isArray(data) ? data : data?.data || data || [];
 
-      // Get current user ID from localStorage
       const currentUserId = localStorage.getItem("userId");
       const currentUserName = localStorage.getItem("userName");
 
@@ -410,237 +426,249 @@ const UserProfile = () => {
     } catch (err) {
       console.error("Error fetching user blogs:", err);
     }
+  }, []);
+
+  const avatarUrl = (() => {
+    const avatar = user?.avatar;
+    if (!avatar) return null;
+    if (avatar.startsWith("http")) return avatar;
+    if (avatar.startsWith("/uploads")) return `http://localhost:5000${avatar}`;
+    return avatar;
+  })();
+
+  const handleFollow = async () => {
+    if (!localStorage.getItem("token")) {
+      navigate("/auth");
+      return;
+    }
+
+    setFollowLoading(true);
+    try {
+      if (following) {
+        await unfollowUser(user._id);
+        setUser((prev) => ({
+          ...prev,
+          stats: { ...prev.stats, followers: prev.stats.followers - 1 },
+        }));
+      } else {
+        await followUser(user._id);
+        setUser((prev) => ({
+          ...prev,
+          stats: { ...prev.stats, followers: prev.stats.followers + 1 },
+        }));
+      }
+      setFollowing(!following);
+    } catch (err) {
+      console.error("Follow error:", err);
+      alert("Failed to update follow status. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
   };
 
-// Update avatar display in UserProfile
-const avatarUrl = (() => {
-  const avatar = user?.avatar;
-  if (!avatar) return null;
-  if (avatar.startsWith("http")) return avatar;
-  if (avatar.startsWith("/uploads")) return `http://localhost:5000${avatar}`;
-  return avatar;
-})();
-
-const handleFollow = async () => {
-  if (!localStorage.getItem("token")) {
-    navigate("/auth");
-    return;
-  }
-
-  setFollowLoading(true);
-  try {
-    if (following) {
-      await unfollowUser(user._id);
-      setUser((prev) => ({
-        ...prev,
-        stats: { ...prev.stats, followers: prev.stats.followers - 1 },
-      }));
-    } else {
-      await followUser(user._id);
-      setUser((prev) => ({
-        ...prev,
-        stats: { ...prev.stats, followers: prev.stats.followers + 1 },
-      }));
+  const handleSaveProfile = (updatedData) => {
+    if (updatedData.name) localStorage.setItem("userName", updatedData.name);
+    if (updatedData.email) localStorage.setItem("userEmail", updatedData.email);
+    if (updatedData.bio !== undefined)
+      localStorage.setItem("userBio", updatedData.bio);
+    if (updatedData.avatar) {
+      let avatarUrl = updatedData.avatar;
+      if (avatarUrl && !avatarUrl.startsWith("http")) {
+        avatarUrl = `http://localhost:5000${avatarUrl}`;
+      }
+      localStorage.setItem("userAvatar", avatarUrl);
+      setAvatarKey(Date.now());
     }
-    setFollowing(!following);
-  } catch (err) {
-    console.error("Follow error:", err);
-    alert("Failed to update follow status. Please try again.");
-  } finally {
-    setFollowLoading(false);
-  }
-};
 
-const handleSaveProfile = (updatedData) => {
-  // Update localStorage
-  if (updatedData.name) localStorage.setItem("userName", updatedData.name);
-  if (updatedData.email) localStorage.setItem("userEmail", updatedData.email);
-  if (updatedData.bio !== undefined)
-    localStorage.setItem("userBio", updatedData.bio);
-  if (updatedData.avatar) {
-    let avatarUrl = updatedData.avatar;
-    if (avatarUrl && !avatarUrl.startsWith("http")) {
-      avatarUrl = `http://localhost:5000${avatarUrl}`;
+    setUser((prev) => ({
+      ...prev,
+      name: updatedData.name || prev.name,
+      email: updatedData.email || prev.email,
+      bio: updatedData.bio !== undefined ? updatedData.bio : prev.bio,
+      avatar: updatedData.avatar
+        ? updatedData.avatar.startsWith("http")
+          ? updatedData.avatar
+          : `http://localhost:5000${updatedData.avatar}`
+        : prev.avatar,
+    }));
+
+    setShowEditModal(false);
+
+    if (updatedData.name !== user.name) {
+      fetchUserBlogs(updatedData.name, true);
     }
-    localStorage.setItem("userAvatar", avatarUrl);
-    // Force avatar refresh
-    setAvatarKey(Date.now());
-  }
+  };
 
-  // Update state with new data
-  setUser((prev) => ({
-    ...prev,
-    name: updatedData.name || prev.name,
-    email: updatedData.email || prev.email,
-    bio: updatedData.bio !== undefined ? updatedData.bio : prev.bio,
-    avatar: updatedData.avatar
-      ? updatedData.avatar.startsWith("http")
-        ? updatedData.avatar
-        : `http://localhost:5000${updatedData.avatar}`
-      : prev.avatar,
-  }));
+  const handleBlogUpdate = useCallback(() => {
+    if (user?.name) {
+      console.log('Refreshing blogs...');
+      fetchUserBlogs(user.name, true);
+    }
+  }, [user?.name, fetchUserBlogs]);
 
-  setShowEditModal(false);
-
-  // If name changed, refresh blogs
-  if (updatedData.name !== user.name) {
-    fetchUserBlogs(updatedData.name, true);
-  }
-};
-
-const handleBlogUpdate = () => {
-  // Refresh blogs when a new blog is created
-  fetchUserBlogs(user.name, true);
-};
-
-/* Loading */
-if (loading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto mb-4" />
-        <p className="text-gray-400">Loading profile...</p>
+  /* Loading */
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto mb-4" />
+          <p className="text-gray-400">Loading profile...</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-/* Error */
-if (error || !user) {
+  /* Error */
+  if (error || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
+        <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-5 text-gray-700">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            User not found
+          </h3>
+          <p className="text-gray-400 mb-6 text-sm">
+            {error || "The user you're looking for doesn't exist."}
+          </p>
+          <button
+            onClick={() => navigate("/home")}
+            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium text-sm"
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = isCurrentUser
+    ? ["posts", "likes", "comments", "saved", "account"]
+    : ["posts"];
+
+  const tabColors = {
+    posts: "border-purple-500",
+    likes: "border-pink-500",
+    comments: "border-blue-500",
+    saved: "border-green-500",
+    account: "border-yellow-500",
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-5 text-gray-700">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      {/* Back + Nav */}
+      <div className="container mx-auto px-4 pt-4">
+        <button
+          onClick={() => navigate("/home")}
+          className="inline-flex items-center text-purple-400 hover:text-purple-300 text-sm group mb-4"
+        >
+          <svg
+            className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth="1"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              strokeWidth="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
             />
           </svg>
-        </div>
-        <h3 className="text-xl font-semibold text-white mb-2">
-          User not found
-        </h3>
-        <p className="text-gray-400 mb-6 text-sm">
-          {error || "The user you're looking for doesn't exist."}
-        </p>
-        <button
-          onClick={() => navigate("/home")}
-          className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium text-sm"
-        >
           Back to Home
         </button>
       </div>
-    </div>
-  );
-}
 
-const tabs = isCurrentUser
-  ? ["posts", "likes", "comments", "saved", "account"]
-  : ["posts"];
+      {/* Cover */}
+      <div className="relative">
+        <div className="h-48 sm:h-64 bg-gradient-to-r from-purple-900/40 via-pink-900/30 to-indigo-900/40">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900" />
+        </div>
 
-const tabColors = {
-  posts: "border-purple-500",
-  likes: "border-pink-500",
-  comments: "border-blue-500",
-  saved: "border-green-500",
-  account: "border-yellow-500",
-};
-
-return (
-  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-    {/* Back + Nav */}
-    <div className="container mx-auto px-4 pt-4">
-      <button
-        onClick={() => navigate("/home")}
-        className="inline-flex items-center text-purple-400 hover:text-purple-300 text-sm group mb-4"
-      >
-        <svg
-          className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
-        Back to Home
-      </button>
-    </div>
-
-    {/* Cover */}
-    <div className="relative">
-      <div className="h-48 sm:h-64 bg-gradient-to-r from-purple-900/40 via-pink-900/30 to-indigo-900/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900" />
-      </div>
-
-      {/* Profile Info */}
-      <div className="container mx-auto px-4 relative -mt-24 sm:-mt-28">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-6">
-          {/* Avatar + Info */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-            {/* // In the UserProfile component, update the avatar display section (around line 780-800): */}
-
-            <div className="relative flex-shrink-0">
-              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-gray-900 overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600">
-                <img
-                  src={
-                    avatarUrl ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`
-                  }
-                  alt={user.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=8b5cf6&color=fff&size=200`;
-                  }}
-                />
-              </div>
-              {isCurrentUser && (
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="absolute bottom-1 right-1 p-1.5 bg-gray-900 rounded-full hover:bg-gray-800 border border-gray-700"
-                  title="Edit profile"
-                >
-                  <svg
-                    className="w-4 h-4 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            <div className="text-white pb-1">
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
-                {user.role === "author" && (
-                  <span className="px-2.5 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-xs font-medium">
-                    ✍️ Author
-                  </span>
-                )}
-                {user.role === "admin" && (
-                  <span className="px-2.5 py-0.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xs font-medium">
-                    👑 Admin
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-300 text-sm mb-3 max-w-xl">{user.bio}</p>
-              <div className="flex flex-wrap gap-3 text-gray-400 text-xs">
+        {/* Profile Info */}
+        <div className="container mx-auto px-4 relative -mt-24 sm:-mt-28">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-6">
+            {/* Avatar + Info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+              <div className="relative flex-shrink-0">
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-gray-900 overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600">
+                  <img
+                    src={
+                      avatarUrl ||
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`
+                    }
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=8b5cf6&color=fff&size=200`;
+                    }}
+                  />
+                </div>
                 {isCurrentUser && (
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="absolute bottom-1 right-1 p-1.5 bg-gray-900 rounded-full hover:bg-gray-800 border border-gray-700"
+                    title="Edit profile"
+                  >
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              <div className="text-white pb-1">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
+                  {user.role === "author" && (
+                    <span className="px-2.5 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full text-xs font-medium">
+                      ✍️ Author
+                    </span>
+                  )}
+                  {user.role === "admin" && (
+                    <span className="px-2.5 py-0.5 bg-gradient-to-r from-red-600 to-orange-600 rounded-full text-xs font-medium">
+                      👑 Admin
+                    </span>
+                  )}
+                </div>
+                <p className="text-gray-300 text-sm mb-3 max-w-xl">{user.bio}</p>
+                <div className="flex flex-wrap gap-3 text-gray-400 text-xs">
+                  {isCurrentUser && (
+                    <span className="flex items-center gap-1">
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      </svg>
+                      {user.email}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1">
                     <svg
                       className="w-3.5 h-3.5"
@@ -652,280 +680,262 @@ return (
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth="2"
-                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    {user.email}
+                    Joined{" "}
+                    {new Date(user.joinDate).toLocaleDateString("en-US", {
+                      month: "long",
+                      year: "numeric",
+                    })}
                   </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Joined{" "}
-                  {new Date(user.joinDate).toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 self-start sm:self-end">
-            {isCurrentUser ? (
-              <>
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1.5"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            {/* Action Buttons */}
+            <div className="flex gap-2 self-start sm:self-end">
+              {isCurrentUser ? (
+                <>
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1.5"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  Edit Profile
-                </button>
-                <button
-                  onClick={() => navigate("/home")}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium text-sm transition-all"
-                >
-                  Home
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={handleFollow}
-                  disabled={followLoading}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-1.5 ${
-                    following
-                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                      : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                  } disabled:opacity-50`}
-                >
-                  {followLoading ? (
                     <svg
-                      className="animate-spin h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4"
                       fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
                       <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
                     </svg>
-                  ) : following ? (
-                    <>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      Following
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-                        />
-                      </svg>
-                      Follow
-                    </>
-                  )}
-                </button>
-                <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1.5">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={() => navigate("/home")}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium text-sm transition-all"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    />
-                  </svg>
-                  Message
-                </button>
-              </>
-            )}
+                    Home
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleFollow}
+                    disabled={followLoading}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-1.5 ${
+                      following
+                        ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                        : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    } disabled:opacity-50`}
+                  >
+                    {followLoading ? (
+                      <svg
+                        className="animate-spin h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    ) : following ? (
+                      <>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        Following
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                          />
+                        </svg>
+                        Follow
+                      </>
+                    )}
+                  </button>
+                  <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center gap-1.5">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                    Message
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
+            {[
+              { label: "Posts", value: user.stats.posts },
+              { label: "Likes", value: user.stats.likes },
+              { label: "Comments", value: user.stats.comments },
+              { label: "Followers", value: user.stats.followers },
+              { label: "Following", value: user.stats.following },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-800 hover:border-purple-900/50 transition-colors"
+              >
+                <div className="text-xl sm:text-2xl font-bold text-white mb-0.5">
+                  {stat.value}
+                </div>
+                <div className="text-gray-400 text-xs">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-8">
-          {[
-            { label: "Posts", value: user.stats.posts },
-            { label: "Likes", value: user.stats.likes },
-            { label: "Comments", value: user.stats.comments },
-            { label: "Followers", value: user.stats.followers },
-            { label: "Following", value: user.stats.following },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-gray-800/50 rounded-xl p-4 text-center border border-gray-800 hover:border-purple-900/50 transition-colors"
+      {/* Content */}
+      <div className="container mx-auto px-4 pb-10">
+        {/* Tabs */}
+        <div className="flex border-b border-gray-800 mb-8 overflow-x-auto scrollbar-hide gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-3 font-medium whitespace-nowrap text-sm capitalize transition-all ${
+                activeTab === tab
+                  ? `text-white border-b-2 ${tabColors[tab]}`
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
             >
-              <div className="text-xl sm:text-2xl font-bold text-white mb-0.5">
-                {stat.value}
-              </div>
-              <div className="text-gray-400 text-xs">{stat.label}</div>
-            </div>
+              {tab === "posts"
+                ? `Posts (${user.stats.posts})`
+                : tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
           ))}
         </div>
-      </div>
-    </div>
 
-    {/* Content */}
-    <div className="container mx-auto px-4 pb-10">
-      {/* Tabs */}
-      <div className="flex border-b border-gray-800 mb-8 overflow-x-auto scrollbar-hide gap-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-3 font-medium whitespace-nowrap text-sm capitalize transition-all ${
-              activeTab === tab
-                ? `text-white border-b-2 ${tabColors[tab]}`
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            {tab === "posts"
-              ? `Posts (${user.stats.posts})`
-              : tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {isCurrentUser ? (
-        <UserDashboard
-          activeTab={activeTab}
-          blogs={blogs}
-          loading={false}
-          user={user}
-          onCreatePost={() => navigate("/home")}
-          onBlogUpdate={handleBlogUpdate}
-        />
-      ) : // Public profile — only posts tab
-      activeTab === "posts" ? (
-        <div>
-          <h2 className="text-xl font-bold text-white mb-6">
-            {user.name}'s Posts
-          </h2>
-          {blogs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogs.map((blog) => (
-                <div
-                  key={blog.id}
-                  className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-900/50 transition-all cursor-pointer group"
-                  onClick={() => navigate(`/blog/${blog.id}`)}
-                >
-                  <div className="relative h-44 overflow-hidden">
-                    <img
-                      src={
-                        blog.image ||
-                        "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800"
-                      }
-                      alt={blog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.src =
-                          "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800";
-                      }}
-                    />
-                    <span className="absolute top-3 left-3 px-2.5 py-1 bg-purple-900/80 text-purple-300 text-xs font-medium rounded-full">
-                      {blog.category}
-                    </span>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-white font-bold mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">
-                      {blog.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm line-clamp-2 mb-3">
-                      {blog.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{blog.date}</span>
-                      <span>{blog.readTime}</span>
+        {isCurrentUser ? (
+          <UserDashboard
+            activeTab={activeTab}
+            blogs={blogs}
+            loading={false}
+            user={user}
+            onCreatePost={() => navigate("/home")}
+            onBlogUpdate={handleBlogUpdate}
+          />
+        ) : activeTab === "posts" ? (
+          <div>
+            <h2 className="text-xl font-bold text-white mb-6">
+              {user.name}'s Posts
+            </h2>
+            {blogs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {blogs.map((blog) => (
+                  <div
+                    key={blog.id}
+                    className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-800 hover:border-purple-900/50 transition-all cursor-pointer group"
+                    onClick={() => navigate(`/blog/${blog.id}`)}
+                  >
+                    <div className="relative h-44 overflow-hidden">
+                      <img
+                        src={
+                          blog.image ||
+                          "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800"
+                        }
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800";
+                        }}
+                      />
+                      <span className="absolute top-3 left-3 px-2.5 py-1 bg-purple-900/80 text-purple-300 text-xs font-medium rounded-full">
+                        {blog.category}
+                      </span>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-white font-bold mb-2 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                        {blog.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm line-clamp-2 mb-3">
+                        {blog.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>{blog.date}</span>
+                        <span>{blog.readTime}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-gray-400">
-                {user.name} hasn't published any posts yet.
-              </p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-400">
-            Only {user.name} can view this section.
-          </p>
-        </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-gray-400">
+                  {user.name} hasn't published any posts yet.
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-400">
+              Only {user.name} can view this section.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Edit Modal */}
+      {showEditModal && (
+        <EditProfileModal
+          user={user}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleSaveProfile}
+        />
       )}
     </div>
-
-    {/* Edit Modal */}
-    {showEditModal && (
-      <EditProfileModal
-        user={user}
-        onClose={() => setShowEditModal(false)}
-        onSave={handleSaveProfile}
-      />
-  )}
-</div>
   );
 };
 
