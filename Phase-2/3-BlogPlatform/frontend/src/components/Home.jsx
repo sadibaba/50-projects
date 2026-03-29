@@ -62,34 +62,32 @@ const Home = () => {
     ]);
   };
 
- const processBlog = (blog) => ({
+ // Update the processBlog function in Home.jsx
+const processBlog = (blog) => ({
   id: blog._id || blog.id,
   _id: blog._id || blog.id,
   title: blog.title || 'Untitled Post',
   content: blog.content || '',
   excerpt: blog.excerpt || (blog.content ? blog.content.substring(0, 150) + '...' : 'No description available'),
   authorName: blog.authorName || blog.author?.name || blog.author || 'Anonymous',
+  authorId: blog.authorId || blog.author?._id,
   author: blog.author,
   date: blog.createdAt
     ? new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
     : 'Unknown date',
   category: blog.category || 'Uncategorized',
-  // FIX: Handle image in multiple possible formats
   image: (() => {
-    // If image exists
+    // Handle image in multiple possible formats
     if (blog.image) {
-      // If it's a string (URL)
       if (typeof blog.image === 'string') return blog.image;
-      // If it has url property
       if (blog.image.url) return blog.image.url;
-      // If it has data property (base64)
       if (blog.image.data) return blog.image.data;
     }
-    // If no image found
     return null;
   })(),
   readTime: blog.readTime || `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 3} min read`,
   likes: blog.likes?.length || 0,
+  likesArray: blog.likes || [],
   comments: blog.comments?.length || 0,
   views: blog.views || 0,
   createdAt: blog.createdAt,

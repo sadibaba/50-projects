@@ -1,6 +1,12 @@
 const API_URL = "http://localhost:5000/api";
 import { requestQueue } from '../utils/requestQueue';
 
+// Remove these lines if they don't exist at the top of your file:
+// let postsCache = null;
+// let postsCacheTime = 0;
+// const CACHE_DURATION = 60000; // 1 minute cache
+// const requestDeduplicator = null; // This is not defined
+
 // Helper function to handle API responses with better error handling
 const handleResponse = async (response) => {
   let data;
@@ -42,6 +48,7 @@ const handleResponse = async (response) => {
   
   return data;
 };
+
 // Helper to get auth token
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
@@ -175,7 +182,23 @@ export const deleteData = async (endpoint) => {
 // Auth endpoints
 export const loginUser = async (credentials) => {
   try {
-    return await postData('users/login', credentials);
+    const response = await postData('users/login', credentials);
+    
+    // Store user data
+    if (response && response._id) {
+      localStorage.setItem('userId', response._id);
+      localStorage.setItem('userName', response.name);
+      localStorage.setItem('userEmail', response.email);
+      localStorage.setItem('userRole', response.role);
+      localStorage.setItem('token', response.token);
+      
+      // Store avatar if available
+      if (response.avatar) {
+        localStorage.setItem('userAvatar', response.avatar);
+      }
+    }
+    
+    return response;
   } catch (error) {
     console.error('Login error:', error);
     throw new Error(error.message || 'Login failed. Please check your credentials.');
@@ -200,26 +223,32 @@ export const getUserProfile = async () => {
   }
 };
 
-// Post endpoints
+// Post endpoints - FIXED: removed requestDeduplicator
 export const getPosts = async (forceRefresh = false) => {
   try {
-    // Use deduplication to prevent multiple identical requests
-    return await requestDeduplicator.makeRequest('getPosts', async () => {
-      // Return cached data if still valid and not forcing refresh
-      if (!forceRefresh && postsCache && (Date.now() - postsCacheTime) < CACHE_DURATION) {
+    // Simple cache implementation
+    const cacheKey = 'posts_cache';
+    const cacheTimeKey = 'posts_cache_time';
+    const CACHE_DURATION = 60000; // 1 minute cache
+    
+    if (!forceRefresh) {
+      const cached = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(cacheTimeKey);
+      
+      if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < CACHE_DURATION) {
         console.log('Returning cached posts');
-        return postsCache;
+        return JSON.parse(cached);
       }
-      
-      const response = await getData('posts');
-      const data = response.data || response;
-      
-      // Update cache
-      postsCache = data;
-      postsCacheTime = Date.now();
-      
-      return data;
-    });
+    }
+    
+    const response = await getData('posts');
+    const data = response.data || response;
+    
+    // Store in cache
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    localStorage.setItem(cacheTimeKey, Date.now().toString());
+    
+    return data;
   } catch (error) {
     console.error('Get posts error:', error);
     throw new Error('Failed to load posts. Please refresh the page.');
@@ -236,11 +265,15 @@ export const getPost = async (id) => {
   }
 };
 
-
 export const createPost = async (data, token) => {
   try {
     const isFormData = data instanceof FormData;
     const response = await postData('posts', data, isFormData);
+    
+    // Clear posts cache after creating a new post
+    localStorage.removeItem('posts_cache');
+    localStorage.removeItem('posts_cache_time');
+    
     if (response && response.post) {
       return { 
         success: true, 
@@ -266,6 +299,11 @@ export const updatePost = async (id, postData) => {
   try {
     const isFormData = postData instanceof FormData;
     const response = await putData(`posts/${id}`, postData, isFormData);
+    
+    // Clear posts cache after updating a post
+    localStorage.removeItem('posts_cache');
+    localStorage.removeItem('posts_cache_time');
+    
     return response.data || response;
   } catch (error) {
     console.error('Update post error:', error);
@@ -275,7 +313,13 @@ export const updatePost = async (id, postData) => {
 
 export const deletePost = async (id) => {
   try {
-    return await deleteData(`posts/${id}`);
+    const response = await deleteData(`posts/${id}`);
+    
+    // Clear posts cache after deleting a post
+    localStorage.removeItem('posts_cache');
+    localStorage.removeItem('posts_cache_time');
+    
+    return response;
   } catch (error) {
     console.error('Delete post error:', error);
     throw new Error(error.message || 'Failed to delete post. Please try again.');
@@ -285,6 +329,11 @@ export const deletePost = async (id) => {
 export const likePost = async (id) => {
   try {
     const response = await putData(`posts/${id}/like`, {});
+    
+    // Clear posts cache after liking a post
+    localStorage.removeItem('posts_cache');
+    localStorage.removeItem('posts_cache_time');
+    
     return response.data || response;
   } catch (error) {
     console.error('Like post error:', error);
@@ -295,6 +344,11 @@ export const likePost = async (id) => {
 export const unlikePost = async (id) => {
   try {
     const response = await putData(`posts/${id}/unlike`, {});
+    
+    // Clear posts cache after unliking a post
+    localStorage.removeItem('posts_cache');
+    localStorage.removeItem('posts_cache_time');
+    
     return response.data || response;
   } catch (error) {
     console.error('Unlike post error:', error);
@@ -353,20 +407,31 @@ export const createCategory = async (categoryData) => {
     throw new Error(error.message || 'Failed to create category. Please try again.');
   }
 };
+
 // ─── User profile update (name, bio, avatar) ──────────────────────────────
 export const updateUserProfile = async (data, isFormData = false) => {
   try {
-    return await putData('users/profile', data, isFormData);
+    const response = await putData('users/profile', data, isFormData);
+    
+    // Update localStorage with new user data
+    if (response && response.user) {
+      if (response.user.name) localStorage.setItem('userName', response.user.name);
+      if (response.user.email) localStorage.setItem('userEmail', response.user.email);
+      if (response.user.avatar) {
+        localStorage.setItem('userAvatar', response.user.avatar);
+      }
+    }
+    
+    return response;
   } catch (error) {
     console.error('Update profile error:', error);
     throw new Error(error.message || 'Failed to update profile. Please try again.');
   }
 };
 
-// Update the uploadAvatar function in api.js
+// uploadAvatar function
 export const uploadAvatar = async (file, retryCount = 0) => {
   try {
-    // If file is already FormData, use it directly
     let formData;
     if (file instanceof FormData) {
       formData = file;
@@ -375,30 +440,31 @@ export const uploadAvatar = async (file, retryCount = 0) => {
       formData.append('avatar', file);
     }
     
-    // Add a delay for retries
     if (retryCount > 0) {
       await new Promise(resolve => setTimeout(resolve, 2000 * retryCount));
     }
     
-    console.log('Uploading avatar with FormData, file size:', file.size || 'unknown');
+    console.log('Uploading avatar, file size:', file.size || 'unknown');
     
     const response = await putData('users/avatar', formData, true);
     
-    // Extract avatar URL from response
+    // Extract avatar URL from response - should be relative path
     let avatarUrl = null;
     if (response && response.avatar) {
       avatarUrl = response.avatar;
     } else if (response && response.user && response.user.avatar) {
       avatarUrl = response.user.avatar;
-    } else if (response && response.data && response.data.avatar) {
-      avatarUrl = response.data.avatar;
+    }
+    
+    // Update localStorage with new avatar
+    if (avatarUrl) {
+      localStorage.setItem('userAvatar', avatarUrl);
     }
     
     return { success: true, avatar: avatarUrl, data: response };
   } catch (error) {
     console.error('Avatar upload error:', error);
     
-    // Retry once if rate limited
     if (error.message.includes('Too many requests') && retryCount < 1) {
       console.log('Rate limited, retrying after delay...');
       return await uploadAvatar(file, retryCount + 1);

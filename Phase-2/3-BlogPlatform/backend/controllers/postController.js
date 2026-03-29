@@ -48,11 +48,12 @@ export const createPost = async (req, res, next) => {
 
         // Image from Cloudinary (multer-storage-cloudinary sets req.file.path & req.file.filename)
         if (req.file) {
-            postData.image = {
-                url: req.file.path,
-                publicId: req.file.filename
-            };
-        }
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    postData.image = {
+        url: req.file.path, 
+        publicId: req.file.filename
+    };
+}
 
         console.log('Creating post with data:', postData);
         const post = await Post.create(postData);

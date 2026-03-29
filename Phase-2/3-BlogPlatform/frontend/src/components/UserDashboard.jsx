@@ -126,52 +126,68 @@ const UserDashboard = ({
   // ─── Avatar Upload ────────────────────────────────────────────────────────
   const handleAvatarClick = () => fileInputRef.current?.click();
 
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ // Replace the handleAvatarChange function in UserDashboard.jsx
+const handleAvatarChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be under 5MB.");
-      return;
-    }
+  if (!file.type.startsWith("image/")) {
+    alert("Please select an image file.");
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Image must be under 5MB.");
+    return;
+  }
 
-    // Show local preview immediately
-    const reader = new FileReader();
-    reader.onload = (ev) => setAvatarPreview(ev.target.result);
-    reader.readAsDataURL(file);
+  // Show local preview immediately
+  const reader = new FileReader();
+  reader.onload = (ev) => setAvatarPreview(ev.target.result);
+  reader.readAsDataURL(file);
 
-    setAvatarUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("avatar", file);
+  setAvatarUploading(true);
+  try {
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-      const response = await updateUserProfile(formData, true);
-      const newAvatarUrl = response?.user?.avatar || response?.avatar;
-
-      if (newAvatarUrl) {
-        const fullUrl = newAvatarUrl.startsWith("http")
-          ? newAvatarUrl
-          : `http://localhost:5000${newAvatarUrl}`;
-        localStorage.setItem("userAvatar", fullUrl);
-        onUserUpdate?.({ avatar: fullUrl });
-        setAvatarKey(Date.now()); // Force refresh
-      }
-    } catch (err) {
-      console.error("Avatar upload error:", err);
+    const response = await updateUserProfile(formData, true);
+    
+    // Extract avatar URL from response (it should be relative path)
+    let newAvatarUrl = response?.user?.avatar || response?.avatar;
+    
+    if (newAvatarUrl) {
+      // Store relative path directly without converting to full URL
+      localStorage.setItem("userAvatar", newAvatarUrl);
+      
+      // Update user object in parent
+      onUserUpdate?.({ avatar: newAvatarUrl });
+      
+      // Clear preview after successful upload
       setAvatarPreview(null);
-      alert("Failed to upload avatar. Please try again.");
-    } finally {
-      setAvatarUploading(false);
+      setAvatarKey(Date.now()); // Force refresh
     }
-  };
+  } catch (err) {
+    console.error("Avatar upload error:", err);
+    setAvatarPreview(null);
+    alert("Failed to upload avatar. Please try again.");
+  } finally {
+    setAvatarUploading(false);
+  }
+};
 
+// Update the avatar display to properly handle relative paths
+const currentAvatar = (() => {
+  const avatar = avatarPreview || user?.avatar;
+  if (!avatar) return null;
+  if (avatar.startsWith('http')) return avatar;
+  if (avatar.startsWith('/uploads')) return `http://localhost:5000${avatar}`;
+  return avatar;
+})();
+
+const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
   // ─── Helpers ──────────────────────────────────────────────────────────────
-  const currentAvatar = avatarPreview || user?.avatar;
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
+  // const currentAvatar = avatarPreview || user?.avatar;
+  // const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
 
   const TabLoader = () => (
     <div className="flex items-center justify-center py-16">

@@ -139,7 +139,6 @@ export const updateAvatar = async (req, res) => {
   try {
     console.log('Avatar upload request received');
     console.log('File:', req.file);
-    console.log('Body:', req.body);
     
     if (!req.file) {
       console.log('No file in request');
@@ -148,21 +147,20 @@ export const updateAvatar = async (req, res) => {
 
     const userId = req.user._id;
     
-    // Get the full URL for the avatar
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const avatarUrl = `${baseUrl}/uploads/avatars/${req.file.filename}`;
+    // Store relative path instead of full URL for consistency
+    const avatarPath = `/uploads/avatars/${req.file.filename}`;
     
-    console.log('Saving avatar URL:', avatarUrl);
+    console.log('Saving avatar path:', avatarPath);
 
     const user = await User.findByIdAndUpdate(
       userId,
-      { avatar: avatarUrl },
+      { avatar: avatarPath },
       { new: true }
     ).select('-password');
 
     res.json({
       success: true,
-      avatar: avatarUrl,
+      avatar: avatarPath,
       user,
       message: 'Avatar updated successfully'
     });
