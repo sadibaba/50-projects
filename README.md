@@ -20,7 +20,7 @@ backend + API, CRUD operations
 13. Task Manager App — React frontend, Node/Express backend, database (MongoDB)✅
 14. Authentication System — SignUp/Login/logout with JWT✅
 15. Blog Platform — CRUD posts, React frontend, Express + Mongo backend ✅ done but error handle and other stuff are we fix later now it can handle 10-15 user at once for now
-16. Recipe App — Public recipe API ya apna backend + search feature
+16. Recipe App — Public recipe API ya apna backend + search feature ✅
 17. Movie Browser — Use OMDB API ya TMDB API
 18. Notes App with Tags — Tagging system + REST API
 19. Contact Book — Contacts CRUD, backend API, React frontend
