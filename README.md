@@ -22,7 +22,7 @@ backend + API, CRUD operations
 15. Blog Platform — CRUD posts, React frontend, Express + Mongo backend ✅ done but error handle and other stuff are we fix later now it can handle 10-15 user at once for now
 16. Recipe App — Public recipe API ya apna backend + search feature ✅
 17. Movie Browser — Use OMDB API ya TMDB API ✅
-18. Notes App with Tags — Tagging system + REST API
+18. Notes App with Tags — Tagging system + REST API ✅
 19. Contact Book — Contacts CRUD, backend API, React frontend
 20. Chat App (Basic) — React + backend (polling API) for messages
 21. File Upload App — Upload files using backend (Express + Multer) ✅ it's already in blog site
