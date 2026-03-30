@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 import './Auth.css';
 
 function Login({ setToken }) {
@@ -8,16 +8,19 @@ function Login({ setToken }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-      setToken(res.data.token);
+      const data = await authService.login({ email, password });
+      setToken(data.token);
+      navigate('/chat');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.error || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -34,6 +37,7 @@ function Login({ setToken }) {
           <h2>Welcome Back</h2>
           <p>Sign in to continue to GoldChat</p>
         </div>
+        
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="input-group">
             <label>Email</label>
@@ -45,6 +49,7 @@ function Login({ setToken }) {
               required
             />
           </div>
+          
           <div className="input-group">
             <label>Password</label>
             <input
@@ -55,11 +60,14 @@ function Login({ setToken }) {
               required
             />
           </div>
+          
           {error && <div className="error-message">{error}</div>}
+          
           <button type="submit" className="auth-btn" disabled={loading}>
             {loading ? <div className="spinner"></div> : 'Sign In'}
           </button>
         </form>
+        
         <div className="auth-footer">
           <p>Don't have an account? <Link to="/register">Sign Up</Link></p>
         </div>
