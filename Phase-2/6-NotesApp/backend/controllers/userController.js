@@ -8,7 +8,7 @@ const generateToken = (id) => {
 
 // @desc    Register new user
 // @route   POST /api/users/register
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   const { username, email, password } = req.body;
 
   try {
@@ -26,13 +26,13 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error); // ✅ errorMiddleware handle karega
   }
 };
 
 // @desc    Login user
 // @route   POST /api/users/login
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -49,13 +49,13 @@ export const loginUser = async (req, res) => {
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
-export const getUserProfile = async (req, res) => {
+export const getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -69,6 +69,6 @@ export const getUserProfile = async (req, res) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };

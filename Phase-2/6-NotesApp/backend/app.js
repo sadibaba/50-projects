@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./database/db.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
+
 // Routes
 import userRoutes from "./routes/userRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
