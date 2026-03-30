@@ -1,6 +1,6 @@
 import express from "express";
 import { createTag, getTags, deleteTag } from "../controllers/tagController.js";
-import protect from "../middleware/authMiddleware.js";
+import protect from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 

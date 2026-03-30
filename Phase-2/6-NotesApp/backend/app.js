@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./database/db.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
 // Routes
 import userRoutes from "./routes/userRoutes.js";
