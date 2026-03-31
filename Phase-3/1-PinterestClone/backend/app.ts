@@ -1,15 +1,22 @@
 import express from "express";
 import cors from "cors";
+import authRoutes from "./routes/auth.routes";
+import pinRoutes from "./routes/pin.routes";
+import boardRoutes from "./routes/board.routes";
+import { errorMiddleware } from "./middleware/error.middleware";
 
 const app = express();
 
-// Middleware
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Example route
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "Backend running with TS 🚀" });
-});
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/pins", pinRoutes);
+app.use("/api/boards", boardRoutes);
+
+// Error handler (last middleware)
+app.use(errorMiddleware);
 
 export default app;
