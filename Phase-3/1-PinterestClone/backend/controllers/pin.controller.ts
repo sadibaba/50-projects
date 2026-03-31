@@ -36,3 +36,13 @@ export const deletePin = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getPinById = async (req: Request, res: Response) => {
+  try {
+    const pin = await Pin.findById(req.params.id).populate("createdBy board");
+    if (!pin) return res.status(404).json({ error: "Pin not found" });
+    res.json(pin);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
