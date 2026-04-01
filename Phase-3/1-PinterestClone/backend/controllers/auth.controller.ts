@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response) => {
    const token = jwt.sign(
   { id: foundUser._id },
   secret,
-  { expiresIn: "1d" } // ✅ hardcoded works fine
+  { expiresIn: "1d" }
 );
 
     res.json({ token });
