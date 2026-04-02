@@ -27,13 +27,13 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-    }
-  };
+ const handleSearch = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (searchQuery.trim()) {
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    setSearchQuery('');
+  }
+};
 
   const handleLogout = async () => {
     await logout();

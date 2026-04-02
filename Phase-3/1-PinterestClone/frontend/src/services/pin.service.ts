@@ -43,7 +43,7 @@ export const pinService = {
   },
 
   async search(query: string): Promise<{ pins: Pin[]; boards: any[] }> {
-    const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
-    return response.data;
-  },
+  const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
+  return response.data;
+},
 };
