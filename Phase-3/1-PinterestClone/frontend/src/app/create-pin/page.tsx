@@ -19,6 +19,7 @@ export default function CreatePinPage() {
     imageUrl: '',
   });
   const [imagePreview, setImagePreview] = useState('');
+  const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showUnsplashPicker, setShowUnsplashPicker] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'url' | 'drag'>('url');
@@ -32,11 +33,17 @@ export default function CreatePinPage() {
   const handleImageUrlChange = (url: string) => {
     setFormData({ ...formData, imageUrl: url });
     setImagePreview(url);
+    setImageError(false); // Reset error when new URL is entered
   };
 
   const handleUnsplashSelect = (imageUrl: string) => {
     handleImageUrlChange(imageUrl);
     setShowUnsplashPicker(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    toast.error('Failed to load image. Please check the URL.');
   };
 
   const handleDrag = useCallback((e: React.DragEvent) => {
@@ -69,74 +76,75 @@ export default function CreatePinPage() {
   }, []);
 
   const compressImage = (file: File, maxSizeMB = 1): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        
-        // Max dimensions
-        const maxWidth = 1200;
-        const maxHeight = 1200;
-        
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Max dimensions
+          const maxWidth = 1200;
+          const maxHeight = 1200;
+          
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
           }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-        
-        // Compress to JPEG with 0.7 quality
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(compressedDataUrl);
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG with 0.7 quality
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = reject;
       };
-      img.onerror = reject;
-    };
-    reader.onerror = reject;
-  });
-};
+      reader.onerror = reject;
+    });
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file && file.type.startsWith('image/')) {
-    if (file.size > 5 * 1024 * 1024) { // If larger than 5MB
-      toast.loading('Compressing image...');
-      try {
-        const compressedUrl = await compressImage(file);
-        handleImageUrlChange(compressedUrl);
-        toast.dismiss();
-        toast.success('Image compressed and loaded!');
-      } catch (error) {
-        toast.dismiss();
-        toast.error('Failed to compress image');
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      if (file.size > 5 * 1024 * 1024) { // If larger than 5MB
+        toast.loading('Compressing image...');
+        try {
+          const compressedUrl = await compressImage(file);
+          handleImageUrlChange(compressedUrl);
+          toast.dismiss();
+          toast.success('Image compressed and loaded!');
+        } catch (error) {
+          toast.dismiss();
+          toast.error('Failed to compress image');
+        }
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          handleImageUrlChange(imageUrl);
+          toast.success('Image loaded!');
+        };
+        reader.readAsDataURL(file);
       }
     } else {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        handleImageUrlChange(imageUrl);
-      };
-      reader.readAsDataURL(file);
+      toast.error('Please select an image file');
     }
-  } else {
-    toast.error('Please select an image file');
-  }
-};
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,6 +156,10 @@ export default function CreatePinPage() {
       toast.error('Please add an image URL or upload an image');
       return;
     }
+    if (imageError) {
+      toast.error('Please fix the image URL before publishing');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -156,6 +168,7 @@ export default function CreatePinPage() {
       router.push('/');
     } catch (err) {
       console.error('Failed to create pin:', err);
+      toast.error('Failed to create pin');
     } finally {
       setLoading(false);
     }
@@ -213,16 +226,22 @@ export default function CreatePinPage() {
                 </div>
 
                 {imagePreview ? (
-                  <div className="relative rounded-lg overflow-hidden">
+                  <div className="relative rounded-lg overflow-hidden border border-gray-200">
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto object-cover max-h-96"
+                      onError={handleImageError}
                     />
+                    {imageError && (
+                      <div className="absolute inset-0 bg-red-50 flex items-center justify-center">
+                        <p className="text-red-500 text-sm">Failed to load image</p>
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={() => handleImageUrlChange('')}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100"
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100 transition-colors"
                     >
                       ✕
                     </button>
@@ -235,8 +254,32 @@ export default function CreatePinPage() {
                           type="url"
                           value={formData.imageUrl}
                           onChange={(e) => handleImageUrlChange(e.target.value)}
-                          placeholder="https://example.com/image.jpg"
+                          placeholder="https://picsum.photos/id/104/500/500"
                         />
+                        <div className="bg-blue-50 rounded-lg p-3">
+                          <p className="text-xs text-blue-600 mb-2">Try these example URLs:</p>
+                          <button
+                            type="button"
+                            onClick={() => handleImageUrlChange("https://picsum.photos/id/104/500/500")}
+                            className="text-xs text-blue-700 hover:underline block mb-1"
+                          >
+                            📷 https://picsum.photos/id/104/500/500 (Mountain)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleImageUrlChange("https://picsum.photos/id/30/500/500")}
+                            className="text-xs text-blue-700 hover:underline block mb-1"
+                          >
+                            ☕ https://picsum.photos/id/30/500/500 (Coffee)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleImageUrlChange("https://picsum.photos/id/89/500/500")}
+                            className="text-xs text-blue-700 hover:underline block"
+                          >
+                            🌊 https://picsum.photos/id/89/500/500 (Ocean)
+                          </button>
+                        </div>
                         <Button
                           type="button"
                           variant="outline"
