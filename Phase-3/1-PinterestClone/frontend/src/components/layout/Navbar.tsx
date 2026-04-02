@@ -17,6 +17,7 @@ import Button from "@/components/common/Button";
 
 const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
@@ -74,7 +75,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Search Bar - Hide on mobile */}
+          {/* Search Bar */}
           <div className="hidden sm:block flex-1 max-w-2xl mx-4">
             <form onSubmit={handleSearch} className="relative">
               <input
@@ -124,23 +125,23 @@ const Navbar = () => {
                   </button>
                 </div>
 
-                {/* User Menu */}
+                {/* User Menu with Profile Picture */}
                 <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="p-2 hover:bg-gray-100 rounded-full"
                   >
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden bg-gradient-to-r from-primary to-red-500">
-                      {user?.profilePicture ? (
-                        <img
-                          src={user.profilePicture}
-                          alt={user.username}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        user?.username?.[0]?.toUpperCase() || "U"
-                      )}
-                    </div>
+                    {user?.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={user.username}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold bg-gradient-to-r from-primary to-red-500">
+                        {user?.username?.[0]?.toUpperCase() || "U"}
+                      </div>
+                    )}
                   </button>
                   <AnimatePresence>
                     {showUserMenu && (
@@ -152,20 +153,35 @@ const Navbar = () => {
                       >
                         <div className="py-2">
                           <div className="px-4 py-2 border-b border-gray-100">
-                            <p className="text-sm font-semibold">
-                              {user?.username}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {user?.email}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden bg-gradient-to-r from-primary to-red-500">
+                                {user?.profilePicture ? (
+                                  <img
+                                    src={user.profilePicture}
+                                    alt={user.username}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  user?.username?.[0]?.toUpperCase() || "U"
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold">
+                                  {user?.username}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {user?.email}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                           <Link
-  href={`/profile/${user?._id}`}
-  className="block px-4 py-2 hover:bg-gray-100 transition-colors"
-  onClick={() => setShowUserMenu(false)}
->
-  My Profile
-</Link>
+                            href={`/profile/${user?._id}`}
+                            className="block px-4 py-2 hover:bg-gray-100 transition-colors"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            My Profile
+                          </Link>
                           <button
                             onClick={handleLogout}
                             className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors flex items-center gap-2 text-red-600"

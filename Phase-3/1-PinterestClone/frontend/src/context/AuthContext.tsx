@@ -5,6 +5,7 @@ import { User } from '@/types';
 import { authService } from '@/services/auth.service';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import api from '@/services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +14,7 @@ interface AuthContextType {
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
+  updateUser: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +44,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const fetchCurrentUser = async (token: string) => {
+    try {
+      // Try to get user info from backend
+      const response = await api.get('/users/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user from backend:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const loadUser = async () => {
       const token = authService.getToken();
@@ -49,12 +64,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (token) {
         try {
-          // Get user from localStorage
+          // First try to get from localStorage
           const storedUser = localStorage.getItem('current_user');
           if (storedUser) {
             const parsedUser = JSON.parse(storedUser);
             console.log('Found stored user:', parsedUser);
             setUser(parsedUser);
+          }
+          
+          // Then try to fetch fresh user data from backend
+          const freshUser = await fetchCurrentUser(token);
+          if (freshUser) {
+            setUser(freshUser);
+            localStorage.setItem('current_user', JSON.stringify(freshUser));
           }
         } catch (error) {
           console.error('Failed to load user:', error);
@@ -75,7 +97,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Login response:', response);
       
       if (response.token) {
-        // Set cookie for middleware
         setCookie('token', response.token, 7);
         
         // Decode the JWT token to get user info
@@ -85,42 +106,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const payload = JSON.parse(atob(tokenParts[1]));
             console.log('Decoded token payload:', payload);
             
-            const userData: User = {
-              _id: payload.id || payload.userId || '1',
-              username: payload.username || email.split('@')[0],
-              email: email,
-              followers: [],
-              following: [],
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
+            // Fetch full user data including profile picture
+            const userData = await fetchCurrentUser(response.token);
             
-            console.log('Setting user from token:', userData);
-            setUser(userData);
-            localStorage.setItem('current_user', JSON.stringify(userData));
+            if (userData) {
+              console.log('Setting user from API:', userData);
+              setUser(userData);
+              localStorage.setItem('current_user', JSON.stringify(userData));
+            } else {
+              // Fallback: create user from token
+              const fallbackUser: User = {
+                _id: payload.id || payload.userId || '1',
+                username: payload.username || email.split('@')[0],
+                email: email,
+                profilePicture: '',
+                bio: '',
+                followers: [],
+                following: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+              setUser(fallbackUser);
+              localStorage.setItem('current_user', JSON.stringify(fallbackUser));
+            }
+            
             toast.success('Logged in successfully!');
-            
-            // Use router.push instead of window.location to avoid full reload
             router.push('/');
-          } else {
-            throw new Error('Invalid token format');
           }
         } catch (decodeError) {
           console.error('Failed to decode token:', decodeError);
-          // Fallback: create user from email
-          const userData: User = {
-            _id: '1',
-            username: email.split('@')[0],
-            email: email,
-            followers: [],
-            following: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          setUser(userData);
-          localStorage.setItem('current_user', JSON.stringify(userData));
-          toast.success('Logged in successfully!');
-          router.push('/');
         }
       }
     } catch (error: any) {
@@ -152,6 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     router.push('/login');
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('current_user', JSON.stringify(updatedUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -161,6 +180,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         isAuthenticated: !!user,
+        updateUser,
       }}
     >
       {children}

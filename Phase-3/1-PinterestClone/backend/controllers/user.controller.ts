@@ -134,3 +134,18 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+
+export const getCurrentUser = async (req: AuthRequest, res: Response) => {
+  try {
+    const currentUserId = req.user?.id;
+    const user = await User.findById(currentUserId).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};

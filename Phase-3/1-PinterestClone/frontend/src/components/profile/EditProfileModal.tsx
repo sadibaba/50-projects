@@ -47,27 +47,29 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onUp
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await api.put('/users/profile/update', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      toast.success('Profile updated successfully!');
-      onUpdate(response.data.user);
-      onClose();
-    } catch (err) {
-      console.error('Update failed:', err);
-      toast.error('Failed to update profile');
-    } finally {
-      setLoading(false);
-    }
-  };
 
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    const token = localStorage.getItem('token');
+    const response = await api.put('/users/profile/update', formData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    toast.success('Profile updated successfully!');
+    onUpdate(response.data.user);
+    // Also update the user in localStorage
+    localStorage.setItem('current_user', JSON.stringify(response.data.user));
+    onClose();
+  } catch (err) {
+    console.error('Update failed:', err);
+    toast.error('Failed to update profile');
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
       <motion.div

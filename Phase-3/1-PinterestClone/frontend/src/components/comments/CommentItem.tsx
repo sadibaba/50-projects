@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { IoTrashOutline } from 'react-icons/io5';
@@ -21,6 +20,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onDelete }) => {
     return null;
   }
   
+  // Handle both populated user object and user ID string
   const commentUser = typeof comment.userId === 'object' ? comment.userId : null;
   const userId = commentUser?._id || comment.userId;
   const username = commentUser?.username || 'User';
@@ -35,22 +35,25 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onDelete }) => {
   
   return (
     <div className="flex gap-3">
+      {/* Profile Picture - Clickable */}
       <div 
         onClick={handleProfileClick}
-        className="cursor-pointer"
+        className="cursor-pointer flex-shrink-0"
       >
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer overflow-hidden bg-gradient-to-r from-primary to-red-500">
-          {profilePicture ? (
-            <img 
-              src={profilePicture} 
-              alt={username}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            username?.[0]?.toUpperCase() || 'U'
-          )}
-        </div>
+        {profilePicture ? (
+          <img 
+            src={profilePicture} 
+            alt={username}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold bg-gradient-to-r from-primary to-red-500">
+            {username?.[0]?.toUpperCase() || 'U'}
+          </div>
+        )}
       </div>
+      
+      {/* Comment Content */}
       <div className="flex-1">
         <div className="bg-gray-100 rounded-lg p-3">
           <span 

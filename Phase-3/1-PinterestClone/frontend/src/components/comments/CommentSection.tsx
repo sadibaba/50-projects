@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { IoTrashOutline } from 'react-icons/io5';
 import { commentService } from '@/services/comment.service';
 import { Comment } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/common/Button';
+import CommentItem from './CommentItem';
 import toast from 'react-hot-toast';
 
 interface CommentSectionProps {
@@ -47,7 +46,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
     setSubmitting(true);
     try {
       const comment = await commentService.addComment(pinId, newComment);
-      setComments([comment, ...comments]);
+      // Refetch comments to get populated user data
+      await fetchComments();
       setNewComment('');
       toast.success('Comment added!');
     } catch (err) {
@@ -115,17 +115,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
         {comments.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
         ) : (
-          comments.map((comment) => {
-            // Import dynamically to avoid circular dependency
-            const CommentItem = require('./CommentItem').default;
-            return (
-              <CommentItem
-                key={comment._id}
-                comment={comment}
-                onDelete={handleDeleteComment}
-              />
-            );
-          })
+          comments.map((comment) => (
+            <CommentItem
+              key={comment._id}
+              comment={comment}
+              onDelete={handleDeleteComment}
+            />
+          ))
         )}
       </div>
     </div>

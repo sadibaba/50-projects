@@ -2,11 +2,14 @@ export interface User {
   _id: string;
   username: string;
   email: string;
+  profilePicture?: string;
+  bio?: string;
   followers: string[];
   following: string[];
   createdAt: string;
   updatedAt: string;
 }
+
 
 export interface Pin {
   _id: string;
@@ -34,7 +37,7 @@ export interface Board {
 export interface Comment {
   _id: string;
   text: string;
-  userId: User | string;  
+  userId: User | string;
   pinId: string;
   createdAt: string;
   updatedAt: string;
