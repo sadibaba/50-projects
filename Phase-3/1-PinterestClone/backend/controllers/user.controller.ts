@@ -1,4 +1,3 @@
-// backend/src/controllers/user.controller.ts
 import { Response } from "express";
 import { AuthRequest } from "../types/authRequest";
 import User from "../models/user.model";
@@ -103,6 +102,35 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
       pins,
       boards
     });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const currentUserId = req.user?.id;
+    const { username, bio, profilePicture, coverPhoto } = req.body;
+
+    if (!currentUserId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const user = await User.findById(currentUserId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (username) user.username = username;
+    if (bio !== undefined) user.bio = bio;
+    if (profilePicture !== undefined) user.profilePicture = profilePicture;
+    if (coverPhoto !== undefined) user.coverPhoto = coverPhoto;
+
+    await user.save();
+
+    const { password, ...userWithoutPassword } = user.toObject();
+    res.json({ message: "Profile updated successfully", user: userWithoutPassword });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

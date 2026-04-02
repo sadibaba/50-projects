@@ -114,14 +114,18 @@ const Navbar = () => {
 
                 {/* User Menu */}
                 <div className="relative">
-                  <button
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                  >
-                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white font-semibold">
-                      {user?.username?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                  </button>
+  <button
+    onClick={() => setShowUserMenu(!showUserMenu)}
+    className="p-2 hover:bg-gray-100 rounded-full"
+  >
+    <div className="w-8 h-8 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden">
+      {user?.profilePicture ? (
+        <img src={user.profilePicture} alt={user.username} className="w-full h-full object-cover" />
+      ) : (
+        user?.username?.[0]?.toUpperCase() || 'U'
+      )}
+    </div>
+  </button>
                   <AnimatePresence>
                     {showUserMenu && (
                       <motion.div

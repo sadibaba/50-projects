@@ -4,6 +4,9 @@ export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+  profilePicture?: string;
+  coverPhoto?: string;
+  bio?: string;
   followers: mongoose.Types.ObjectId[];
   following: mongoose.Types.ObjectId[];
 }
@@ -12,6 +15,9 @@ const UserSchema = new Schema<IUser>({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  profilePicture: { type: String, default: "" },
+  coverPhoto: { type: String, default: "" },
+  bio: { type: String, default: "" },
   followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   following: [{ type: Schema.Types.ObjectId, ref: "User" }]
 }, { timestamps: true });

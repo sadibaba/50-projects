@@ -10,7 +10,8 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { pinService } from '@/services/pin.service';
 import toast from 'react-hot-toast';
-import { IoHeartOutline, IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5';
+import { IoHeartOutline, IoPersonAddOutline, IoPersonRemoveOutline, IoCreateOutline } from 'react-icons/io5';
+import EditProfileModal from '@/components/profile/EditProfileModal';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -25,6 +26,7 @@ export default function ProfilePage() {
   const [totalLikes, setTotalLikes] = useState(0);
   const [isFollowingLoading, setIsFollowingLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -108,6 +110,12 @@ export default function ProfilePage() {
     }
   };
 
+  const handleProfileUpdate = (updatedUser: any) => {
+    setProfileUser(updatedUser);
+    // Refresh pins to update any changes
+    fetchUserPins();
+  };
+
   if (!mounted || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -134,15 +142,37 @@ export default function ProfilePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        className="relative"
       >
+        {/* Edit Button for Own Profile */}
+        {isOwnProfile && (
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="absolute top-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors z-10"
+          >
+            <IoCreateOutline size={20} className="text-gray-600" />
+          </button>
+        )}
+
         {/* Profile Header */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-32 h-32 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white text-5xl font-bold">
-            {profileUser.username?.[0]?.toUpperCase() || 'U'}
+          <div className="w-32 h-32 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white text-5xl font-bold overflow-hidden">
+            {profileUser.profilePicture ? (
+              <img 
+                src={profileUser.profilePicture} 
+                alt={profileUser.username} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              profileUser.username?.[0]?.toUpperCase() || 'U'
+            )}
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mt-4">{profileUser.username}</h1>
+          {profileUser.bio && (
+            <p className="text-gray-600 mt-2 max-w-md">{profileUser.bio}</p>
+          )}
           <p className="text-gray-500 mt-1">{profileUser.email}</p>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-400 text-sm mt-2">
             Joined {new Date(profileUser.createdAt).toLocaleDateString()}
           </p>
         </div>
@@ -218,6 +248,15 @@ export default function ProfilePage() {
           )}
         </div>
       </motion.div>
+
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <EditProfileModal
+          user={profileUser}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={handleProfileUpdate}
+        />
+      )}
     </div>
   );
 }

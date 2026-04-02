@@ -22,4 +22,9 @@ export const userService = {
     const response = await api.put(`/users/${id}/unfollow`);
     return response.data;
   },
+
+  async updateProfile(data: { username?: string; bio?: string; profilePicture?: string }): Promise<User> {
+  const response = await api.put('/users/profile/update', data);
+  return response.data.user;
+},
 };
