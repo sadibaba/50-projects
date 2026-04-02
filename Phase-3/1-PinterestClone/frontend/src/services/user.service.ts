@@ -14,10 +14,12 @@ export const userService = {
   },
 
   async followUser(id: string): Promise<void> {
-    await api.put(`/users/${id}/follow`);
+    const response = await api.put(`/users/${id}/follow`);
+    return response.data;
   },
 
   async unfollowUser(id: string): Promise<void> {
-    await api.put(`/users/${id}/unfollow`);
+    const response = await api.put(`/users/${id}/unfollow`);
+    return response.data;
   },
 };

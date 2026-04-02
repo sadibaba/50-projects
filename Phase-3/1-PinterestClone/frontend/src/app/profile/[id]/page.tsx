@@ -8,16 +8,22 @@ import { useAuth } from '@/context/AuthContext';
 import PinGrid from '@/components/pins/PinGrid';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { usePins } from '@/hooks/usePins';
+import { pinService } from '@/services/pin.service';
+import toast from 'react-hot-toast';
+import { IoHeartOutline, IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5';
 
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { user: currentUser, isAuthenticated } = useAuth();
-  const { pins: allPins, loading: pinsLoading } = usePins(false);
-  const [profile, setProfile] = useState<any>(null);
+  const [profileUser, setProfileUser] = useState<any>(null);
+  const [userPins, setUserPins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'pins' | 'boards'>('pins');
+  const [following, setFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [totalLikes, setTotalLikes] = useState(0);
+  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,37 +33,78 @@ export default function ProfilePage() {
   useEffect(() => {
     if (mounted && params.id) {
       fetchProfile();
+      fetchUserPins();
     }
   }, [params.id, mounted]);
 
   const fetchProfile = async () => {
     try {
       const data = await userService.getUserProfile(params.id as string);
-      setProfile(data);
+      setProfileUser(data.user);
+      setFollowersCount(data.followersCount);
+      setFollowingCount(data.followingCount);
+      
+      // Check if current user is following this profile
+      if (currentUser && data.user) {
+        const isFollowingUser = data.user.followers?.includes(currentUser._id);
+        setFollowing(isFollowingUser);
+      }
     } catch (err) {
       console.error('Failed to fetch profile:', err);
+      toast.error('Failed to load profile');
+    }
+  };
+
+  const fetchUserPins = async () => {
+    try {
+      const allPins = await pinService.getAllPins();
+      const pins = allPins.filter(pin => pin.createdBy?._id === params.id);
+      setUserPins(pins);
+      
+      // Calculate total likes
+      const likes = pins.reduce((total, pin) => total + (pin.likes?.length || 0), 0);
+      setTotalLikes(likes);
+    } catch (err) {
+      console.error('Failed to fetch user pins:', err);
+      setUserPins([]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleFollow = async () => {
-    if (!currentUser) return;
+    if (!isAuthenticated) {
+      toast.error('Please login to follow users');
+      router.push('/login');
+      return;
+    }
+
+    setIsFollowingLoading(true);
     try {
       await userService.followUser(params.id as string);
-      fetchProfile();
+      setFollowing(true);
+      setFollowersCount(prev => prev + 1);
+      toast.success(`Following ${profileUser?.username}`);
     } catch (err) {
-      console.error('Failed to follow user:', err);
+      console.error('Failed to follow:', err);
+      toast.error('Failed to follow user');
+    } finally {
+      setIsFollowingLoading(false);
     }
   };
 
   const handleUnfollow = async () => {
-    if (!currentUser) return;
+    setIsFollowingLoading(true);
     try {
       await userService.unfollowUser(params.id as string);
-      fetchProfile();
+      setFollowing(false);
+      setFollowersCount(prev => prev - 1);
+      toast.success(`Unfollowed ${profileUser?.username}`);
     } catch (err) {
-      console.error('Failed to unfollow user:', err);
+      console.error('Failed to unfollow:', err);
+      toast.error('Failed to unfollow user');
+    } finally {
+      setIsFollowingLoading(false);
     }
   };
 
@@ -69,7 +116,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profile) {
+  if (!profileUser) {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-semibold text-gray-900">User not found</h2>
@@ -81,9 +128,6 @@ export default function ProfilePage() {
   }
 
   const isOwnProfile = currentUser?._id === params.id;
-  const isFollowing = currentUser?.following?.includes(params.id as string);
-
-  const userPins = allPins.filter(pin => pin.createdBy?._id === params.id);
 
   return (
     <div className="max-w-[2000px] mx-auto px-4">
@@ -94,88 +138,83 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className="flex flex-col items-center text-center">
           <div className="w-32 h-32 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white text-5xl font-bold">
-            {profile.user.username[0].toUpperCase()}
+            {profileUser.username?.[0]?.toUpperCase() || 'U'}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">{profile.user.username}</h1>
-          <p className="text-gray-500 mt-1">{profile.user.email}</p>
-          <p className="text-gray-600 mt-2">Joined {new Date(profile.user.createdAt).toLocaleDateString()}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mt-4">{profileUser.username}</h1>
+          <p className="text-gray-500 mt-1">{profileUser.email}</p>
+          <p className="text-gray-600 mt-2">
+            Joined {new Date(profileUser.createdAt).toLocaleDateString()}
+          </p>
         </div>
 
-        {/* Stats and Actions */}
-        <div className="flex items-center justify-between mt-6">
-          <div className="flex gap-8">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{userPins.length}</p>
-              <p className="text-sm text-gray-500">Pins</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{profile.followersCount}</p>
-              <p className="text-sm text-gray-500">Followers</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{profile.followingCount}</p>
-              <p className="text-sm text-gray-500">Following</p>
-            </div>
+        {/* Stats */}
+        <div className="flex items-center justify-center gap-8 mt-6">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900">{userPins.length}</p>
+            <p className="text-sm text-gray-500">Pins</p>
           </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900">{totalLikes}</p>
+            <p className="text-sm text-gray-500">Total Likes</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900">{followersCount}</p>
+            <p className="text-sm text-gray-500">Followers</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-gray-900">{followingCount}</p>
+            <p className="text-sm text-gray-500">Following</p>
+          </div>
+        </div>
+
+        {/* Follow Button */}
+        {!isOwnProfile && isAuthenticated && (
+          <div className="flex justify-center mt-6">
+            {following ? (
+              <Button
+                variant="outline"
+                onClick={handleUnfollow}
+                loading={isFollowingLoading}
+              >
+                <IoPersonRemoveOutline className="mr-2" size={18} />
+                Unfollow
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={handleFollow}
+                loading={isFollowingLoading}
+              >
+                <IoPersonAddOutline className="mr-2" size={18} />
+                Follow
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Pins Section */}
+        <div className="mt-12">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            {isOwnProfile ? 'Your Pins' : `${profileUser.username}'s Pins`}
+            <span className="text-sm text-gray-500 ml-2">({userPins.length})</span>
+          </h2>
           
-          {!isOwnProfile && isAuthenticated && (
-            <Button
-              variant={isFollowing ? 'outline' : 'primary'}
-              onClick={isFollowing ? handleUnfollow : handleFollow}
-            >
-              {isFollowing ? 'Unfollow' : 'Follow'}
-            </Button>
-          )}
-        </div>
-
-        {/* Tabs */}
-        <div className="border-b border-gray-200 mt-8">
-          <div className="flex gap-8">
-            <button
-              onClick={() => setActiveTab('pins')}
-              className={`pb-3 text-sm font-semibold transition-colors ${
-                activeTab === 'pins'
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Pins ({userPins.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('boards')}
-              className={`pb-3 text-sm font-semibold transition-colors ${
-                activeTab === 'boards'
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Boards ({profile.boards?.length || 0})
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="mt-8">
-          {activeTab === 'pins' && (
-            <PinGrid pins={userPins} loading={pinsLoading} />
-          )}
-          {activeTab === 'boards' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {profile.boards?.map((board: any) => (
-                <div key={board._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-4">
-                  <h3 className="font-semibold text-gray-900">{board.name}</h3>
-                  {board.description && (
-                    <p className="text-sm text-gray-500 mt-1">{board.description}</p>
-                  )}
-                  <p className="text-xs text-gray-400 mt-2">{board.pins?.length || 0} pins</p>
-                </div>
-              ))}
-              {(!profile.boards || profile.boards.length === 0) && (
-                <div className="col-span-full text-center py-12 text-gray-500">
-                  No boards yet
-                </div>
+          {userPins.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <div className="text-6xl mb-4">📌</div>
+              <p className="text-gray-500">
+                {isOwnProfile 
+                  ? "You haven't created any pins yet." 
+                  : `${profileUser.username} hasn't created any pins yet.`}
+              </p>
+              {isOwnProfile && (
+                <Button onClick={() => router.push('/create-pin')} className="mt-4">
+                  Create your first pin
+                </Button>
               )}
             </div>
+          ) : (
+            <PinGrid pins={userPins} />
           )}
         </div>
       </motion.div>

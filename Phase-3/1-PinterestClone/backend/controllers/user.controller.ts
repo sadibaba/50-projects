@@ -1,3 +1,4 @@
+// backend/src/controllers/user.controller.ts
 import { Response } from "express";
 import { AuthRequest } from "../types/authRequest";
 import User from "../models/user.model";
@@ -34,7 +35,10 @@ export const followUser = async (req: AuthRequest, res: Response) => {
       await currentUser.save();
     }
 
-    res.json({ message: "Followed successfully" });
+    res.json({ 
+      message: "Followed successfully",
+      followersCount: userToFollow.followers.length 
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -66,7 +70,10 @@ export const unfollowUser = async (req: AuthRequest, res: Response) => {
     await userToUnfollow.save();
     await currentUser.save();
 
-    res.json({ message: "Unfollowed successfully" });
+    res.json({ 
+      message: "Unfollowed successfully",
+      followersCount: userToUnfollow.followers.length 
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -79,13 +86,20 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
     const user = await User.findById(id).select("-password");
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const pins = await Pin.find({ createdBy: id }).sort({ createdAt: -1 });
-    const boards = await Board.find({ userId: id });
+    const pins = await Pin.find({ createdBy: id })
+      .sort({ createdAt: -1 })
+      .populate("createdBy", "username email");
+    
+    const boards = await Board.find({ createdBy: id });
+
+    // Calculate total likes from user's pins
+    const totalLikes = pins.reduce((total, pin) => total + (pin.likes?.length || 0), 0);
 
     res.json({
       user,
       followersCount: user.followers.length,
       followingCount: user.following.length,
+      totalLikes,
       pins,
       boards
     });
