@@ -4,15 +4,11 @@ import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
 
-const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
-
-// Debug: Check if key is loaded
-console.log('Unsplash API Key loaded:', !!UNSPLASH_ACCESS_KEY);
-console.log('Unsplash API Key value:', UNSPLASH_ACCESS_KEY ? `${UNSPLASH_ACCESS_KEY.substring(0, 10)}...` : 'NOT FOUND');
-
-router.get("/images", authMiddleware, async (req, res) => {
+router.get("/search", authMiddleware, async (req, res) => {
   try {
-    const { query = "nature", page = 1, perPage = 20 } = req.query;
+    const { query, perPage = 20 } = req.query;
+    const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
+    
     
     if (!UNSPLASH_ACCESS_KEY) {
       return res.status(500).json({ error: "Unsplash API key not configured" });
@@ -23,40 +19,31 @@ router.get("/images", authMiddleware, async (req, res) => {
         Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
       },
       params: {
-        query,
-        page: parseInt(page as string),
+        query: query || "nature",
         per_page: parseInt(perPage as string),
       },
     });
     
-    res.json(response.data);
-  } catch (err: any) {
-    console.error("Unsplash API error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Failed to fetch images", details: err.response?.data });
-  }
-});
-
-router.get("/images/random", authMiddleware, async (req, res) => {
-  try {
-    const { count = 20 } = req.query;
-    
-    if (!UNSPLASH_ACCESS_KEY) {
-      return res.status(500).json({ error: "Unsplash API key not configured" });
-    }
-    
-    const response = await axios.get("https://api.unsplash.com/photos/random", {
-      headers: {
-        Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
+    const images = response.data.results.map((photo: any) => ({
+      id: photo.id,
+      urls: {
+        regular: photo.urls.regular,
+        small: photo.urls.small,
+        thumb: photo.urls.thumb,
       },
-      params: {
-        count: parseInt(count as string),
+      user: {
+        name: photo.user.name,
+        username: photo.user.username,
       },
-    });
+      alt_description: photo.alt_description || query,
+      description: photo.description || `Beautiful ${query} photo`,
+      likes: photo.likes,
+    }));
     
-    res.json(response.data);
+    res.json({ results: images, total: response.data.total });
+    
   } catch (err: any) {
-    console.error("Unsplash API error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Failed to fetch random images", details: err.response?.data });
+    res.status(500).json({ error: err.response?.data?.errors?.[0] || "Failed to fetch images" });
   }
 });
 

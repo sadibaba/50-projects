@@ -51,5 +51,18 @@ export const imageService = {
       }
       return fallbackImages;
     }
+    
   },
+  
 };
+
+
+
+// export const imageService = {
+//   async searchImages(query: string, perPage: number = 20) {
+//     const response = await api.get('/unsplash/search', {
+//       params: { query, perPage }
+//     });
+//     return response.data;
+//   },
+// };
