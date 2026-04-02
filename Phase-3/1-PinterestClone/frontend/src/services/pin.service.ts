@@ -22,19 +22,23 @@ export const pinService = {
   },
 
   async likePin(id: string): Promise<void> {
-    await api.put(`/pins/${id}/like`);
+    const response = await api.put(`/pins/${id}/like`);
+    return response.data;
   },
 
   async unlikePin(id: string): Promise<void> {
-    await api.put(`/pins/${id}/unlike`);
+    const response = await api.put(`/pins/${id}/unlike`);
+    return response.data;
   },
 
   async savePin(id: string): Promise<void> {
-    await api.put(`/pins/${id}/save`);
+    const response = await api.put(`/pins/${id}/save`);
+    return response.data;
   },
 
   async unsavePin(id: string): Promise<void> {
-    await api.put(`/pins/${id}/unsave`);
+    const response = await api.put(`/pins/${id}/unsave`);
+    return response.data;
   },
 
   async getFeed(): Promise<Pin[]> {
@@ -43,7 +47,7 @@ export const pinService = {
   },
 
   async search(query: string): Promise<{ pins: Pin[]; boards: any[] }> {
-  const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
-  return response.data;
-},
+    const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
+    return response.data;
+  },
 };

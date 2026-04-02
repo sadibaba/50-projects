@@ -1,44 +1,118 @@
-// frontend/src/app/pin/[id]/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { IoHeartOutline, IoHeart, IoBookmarkOutline, IoBookmark, IoArrowBackOutline } from 'react-icons/io5';
 import { usePins } from '@/hooks/usePins';
+import { useAuth } from '@/context/AuthContext';
 import CommentSection from '@/components/comments/CommentSection';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import toast from 'react-hot-toast';
+import { pinService } from '@/services/pin.service';
 
 export default function PinDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
   const { pins, loading, likePin, unlikePin, savePin, unsavePin } = usePins();
   const [imageError, setImageError] = useState(false);
-  
-  const pin = pins.find(p => p._id === params.id);
-  
-  if (loading) {
+  const [pin, setPin] = useState<any>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    if (params.id) {
+      fetchPinDetails();
+    }
+  }, [params.id]);
+
+  useEffect(() => {
+    if (pin && user) {
+      const liked = pin.likes?.includes(user._id);
+      setIsLiked(liked);
+      setLikeCount(pin.likes?.length || 0);
+      
+      const saved = pin.saves?.includes(user._id);
+      setIsSaved(saved);
+    }
+  }, [pin, user]);
+
+  const fetchPinDetails = async () => {
+    try {
+      const data = await pinService.getPinById(params.id as string);
+      setPin(data);
+    } catch (error) {
+      console.error('Failed to fetch pin:', error);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to like');
+      return;
+    }
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    try {
+      if (isLiked) {
+        await pinService.unlikePin(pin._id);
+        setIsLiked(false);
+        setLikeCount(prev => prev - 1);
+        toast.success('Unliked!');
+      } else {
+        await pinService.likePin(pin._id);
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+        toast.success('Liked!');
+      }
+    } catch (error) {
+      console.error('Like action failed:', error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to save');
+      return;
+    }
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    try {
+      if (isSaved) {
+        await pinService.unsavePin(pin._id);
+        setIsSaved(false);
+        toast.success('Removed from saved');
+      } else {
+        await pinService.savePin(pin._id);
+        setIsSaved(true);
+        toast.success('Saved!');
+      }
+    } catch (error) {
+      console.error('Save action failed:', error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  if (loading || !pin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
-  
-  if (!pin) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-semibold text-gray-900">Pin not found</h2>
-        <Button onClick={() => router.push('/')} className="mt-4">
-          Go Home
-        </Button>
-      </div>
-    );
-  }
-  
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <button
@@ -88,18 +162,33 @@ export default function PinDetailPage() {
               
               <div className="flex gap-2">
                 <button
-                  onClick={() => likePin?.(pin._id)}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  onClick={handleLike}
+                  disabled={isProcessing}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
-                  <IoHeartOutline size={24} />
+                  {isLiked ? (
+                    <IoHeart className="text-red-500" size={24} />
+                  ) : (
+                    <IoHeartOutline size={24} />
+                  )}
                 </button>
                 <button
-                  onClick={() => savePin?.(pin._id)}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                  onClick={handleSave}
+                  disabled={isProcessing}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
-                  <IoBookmarkOutline size={24} />
+                  {isSaved ? (
+                    <IoBookmark className="text-primary" size={24} />
+                  ) : (
+                    <IoBookmarkOutline size={24} />
+                  )}
                 </button>
               </div>
+            </div>
+            
+            <div className="flex items-center gap-2 mb-4">
+              <IoHeart className={isLiked ? "text-red-500" : "text-gray-400"} size={20} />
+              <span className="text-gray-700">{likeCount} {likeCount === 1 ? 'like' : 'likes'}</span>
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{pin.title}</h1>

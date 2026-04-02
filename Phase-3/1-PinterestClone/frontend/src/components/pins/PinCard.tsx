@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { IoHeartOutline, IoHeart, IoBookmarkOutline, IoBookmark, IoShareOutline } from 'react-icons/io5';
@@ -10,10 +10,10 @@ import toast from 'react-hot-toast';
 
 interface PinCardProps {
   pin: Pin;
-  onLike?: (id: string) => void;
-  onUnlike?: (id: string) => void;
-  onSave?: (id: string) => void;
-  onUnsave?: (id: string) => void;
+  onLike?: (id: string) => Promise<void>;
+  onUnlike?: (id: string) => Promise<void>;
+  onSave?: (id: string) => Promise<void>;
+  onUnsave?: (id: string) => Promise<void>;
 }
 
 const PinCard: React.FC<PinCardProps> = ({
@@ -23,40 +23,81 @@ const PinCard: React.FC<PinCardProps> = ({
   onSave,
   onUnsave,
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [likeCount, setLikeCount] = useState(pin.likes?.length || 0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleLike = (e: React.MouseEvent) => {
+  useEffect(() => {
+    // Check if current user has liked this pin
+    if (user && pin.likes) {
+      const liked = pin.likes.includes(user._id as any);
+      setIsLiked(liked);
+    }
+    setLikeCount(pin.likes?.length || 0);
+  }, [pin.likes, user]);
+
+  const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
     if (!isAuthenticated) {
       toast.error('Please login to like pins');
       return;
     }
-    if (isLiked) {
-      onUnlike?.(pin._id);
-      setIsLiked(false);
-    } else {
-      onLike?.(pin._id);
-      setIsLiked(true);
+    
+    if (isProcessing) return;
+    setIsProcessing(true);
+    
+    try {
+      if (isLiked) {
+        await onUnlike?.(pin._id);
+        setIsLiked(false);
+        setLikeCount(prev => prev - 1);
+        toast.success('Unliked!');
+      } else {
+        await onLike?.(pin._id);
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+        toast.success('Liked!');
+      }
+    } catch (error) {
+      console.error('Like action failed:', error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleSave = (e: React.MouseEvent) => {
+  const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
     if (!isAuthenticated) {
       toast.error('Please login to save pins');
       return;
     }
-    if (isSaved) {
-      onUnsave?.(pin._id);
-      setIsSaved(false);
-    } else {
-      onSave?.(pin._id);
-      setIsSaved(true);
+    
+    if (isProcessing) return;
+    setIsProcessing(true);
+    
+    try {
+      if (isSaved) {
+        await onUnsave?.(pin._id);
+        setIsSaved(false);
+        toast.success('Removed from saved');
+      } else {
+        await onSave?.(pin._id);
+        setIsSaved(true);
+        toast.success('Saved!');
+      }
+    } catch (error) {
+      console.error('Save action failed:', error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -99,7 +140,8 @@ const PinCard: React.FC<PinCardProps> = ({
               >
                 <button
                   onClick={handleLike}
-                  className="p-3 bg-white rounded-full hover:scale-110 transition-transform"
+                  disabled={isProcessing}
+                  className="p-3 bg-white rounded-full hover:scale-110 transition-transform disabled:opacity-50"
                 >
                   {isLiked ? (
                     <IoHeart className="text-red-500" size={24} />
@@ -109,7 +151,8 @@ const PinCard: React.FC<PinCardProps> = ({
                 </button>
                 <button
                   onClick={handleSave}
-                  className="p-3 bg-white rounded-full hover:scale-110 transition-transform"
+                  disabled={isProcessing}
+                  className="p-3 bg-white rounded-full hover:scale-110 transition-transform disabled:opacity-50"
                 >
                   {isSaved ? (
                     <IoBookmark className="text-primary" size={24} />
@@ -144,8 +187,8 @@ const PinCard: React.FC<PinCardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-1 text-sm text-gray-500">
-                <IoHeartOutline size={16} />
-                <span>{pin.likes?.length || 0}</span>
+                <IoHeart className={isLiked ? "text-red-500" : "text-gray-400"} size={14} />
+                <span>{likeCount}</span>
               </div>
             </div>
           </div>

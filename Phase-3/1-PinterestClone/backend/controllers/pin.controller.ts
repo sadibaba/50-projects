@@ -67,13 +67,14 @@ export const likePin = async (req: AuthRequest, res: Response) => {
       await pin.save();
     }
 
-    res.json({ message: "Pin liked", likes: pin.likes.length });
+    // Return the updated pin with likes count
+    const updatedPin = await Pin.findById(id).populate("createdBy", "username");
+    res.json({ message: "Pin liked", likes: pin.likes.length, pin: updatedPin });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// Unlike a pin
 export const unlikePin = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -89,7 +90,9 @@ export const unlikePin = async (req: AuthRequest, res: Response) => {
     );
     await pin.save();
 
-    res.json({ message: "Pin unliked", likes: pin.likes.length });
+    // Return the updated pin with likes count
+    const updatedPin = await Pin.findById(id).populate("createdBy", "username");
+    res.json({ message: "Pin unliked", likes: pin.likes.length, pin: updatedPin });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
