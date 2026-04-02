@@ -27,11 +27,12 @@ export const addComment = async (req: AuthRequest, res: Response) => {
   }
 };
 
+
 export const getComments = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params; 
     const comments = await Comment.find({ pinId: id })
-      .populate("userId", "username email")
+      .populate("userId", "username email profilePicture bio") 
       .sort({ createdAt: -1 });
 
     res.json(comments);

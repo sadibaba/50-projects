@@ -78,22 +78,21 @@ export const unfollowUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
+
 export const getUserProfile = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-
     const user = await User.findById(id).select("-password");
     if (!user) return res.status(404).json({ error: "User not found" });
-
+    
     const pins = await Pin.find({ createdBy: id })
       .sort({ createdAt: -1 })
-      .populate("createdBy", "username email");
+      .populate("createdBy", "username email profilePicture bio"); // Add profilePicture
     
     const boards = await Board.find({ createdBy: id });
-
-    // Calculate total likes from user's pins
+    
     const totalLikes = pins.reduce((total, pin) => total + (pin.likes?.length || 0), 0);
-
+    
     res.json({
       user,
       followersCount: user.followers.length,

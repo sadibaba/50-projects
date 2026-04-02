@@ -7,6 +7,7 @@ import { IoHeartOutline, IoHeart, IoBookmarkOutline, IoBookmark, IoShareOutline 
 import { Pin } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import toast from 'react-hot-toast';
+import { pinService } from '@/services/pin.service';
 
 interface PinCardProps {
   pin: Pin;
@@ -33,7 +34,7 @@ const PinCard: React.FC<PinCardProps> = ({
   useEffect(() => {
     // Check if current user has liked this pin
     if (user && pin.likes) {
-      const liked = pin.likes.includes(user._id as any);
+      const liked = pin.likes.includes(user._id);
       setIsLiked(liked);
     }
     setLikeCount(pin.likes?.length || 0);
@@ -53,12 +54,12 @@ const PinCard: React.FC<PinCardProps> = ({
     
     try {
       if (isLiked) {
-        await onUnlike?.(pin._id);
+        await pinService.unlikePin(pin._id);
         setIsLiked(false);
         setLikeCount(prev => prev - 1);
         toast.success('Unliked!');
       } else {
-        await onLike?.(pin._id);
+        await pinService.likePin(pin._id);
         setIsLiked(true);
         setLikeCount(prev => prev + 1);
         toast.success('Liked!');
@@ -85,11 +86,11 @@ const PinCard: React.FC<PinCardProps> = ({
     
     try {
       if (isSaved) {
-        await onUnsave?.(pin._id);
+        await pinService.unsavePin(pin._id);
         setIsSaved(false);
         toast.success('Removed from saved');
       } else {
-        await onSave?.(pin._id);
+        await pinService.savePin(pin._id);
         setIsSaved(true);
         toast.success('Saved!');
       }
@@ -108,12 +109,11 @@ const PinCard: React.FC<PinCardProps> = ({
     toast.success('Link copied to clipboard!');
   };
 
-  const handleProfileClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    window.location.href = `/profile/${pin.createdBy._id}`;
-  };
-
+  const handleProfileClick = (e: React.MouseEvent, userId: string) => {
+  e.preventDefault();
+  e.stopPropagation();
+  router.push(`/profile/${userId}`);
+};
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -176,19 +176,33 @@ const PinCard: React.FC<PinCardProps> = ({
             )}
             <div className="flex items-center justify-between mt-3">
               <div 
-                onClick={handleProfileClick}
-                className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <div className="w-8 h-8 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {pin.createdBy.username?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <span className="text-sm text-gray-600 hover:text-primary">
-                  {pin.createdBy.username}
+  onClick={(e) => handleProfileClick(e, pin.createdBy._id)}
+  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+>
+  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold overflow-hidden bg-gradient-to-r from-primary to-red-500">
+    {pin.createdBy.profilePicture ? (
+      <img 
+        src={pin.createdBy.profilePicture} 
+        alt={pin.createdBy.username}
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      pin.createdBy.username?.[0]?.toUpperCase() || 'U'
+    )}
+  </div>
+  <span className="text-sm text-gray-600 hover:text-primary">
+    {pin.createdBy.username}
+  </span>
+</div>
+              <div className="flex items-center gap-1 text-sm">
+                {isLiked ? (
+                  <IoHeart className="text-red-500" size={14} />
+                ) : (
+                  <IoHeartOutline className="text-gray-400" size={14} />
+                )}
+                <span className={isLiked ? "text-red-500" : "text-gray-500"}>
+                  {likeCount}
                 </span>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-gray-500">
-                <IoHeart className={isLiked ? "text-red-500" : "text-gray-400"} size={14} />
-                <span>{likeCount}</span>
               </div>
             </div>
           </div>

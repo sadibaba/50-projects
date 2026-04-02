@@ -22,12 +22,16 @@ export const createPin = async (req: Request, res: Response) => {
 
 export const getPins = async (_req: Request, res: Response) => {
   try {
-    const pins = await Pin.find().populate("createdBy", "username");
+    const pins = await Pin.find()
+      .populate("createdBy", "username email profilePicture bio") 
+      .sort({ createdAt: -1 });
     res.json(pins);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };
+
+
 
 export const deletePin = async (req: Request, res: Response) => {
   try {
@@ -41,7 +45,9 @@ export const deletePin = async (req: Request, res: Response) => {
 
 export const getPinById = async (req: Request, res: Response) => {
   try {
-    const pin = await Pin.findById(req.params.id).populate("createdBy board");
+    const pin = await Pin.findById(req.params.id)
+      .populate("createdBy", "username email profilePicture bio") 
+      .populate("board");
     if (!pin) return res.status(404).json({ error: "Pin not found" });
     res.json(pin);
   } catch (err: any) {
@@ -143,3 +149,5 @@ export const unsavePin = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+

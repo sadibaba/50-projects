@@ -3,112 +3,126 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { userService } from '@/services/user.service';
+import { IoHeartOutline, IoHeart, IoBookmarkOutline, IoBookmark, IoArrowBackOutline, IoShareOutline } from 'react-icons/io5';
 import { useAuth } from '@/context/AuthContext';
-import PinGrid from '@/components/pins/PinGrid';
+import { pinService } from '@/services/pin.service';
+import CommentSection from '@/components/comments/CommentSection';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { pinService } from '@/services/pin.service';
 import toast from 'react-hot-toast';
-import { IoHeartOutline, IoPersonAddOutline, IoPersonRemoveOutline } from 'react-icons/io5';
 
-export default function ProfilePage() {
+export default function PinDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user: currentUser, isAuthenticated } = useAuth();
-  const [profileUser, setProfileUser] = useState<any>(null);
-  const [userPins, setUserPins] = useState<any[]>([]);
+  const { user, isAuthenticated } = useAuth();
+  const [pin, setPin] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [following, setFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-  const [totalLikes, setTotalLikes] = useState(0);
-  const [isFollowingLoading, setIsFollowingLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (params.id) {
+      fetchPinDetails();
+    }
+  }, [params.id]);
 
   useEffect(() => {
-    if (mounted && params.id) {
-      fetchProfile();
-      fetchUserPins();
-    }
-  }, [params.id, mounted]);
-
-  const fetchProfile = async () => {
-    try {
-      const data = await userService.getUserProfile(params.id as string);
-      setProfileUser(data.user);
-      setFollowersCount(data.followersCount);
-      setFollowingCount(data.followingCount);
+    if (pin && user) {
+      const liked = pin.likes?.includes(user._id);
+      setIsLiked(liked);
+      setLikeCount(pin.likes?.length || 0);
       
-      // Check if current user is following this profile
-      if (currentUser && data.user) {
-        const isFollowingUser = data.user.followers?.includes(currentUser._id);
-        setFollowing(isFollowingUser);
-      }
-    } catch (err) {
-      console.error('Failed to fetch profile:', err);
-      toast.error('Failed to load profile');
+      const saved = pin.saves?.includes(user._id);
+      setIsSaved(saved);
     }
-  };
+  }, [pin, user]);
 
-  const fetchUserPins = async () => {
+  const fetchPinDetails = async () => {
     try {
-      const allPins = await pinService.getAllPins();
-      const pins = allPins.filter(pin => pin.createdBy?._id === params.id);
-      setUserPins(pins);
-      
-      // Calculate total likes
-      const likes = pins.reduce((total, pin) => total + (pin.likes?.length || 0), 0);
-      setTotalLikes(likes);
-    } catch (err) {
-      console.error('Failed to fetch user pins:', err);
-      setUserPins([]);
+      const data = await pinService.getPinById(params.id as string);
+      setPin(data);
+    } catch (error) {
+      console.error('Failed to fetch pin:', error);
+      toast.error('Failed to load pin');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFollow = async () => {
+  const handleLike = async () => {
     if (!isAuthenticated) {
-      toast.error('Please login to follow users');
+      toast.error('Please login to like');
       router.push('/login');
       return;
     }
-
-    setIsFollowingLoading(true);
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
     try {
-      await userService.followUser(params.id as string);
-      setFollowing(true);
-      setFollowersCount(prev => prev + 1);
-      toast.success(`Following ${profileUser?.username}`);
-    } catch (err) {
-      console.error('Failed to follow:', err);
-      toast.error('Failed to follow user');
+      if (isLiked) {
+        await pinService.unlikePin(pin._id);
+        setIsLiked(false);
+        setLikeCount(prev => prev - 1);
+        toast.success('Unliked!');
+      } else {
+        await pinService.likePin(pin._id);
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+        toast.success('Liked!');
+      }
+    } catch (error) {
+      console.error('Like action failed:', error);
+      toast.error('Something went wrong');
     } finally {
-      setIsFollowingLoading(false);
+      setIsProcessing(false);
     }
   };
 
-  const handleUnfollow = async () => {
-    setIsFollowingLoading(true);
+  const handleSave = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to save');
+      router.push('/login');
+      return;
+    }
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
     try {
-      await userService.unfollowUser(params.id as string);
-      setFollowing(false);
-      setFollowersCount(prev => prev - 1);
-      toast.success(`Unfollowed ${profileUser?.username}`);
-    } catch (err) {
-      console.error('Failed to unfollow:', err);
-      toast.error('Failed to unfollow user');
+      if (isSaved) {
+        await pinService.unsavePin(pin._id);
+        setIsSaved(false);
+        toast.success('Removed from saved');
+      } else {
+        await pinService.savePin(pin._id);
+        setIsSaved(true);
+        toast.success('Saved!');
+      }
+    } catch (error) {
+      console.error('Save action failed:', error);
+      toast.error('Something went wrong');
     } finally {
-      setIsFollowingLoading(false);
+      setIsProcessing(false);
     }
   };
 
-  if (!mounted || loading) {
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/pin/${pin._id}`);
+      toast.success('Link copied to clipboard!');
+    } catch (error) {
+      toast.error('Failed to copy link');
+    }
+  };
+
+  const handleCreatorClick = (e: React.MouseEvent, userId: string) => {
+    e.preventDefault();
+    router.push(`/profile/${userId}`);
+  };
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="lg" />
@@ -116,10 +130,10 @@ export default function ProfilePage() {
     );
   }
 
-  if (!profileUser) {
+  if (!pin) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-semibold text-gray-900">User not found</h2>
+        <h2 className="text-2xl font-semibold text-gray-900">Pin not found</h2>
         <Button onClick={() => router.push('/')} className="mt-4">
           Go Home
         </Button>
@@ -127,95 +141,112 @@ export default function ProfilePage() {
     );
   }
 
-  const isOwnProfile = currentUser?._id === params.id;
-
   return (
-    <div className="max-w-[2000px] mx-auto px-4">
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <button
+        onClick={() => router.back()}
+        className="mb-6 flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
+      >
+        <IoArrowBackOutline size={20} />
+        Back
+      </button>
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-xl overflow-hidden"
       >
-        {/* Profile Header */}
-        <div className="flex flex-col items-center text-center">
-          <div className="w-32 h-32 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white text-5xl font-bold">
-            {profileUser.username?.[0]?.toUpperCase() || 'U'}
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4">{profileUser.username}</h1>
-          <p className="text-gray-500 mt-1">{profileUser.email}</p>
-          <p className="text-gray-600 mt-2">
-            Joined {new Date(profileUser.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="flex items-center justify-center gap-8 mt-6">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{userPins.length}</p>
-            <p className="text-sm text-gray-500">Pins</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{totalLikes}</p>
-            <p className="text-sm text-gray-500">Total Likes</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{followersCount}</p>
-            <p className="text-sm text-gray-500">Followers</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{followingCount}</p>
-            <p className="text-sm text-gray-500">Following</p>
-          </div>
-        </div>
-
-        {/* Follow Button */}
-        {!isOwnProfile && isAuthenticated && (
-          <div className="flex justify-center mt-6">
-            {following ? (
-              <Button
-                variant="outline"
-                onClick={handleUnfollow}
-                loading={isFollowingLoading}
-              >
-                <IoPersonRemoveOutline className="mr-2" size={18} />
-                Unfollow
-              </Button>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Image */}
+          <div className="relative min-h-[400px] bg-gray-100">
+            {!imageError ? (
+              <img
+                src={pin.imageUrl}
+                alt={pin.title}
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
+              />
             ) : (
-              <Button
-                variant="primary"
-                onClick={handleFollow}
-                loading={isFollowingLoading}
-              >
-                <IoPersonAddOutline className="mr-2" size={18} />
-                Follow
-              </Button>
+              <div className="flex items-center justify-center h-full min-h-[400px]">
+                <p className="text-gray-500">Failed to load image</p>
+              </div>
             )}
           </div>
-        )}
-
-        {/* Pins Section */}
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            {isOwnProfile ? 'Your Pins' : `${profileUser.username}'s Pins`}
-            <span className="text-sm text-gray-500 ml-2">({userPins.length})</span>
-          </h2>
           
-          {userPins.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="text-6xl mb-4">📌</div>
-              <p className="text-gray-500">
-                {isOwnProfile 
-                  ? "You haven't created any pins yet." 
-                  : `${profileUser.username} hasn't created any pins yet.`}
-              </p>
-              {isOwnProfile && (
-                <Button onClick={() => router.push('/create-pin')} className="mt-4">
-                  Create your first pin
-                </Button>
-              )}
+          {/* Content */}
+          <div className="p-6">
+            {/* Creator Info */}
+            <div className="flex items-center justify-between mb-4">
+              <div 
+                onClick={(e) => handleCreatorClick(e, pin.createdBy?._id)}
+                className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg overflow-hidden bg-gradient-to-r from-primary to-red-500">
+                  {pin.createdBy?.profilePicture ? (
+                    <img 
+                      src={pin.createdBy.profilePicture} 
+                      alt={pin.createdBy.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    pin.createdBy?.username?.[0]?.toUpperCase() || 'U'
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{pin.createdBy?.username || 'User'}</p>
+                  <p className="text-sm text-gray-500">Creator</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={handleLike}
+                  disabled={isProcessing}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                >
+                  {isLiked ? (
+                    <IoHeart className="text-red-500" size={24} />
+                  ) : (
+                    <IoHeartOutline size={24} />
+                  )}
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isProcessing}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                >
+                  {isSaved ? (
+                    <IoBookmark className="text-primary" size={24} />
+                  ) : (
+                    <IoBookmarkOutline size={24} />
+                  )}
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <IoShareOutline size={24} />
+                </button>
+              </div>
             </div>
-          ) : (
-            <PinGrid pins={userPins} />
-          )}
+            
+            {/* Like Count */}
+            <div className="flex items-center gap-2 mb-4">
+              <IoHeart className={isLiked ? "text-red-500" : "text-gray-400"} size={20} />
+              <span className="text-gray-700">{likeCount} {likeCount === 1 ? 'like' : 'likes'}</span>
+            </div>
+            
+            {/* Title & Description */}
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{pin.title}</h1>
+            {pin.description && (
+              <p className="text-gray-600 mb-6 leading-relaxed">{pin.description}</p>
+            )}
+            
+            {/* Comments Section */}
+            <div className="border-t border-gray-200 pt-6">
+              <CommentSection pinId={pin._id} />
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>
