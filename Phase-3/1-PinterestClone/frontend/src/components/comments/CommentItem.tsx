@@ -14,20 +14,30 @@ interface CommentItemProps {
 
 const CommentItem: React.FC<CommentItemProps> = ({ comment, onDelete }) => {
   const { user } = useAuth();
-  const isOwner = user?._id === comment.userId._id;
-
+  
+  // Safely check if comment and userId exist
+  if (!comment || !comment.userId) {
+    return null;
+  }
+  
+  // Handle both populated user object and user ID string
+  const commentUser = typeof comment.userId === 'object' ? comment.userId : null;
+  const userId = commentUser?._id || comment.userId;
+  const username = commentUser?.username || 'User';
+  const isOwner = user?._id === userId;
+  
   return (
     <div className="flex gap-3">
-      <Link href={`/profile/${comment.userId._id}`}>
+      <Link href={`/profile/${userId}`}>
         <div className="w-10 h-10 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">
-          {comment.userId.username[0].toUpperCase()}
+          {username?.[0]?.toUpperCase() || 'U'}
         </div>
       </Link>
       <div className="flex-1">
         <div className="bg-gray-100 rounded-lg p-3">
-          <Link href={`/profile/${comment.userId._id}`}>
-            <span className="font-semibold text-sm hover:text-primary">
-              {comment.userId.username}
+          <Link href={`/profile/${userId}`}>
+            <span className="font-semibold text-sm hover:text-primary cursor-pointer">
+              {username}
             </span>
           </Link>
           <p className="text-gray-800 mt-1">{comment.text}</p>

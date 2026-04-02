@@ -34,7 +34,7 @@ export interface Board {
 export interface Comment {
   _id: string;
   text: string;
-  userId: User;
+  userId: User | string;  
   pinId: string;
   createdAt: string;
   updatedAt: string;

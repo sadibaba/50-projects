@@ -7,7 +7,6 @@ import { commentService } from '@/services/comment.service';
 import { Comment } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/common/Button';
-import CommentItem from './CommentItem';
 import toast from 'react-hot-toast';
 
 interface CommentSectionProps {
@@ -28,9 +27,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
   const fetchComments = async () => {
     try {
       const data = await commentService.getComments(pinId);
-      setComments(data);
+      setComments(Array.isArray(data) ? data : []);
     } catch (err) {
-      toast.error('Failed to load comments');
+      console.error('Failed to load comments:', err);
+      setComments([]);
     } finally {
       setLoading(false);
     }
@@ -51,6 +51,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
       setNewComment('');
       toast.success('Comment added!');
     } catch (err) {
+      console.error('Failed to add comment:', err);
       toast.error('Failed to add comment');
     } finally {
       setSubmitting(false);
@@ -63,6 +64,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
       setComments(comments.filter(c => c._id !== commentId));
       toast.success('Comment deleted');
     } catch (err) {
+      console.error('Failed to delete comment:', err);
       toast.error('Failed to delete comment');
     }
   };
@@ -71,7 +73,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
     return (
       <div className="space-y-4">
         <div className="h-10 bg-gray-100 rounded-lg animate-pulse" />
-        {[...Array(3)].map((_, i) => (
+        {[...Array(2)].map((_, i) => (
           <div key={i} className="flex gap-3">
             <div className="w-10 h-10 bg-gray-100 rounded-full animate-pulse" />
             <div className="flex-1 space-y-2">
@@ -113,13 +115,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ pinId }) => {
         {comments.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No comments yet. Be the first to comment!</p>
         ) : (
-          comments.map((comment) => (
-            <CommentItem
-              key={comment._id}
-              comment={comment}
-              onDelete={handleDeleteComment}
-            />
-          ))
+          comments.map((comment) => {
+            // Import dynamically to avoid circular dependency
+            const CommentItem = require('./CommentItem').default;
+            return (
+              <CommentItem
+                key={comment._id}
+                comment={comment}
+                onDelete={handleDeleteComment}
+              />
+            );
+          })
         )}
       </div>
     </div>
