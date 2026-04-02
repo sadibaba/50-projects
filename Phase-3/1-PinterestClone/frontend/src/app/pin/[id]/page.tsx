@@ -1,6 +1,7 @@
+// frontend/src/app/pin/[id]/page.tsx
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ export default function PinDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { pins, loading, likePin, unlikePin, savePin, unsavePin } = usePins();
+  const [imageError, setImageError] = useState(false);
   
   const pin = pins.find(p => p._id === params.id);
   
@@ -30,15 +32,12 @@ export default function PinDetailPage() {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-semibold text-gray-900">Pin not found</h2>
-        <Button onClick={() => router.back()} className="mt-4">
-          Go back
+        <Button onClick={() => router.push('/')} className="mt-4">
+          Go Home
         </Button>
       </div>
     );
   }
-  
-  const isLiked = false; // Check if current user liked
-  const isSaved = false; // Check if current user saved
   
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -57,26 +56,31 @@ export default function PinDetailPage() {
       >
         <div className="grid md:grid-cols-2 gap-8">
           {/* Image */}
-          <div className="relative">
-            <Image
-              src={pin.imageUrl}
-              alt={pin.title}
-              width={800}
-              height={800}
-              className="w-full h-full object-cover"
-            />
+          <div className="relative min-h-[400px] bg-gray-100">
+            {!imageError ? (
+              <img
+                src={pin.imageUrl}
+                alt={pin.title}
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full min-h-[400px]">
+                <p className="text-gray-500">Failed to load image</p>
+              </div>
+            )}
           </div>
           
           {/* Content */}
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <Link href={`/profile/${pin.createdBy._id}`}>
+              <Link href={`/profile/${pin.createdBy?._id}`}>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gradient-to-r from-primary to-red-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                    {pin.createdBy.username[0].toUpperCase()}
+                    {pin.createdBy?.username?.[0]?.toUpperCase() || 'U'}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{pin.createdBy.username}</p>
+                    <p className="font-semibold text-gray-900">{pin.createdBy?.username || 'User'}</p>
                     <p className="text-sm text-gray-500">Creator</p>
                   </div>
                 </div>
@@ -84,24 +88,16 @@ export default function PinDetailPage() {
               
               <div className="flex gap-2">
                 <button
-                  onClick={() => isLiked ? unlikePin(pin._id) : likePin(pin._id)}
+                  onClick={() => likePin?.(pin._id)}
                   className="p-3 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  {isLiked ? (
-                    <IoHeart className="text-red-500" size={24} />
-                  ) : (
-                    <IoHeartOutline size={24} />
-                  )}
+                  <IoHeartOutline size={24} />
                 </button>
                 <button
-                  onClick={() => isSaved ? unsavePin(pin._id) : savePin(pin._id)}
+                  onClick={() => savePin?.(pin._id)}
                   className="p-3 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  {isSaved ? (
-                    <IoBookmark className="text-primary" size={24} />
-                  ) : (
-                    <IoBookmarkOutline size={24} />
-                  )}
+                  <IoBookmarkOutline size={24} />
                 </button>
               </div>
             </div>

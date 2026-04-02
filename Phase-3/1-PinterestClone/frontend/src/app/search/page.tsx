@@ -52,7 +52,6 @@ function SearchContent() {
     setUnsplashLoading(true);
     try {
       const data = await unsplashService.searchImages(query);
-      console.log('Unsplash API response:', data);
       setUnsplashImages(data.results || []);
     } catch (err) {
       console.error('Unsplash search failed:', err);
@@ -74,9 +73,8 @@ function SearchContent() {
 
       {/* My Pins Section */}
       <div className="mb-12">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>My Pins</span>
-          <span className="text-sm text-gray-500">({pins.length})</span>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          📌 My Pins ({pins.length})
         </h2>
         
         {loading ? (
@@ -94,9 +92,8 @@ function SearchContent() {
 
       {/* Unsplash Images Section */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>From API</span>
-          <span className="text-sm text-gray-500">({unsplashImages.length})</span>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          🖼️ From Unsplash ({unsplashImages.length})
         </h2>
         
         {unsplashLoading ? (
