@@ -10,6 +10,7 @@ import commentRoutes from "./routes/comment.routes";
 import notificationRoutes from "./routes/notification.routes";
 import searchRoutes from "./routes/search.routes";
 import unsplashRoutes from "./routes/unsplash.routes";
+import imageRoutes from "./routes/image.routes";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/feed", feedRoutes);
 app.use("/api", commentRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/unsplash", unsplashRoutes);
+app.use("/api/images", imageRoutes);
 
 // Error handler (last middleware)
 app.use(errorMiddleware);

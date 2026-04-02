@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter ,  useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { IoCloudUploadOutline, IoLinkOutline, IoImagesOutline } from 'react-icons/io5';
 import { usePins } from '@/hooks/usePins';
@@ -25,6 +25,17 @@ export default function CreatePinPage() {
   const [uploadMethod, setUploadMethod] = useState<'url' | 'drag'>('url');
   const [dragActive, setDragActive] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const searchParams = useSearchParams();
+  const imageFromSearch = searchParams.get('image');
+  const titleFromSearch = searchParams.get('title');
+
+
+  useEffect(() => {
+  if (imageFromSearch) {
+    handleImageUrlChange(imageFromSearch);
+    setFormData(prev => ({ ...prev, title: titleFromSearch || '' }));
+  }
+}, [imageFromSearch, titleFromSearch]);
 
   useEffect(() => {
     setMounted(true);
