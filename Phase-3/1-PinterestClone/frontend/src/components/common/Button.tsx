@@ -30,9 +30,9 @@ const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-primary text-white hover:bg-red-700',
-    secondary: 'bg-gray-800 text-white hover:bg-gray-900',
-    outline: 'border-2 border-gray-300 text-gray-700 hover:bg-gray-100',
+    primary: 'bg-gray-300 text-black hover:text-white hover:bg-red-700',
+    secondary: 'bg-gray-800 text-black hover:text-white hover:bg-gray-900',
+    outline: 'border-2 border-gray-300 text-gray-700 hover:bg-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700',
   };
   
@@ -57,7 +57,7 @@ const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-b-mist-300 border-t-transparent rounded-full animate-spin" />
           <span>Loading...</span>
         </div>
       ) : (
