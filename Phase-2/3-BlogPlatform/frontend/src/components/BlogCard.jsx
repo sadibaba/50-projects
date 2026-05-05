@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const BlogCard = ({ blog, onReadMore, currentUserId }) => {
   const navigate = useNavigate();
 
-  // Safe extraction of data
+  
   const id = blog.id || blog._id;
   const title = blog.title || 'Untitled Post';
   const excerpt =
@@ -22,7 +22,7 @@ const BlogCard = ({ blog, onReadMore, currentUserId }) => {
   const comments = blog.commentsCount || blog.comments?.length || 0;
   const isOwner = currentUserId === blog.authorId;
 
-  // Handle image in multiple formats
+  
   const image = (() => {
     if (!blog.image)
       return 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
