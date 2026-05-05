@@ -74,7 +74,7 @@ export const getUserProfile = async (req, res) => {
     
     // Calculate stats
     const stats = {
-      posts: 0, // You'll need to count posts from Post model
+      posts: 0,
       likes: 0,
       comments: 0,
       followers: user.followers.length,
