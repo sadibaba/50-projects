@@ -11,7 +11,7 @@ export const getMessages = async (req , res) =>{
                 {sender:currentUserId,receiver:userId},
                 {sender:userId,receiver:currentUserId}
             ],
-        }).sort({createdAt:1})
+        }).populate("sender receiver", "username email").sort({createdAt:1})
         res.json(messages)
     }catch(error){
         res.status(500).json({error:error.message})
@@ -21,7 +21,7 @@ export const getMessages = async (req , res) =>{
 
 export const getChatUsers = async (req,res)=>{
     try{
-        const currrentUserId = req.user.userId
+        const currentUserId = req.user.userId
         const messages = await Message.find({
             $or:[
                 {sender:currentUserId},
@@ -51,3 +51,26 @@ export const getChatUsers = async (req,res)=>{
         })
     }
 }
+
+export const sendMessage = async (req, res) => {
+  try {
+    const { receiverId, message } = req.body;
+    const senderId = req.user.userId;
+
+    const Message = (await import("../models/message_model.js")).default;
+    
+    const newMessage = new Message({
+      sender: senderId,
+      receiver: receiverId,
+      message: message,
+    });
+    
+    await newMessage.save();
+    
+    const populatedMessage = await newMessage.populate("sender receiver", "username email");
+    
+    res.status(201).json(populatedMessage);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

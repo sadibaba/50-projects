@@ -1,6 +1,6 @@
 import app from "./app.js";
 import http from "http";
-import {initSocket} from '../auth/sockets/socket.js'
+import {initSocket} from '../backend/sockets/socket.js'
 
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app)
