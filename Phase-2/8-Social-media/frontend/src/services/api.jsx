@@ -19,7 +19,7 @@ export const loginUser = async (credentials) => {
   try {
     const res = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
-      
+
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
@@ -56,4 +56,49 @@ export const getAllUsers = async() =>{
   }catch(error){
     throw new Error(error.message,{cause:error})
   }
+}
+
+export const getChatUsers = async () =>{
+  try{
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${BASE_URL}/messages/chat-users`,{
+      header:{Authorization:`Bearer ${token}`},
+    })
+    const data = await res.json()
+    return data 
+  }catch(error){
+    throw new Error(error.message,{cause:error})
+  }
+}
+
+export const getMessage = async (userId) =>{
+  try{
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${BASE_URL}/message/${userId}/message`,{
+      headers:{Authorization:`Bearer ${token}`}
+    })
+    const data = await res.json()
+    return data
+  }catch(error){
+    throw new Error(error.message,{cause:error})
+}
+}
+
+
+export const sendMessageAPI = async (receiverId,message) =>{
+  try{
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${BASE_URL}/message`,{
+      method:'POST',
+      headers:{
+        'Content-type':'application/json',
+        Authorization:`Bearer${token}`,
+      },
+      body:JSON.stringify({receiverId,message}),
+    })
+    const data = await res.json()
+    return data
+  }catch(error){
+    throw new Error(error.message,{cause:error})
+}
 }
