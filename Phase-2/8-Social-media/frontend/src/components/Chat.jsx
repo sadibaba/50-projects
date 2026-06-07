@@ -1,5 +1,6 @@
-    import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getSocket } from "../services/socket";
+import { getMessage } from "../services/api";
 
 function Chat({ selectedUser, currentUser, onClose }) {
   const [messages, setMessages] = useState([]);
@@ -14,15 +15,11 @@ function Chat({ selectedUser, currentUser, onClose }) {
     
     const fetchMessages = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:3000/api/messages/${selectedUser._id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const data = await response.json();
+        const data = await getMessage(selectedUser._id)
         setMessages(data);
+        console.log('Messages Loaded:',data);
       } catch (error) {
-        console.error(error);
+        console.error('Error loading messages',error);
       }
     };
     
@@ -38,6 +35,8 @@ function Chat({ selectedUser, currentUser, onClose }) {
     if (!socket) return;
     
     const handleNewMessage = (message) => {
+      console.log('new message received:',message);
+      
       if (message.sender._id === selectedUser?._id || message.receiver._id === selectedUser?._id) {
         setMessages((prev) => [...prev, message]);
       }
@@ -48,17 +47,23 @@ function Chat({ selectedUser, currentUser, onClose }) {
         setOtherUserTyping(data.isTyping);
       }
     };
+
+    const handleMessageSent = (message) =>{
+      console.log('message send confirmation', message);
+      setMessages((prev) => [...prev,message])
+    }
     
     socket.on("new-message", handleNewMessage);
     socket.on("user-typing", handleTyping);
-    socket.on("message-sent", (message) => {
+    socket.on("message-sent",handleMessageSent,(message) => {
       setMessages((prev) => [...prev, message]);
     });
     
     return () => {
+      console.log("Cleaning up socket listeners");
       socket.off("new-message", handleNewMessage);
       socket.off("user-typing", handleTyping);
-      socket.off("message-sent");
+      socket.off("message-sent",handleMessageSent);
     };
   }, [socket, selectedUser]);
 

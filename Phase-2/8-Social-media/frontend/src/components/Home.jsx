@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Chat from "./Chat";
 import { connectSocket, disconnectSocket, getSocket } from "../services/socket";
+import { getCurrentUser , getAllUsers , getChatUsers } from "../services/api";
 
 function Home() {
   const [users, setUsers] = useState([]);
@@ -11,14 +12,10 @@ function Home() {
   const [chatUsers, setChatUsers] = useState([]);
   const [onlineUsersList, setOnlineUsersList] = useState([]);
 
-  const fetchChatUsers = async () => {
+  const fetchCurrentUser  = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/messages/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      setChatUsers(data);
+      const data = await getCurrentUser()
+      setCurrentUser(data);
     } catch (error) {
       console.error(error);
     }
@@ -26,11 +23,7 @@ function Home() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:3000/api/auth/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
+      const data = await getAllUsers()
       setUsers(data);
     } catch (error) {
       console.error(error);
@@ -39,14 +32,10 @@ function Home() {
     }
   };
 
-  const fetchCurrentUser = async () => {
+  const fetchChatUsers  = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3000/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      setCurrentUser(data);
+      const data = await getChatUsers()
+      setChatUsers (data);
     } catch (error) {
       console.error(error);
     }
