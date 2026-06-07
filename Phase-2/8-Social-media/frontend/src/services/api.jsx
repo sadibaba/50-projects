@@ -19,6 +19,7 @@ export const loginUser = async (credentials) => {
   try {
     const res = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
+      
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
@@ -30,3 +31,29 @@ export const loginUser = async (credentials) => {
 };
 
 
+export const getCurrentUser = async() =>{
+  try{
+    const token = localStorage.getItem('token')
+    const res = await fetch (`${BASE_URL}/auth/me`,{
+      headers:{Authorization :`Bearer ${token}`},
+    })
+    const data = await res.json()
+    return data 
+  }catch(error){
+    throw new Error (error.message, { cause: error })
+  }
+}
+
+
+export const getAllUsers = async() =>{
+  try{
+    const token = localStorage.getItem('token')
+    const res = await fetch(`${BASE_URL}/auth/users`<{
+      headers:{Authorization : `Bearer ${token}`},
+    })
+    const data = await res.json
+    return data
+  }catch(error){
+    throw new Error(error.message,{cause:error})
+  }
+}

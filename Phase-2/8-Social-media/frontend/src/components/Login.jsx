@@ -44,15 +44,15 @@ const handleLogin = async () =>{
     setMessage('')
     try{
       const response = await loginUser(credentials)
-      console.log("🔴 Full response:", response)  
-      console.log("🔴 Token:", response.token)  
+      console.log(" Full response:", response)  
+      console.log(" Token:", response.token)  
       if(response.token){
         localStorage.setItem('token',response.token)
-        console.log("✅ Token saved!") 
+        console.log(" Token saved!") 
         setMessage('login successful redirecting...')
         setTimeout(() => navigate('/home'), 1500)
       }else{
-        console.log("❌ No token in response") 
+        console.log(" No token in response") 
         setTimeout(() => setMessage(response.error  || 'login failed'), 1500)
       }
     }catch(error){

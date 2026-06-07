@@ -9,7 +9,6 @@ function Chat({ selectedUser, currentUser, onClose }) {
   const messagesEndRef = useRef(null);
   const socket = getSocket();
 
-  // Fetch old messages
   useEffect(() => {
     if (!selectedUser) return;
     
@@ -30,7 +29,6 @@ function Chat({ selectedUser, currentUser, onClose }) {
     fetchMessages();
   }, [selectedUser]);
 
-  // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
