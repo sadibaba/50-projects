@@ -83,8 +83,6 @@ export const getMessage = async (userId) =>{
     throw new Error(error.message,{cause:error})
 }
 }
-
-
 export const sendMessageAPI = async (receiverId,message) =>{
   try{
     const token = localStorage.getItem('token')
