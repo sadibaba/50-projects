@@ -56,7 +56,7 @@ const handleLogin = async () =>{
         setTimeout(() => setMessage(response.error  || 'login failed'), 1500)
       }
     }catch(error){
-      console.log("❌ Catch error:", error)        
+      console.log(" Catch error:", error)        
       setMessage('error' + error.error || error.message)
     }finally{
       setIsLoading(false)
