@@ -74,7 +74,7 @@ export const getChatUsers = async () =>{
 export const getMessage = async (userId) =>{
   try{
     const token = localStorage.getItem('token')
-    const res = await fetch(`${BASE_URL}/message/${userId}/message`,{
+    const res = await fetch(`${BASE_URL}/messages/${userId}/messages`,{
       headers:{Authorization:`Bearer ${token}`}
     })
     const data = await res.json()
