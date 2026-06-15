@@ -48,7 +48,7 @@ export const getCurrentUser = async() =>{
 export const getAllUsers = async() =>{
   try{
     const token = localStorage.getItem('token')
-    const res = await fetch(`${BASE_URL}/auth/users`<{
+    const res = await fetch(`${BASE_URL}/auth/users`,{
       headers:{Authorization : `Bearer ${token}`},
     })
     const data = await res.json()
@@ -62,7 +62,7 @@ export const getChatUsers = async () =>{
   try{
     const token = localStorage.getItem('token')
     const res = await fetch(`${BASE_URL}/messages/chat-users`,{
-      header:{Authorization:`Bearer ${token}`},
+      headers:{Authorization:`Bearer ${token}`},
     })
     const data = await res.json()
     return data 
@@ -90,7 +90,7 @@ export const sendMessageAPI = async (receiverId,message) =>{
       method:'POST',
       headers:{
         'Content-type':'application/json',
-        Authorization:`Bearer${token}`,
+        Authorization:`Bearer ${token}`,
       },
       body:JSON.stringify({receiverId,message}),
     })
