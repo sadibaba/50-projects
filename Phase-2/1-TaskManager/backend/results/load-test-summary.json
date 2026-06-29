@@ -1,0 +1,171 @@
+{
+    "metrics": {
+        "data_received": {
+            "count": 0,
+            "rate": 0
+        },
+        "vus_max": {
+            "value": 200,
+            "min": 200,
+            "max": 200
+        },
+        "http_req_sending": {
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0
+        },
+        "http_req_receiving": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "requests": {
+            "count": 18532,
+            "rate": 76.78732505618564
+        },
+        "http_req_duration": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "thresholds": {
+                "p(95)<500": false
+            }
+        },
+        "data_sent": {
+            "count": 0,
+            "rate": 0
+        },
+        "checks": {
+            "passes": 9266,
+            "fails": 18533,
+            "value": 0.3333213424943343
+        },
+        "http_req_blocked": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 199
+        },
+        "errors": {
+            "fails": 0,
+            "passes": 18532,
+            "thresholds": {
+                "rate<0.05": true
+            },
+            "value": 1
+        },
+        "http_req_tls_handshaking": {
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0
+        },
+        "iteration_duration": {
+            "avg": 2004.6480306928445,
+            "min": 2000.8187,
+            "med": 2004.33185,
+            "max": 2012.7957,
+            "p(90)": 2006.9137,
+            "p(95)": 2007.5957
+        },
+        "iterations": {
+            "count": 9266,
+            "rate": 38.39366252809282
+        },
+        "http_req_failed": {
+            "fails": 0,
+            "passes": 18534,
+            "thresholds": {
+                "rate<0.01": true
+            },
+            "value": 1
+        },
+        "http_reqs": {
+            "count": 18534,
+            "rate": 76.79561205435704
+        },
+        "http_req_waiting": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_connecting": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        }
+    },
+    "setup_data": {
+        "token": "",
+        "userEmail": "test_1782719071036@example.com"
+    },
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "setup": {
+                "name": "setup",
+                "path": "::setup",
+                "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+                "groups": {},
+                "checks": {
+                        "User registered successfully": {
+                            "id": "0fda2025d3ba7109f17ba1aa802b8ada",
+                            "passes": 0,
+                            "fails": 1,
+                            "name": "User registered successfully",
+                            "path": "::setup::User registered successfully"
+                        }
+                    }
+            }
+        },
+        "checks": {
+            "Task created successfully": {
+                "name": "Task created successfully",
+                "path": "::Task created successfully",
+                "id": "49d55f0716bea4ce3c570b734c324dbf",
+                "passes": 0,
+                "fails": 9266
+            },
+            "Tasks retrieved successfully": {
+                "name": "Tasks retrieved successfully",
+                "path": "::Tasks retrieved successfully",
+                "id": "2628510c6dab55b19f66e6b6f1049a67",
+                "passes": 0,
+                "fails": 9266
+            },
+            "Response time under 200ms": {
+                "name": "Response time under 200ms",
+                "path": "::Response time under 200ms",
+                "id": "46588c4a4ce40a6861f92cbb71fc4b8d",
+                "passes": 9266,
+                "fails": 0
+            }
+        },
+        "name": "",
+        "path": ""
+    }
+}

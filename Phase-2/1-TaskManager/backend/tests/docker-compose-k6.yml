@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  k6:
+    image: grafana/k6:latest
+    container_name: k6-tester
+    volumes:
+      - ./:/scripts
+      - ./results:/results
+    environment:
+      - K6_OUT=json=results/k6-results.json
+    command: run /scripts/k6-load-test.js
+    network_mode: host

@@ -1,0 +1,8 @@
+{
+  "options": {
+    "summaryTrendStats": ["avg", "min", "med", "max", "p(90)", "p(95)", "p(99)"],
+    "noColor": false,
+    "batch": 10,
+    "maxRedirects": 10
+  }
+}
