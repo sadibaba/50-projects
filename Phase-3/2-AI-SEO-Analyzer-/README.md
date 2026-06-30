@@ -4,7 +4,7 @@ An AI-powered SEO audit tool that analyzes any URL, compares it against competit
 
 ## Overview
 
-This project is built on top of an open-source SEO analyzer foundation and extended with competitor analysis, AI-generated recommendations, and a redesigned UI to meet the full scope of the assigned task.
+An AI-powered SEO audit tool — extended with competitor analysis, AI-generated recommendations, and a redesigned UI.
 
 ## Features
 
@@ -58,7 +58,7 @@ src/
 ## Getting Started
 
 ```bash
-git clone <https://github.com/sadibaba/50-projects.git>
+git clone https://github.com/sadibaba/50-projects.git
 cd ai-seo-analyzer
 npm install
 ```
@@ -83,7 +83,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Acknowledgments
 
-Built on top of the open-source SEO analyzer originally created by Gabriel Nathanael, extended with competitor analysis, AI recommendations, and UI improvements for this project.
+Built on top of the open-source SEO analyzer originally created by [Gabriel Nathanael Purba](https://github.com/GabrielNathanael), extended with competitor analysis, AI recommendations, and UI improvements for this project.
 
 ## Author
 
