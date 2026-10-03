@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const CONTACT_CARDS = [
   {
     label: "Email",
-    value: "saad@example.com",
+    value: "sadisheikh169@gmail.com",
     description: "Drop me a line — I reply within 24 hours.",
-    href: "mailto:saad@example.com",
+    href: "mailto:sadisheikh169@gmail.com",
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -16,9 +16,9 @@ const CONTACT_CARDS = [
   },
   {
     label: "GitHub",
-    value: "@saad-dev",
+    value: "@sadibaba",
     description: "Where the code lives. Stars appreciated.",
-    href: "https://github.com",
+    href: "https://github.com/sadibaba",
     icon: (
       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-1.94c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 015.79 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.43-2.71 5.4-5.28 5.69.41.35.78 1.05.78 2.12v3.14c0 .31.21.67.8.55A11.5 11.5 0 0023.5 12C23.5 5.65 18.35.5 12 .5z" />
@@ -27,9 +27,9 @@ const CONTACT_CARDS = [
   },
   {
     label: "LinkedIn",
-    value: "/in/saad-dev",
+    value: "/in/aizaz-saad",
     description: "Professional side. Let's connect.",
-    href: "https://linkedin.com",
+    href: "https://www.linkedin.com/in/aizaz-saad/",
     icon: (
       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 11.01-4.13 2.06 2.06 0 01-.01 4.13zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0z" />
@@ -38,9 +38,9 @@ const CONTACT_CARDS = [
   },
   {
     label: "Twitter / X",
-    value: "@saad_builds",
+    value: "@babasaad69",
     description: "Random thoughts and build logs.",
-    href: "https://twitter.com",
+    href: "https://x.com/babasaad69",
     icon: (
       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
