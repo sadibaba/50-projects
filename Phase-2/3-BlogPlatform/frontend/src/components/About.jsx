@@ -15,7 +15,6 @@ const PROJECTS = [
     description:
       "A cinematic blogging platform with real-time likes, comments, follow system, and an orbital 3D post wheel. Built from scratch as a final-year project.",
     stack: ["React", "Node.js", "MongoDB", "GSAP", "Tailwind"],
-    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?q=80&w=1400",
   },
   {
@@ -25,7 +24,6 @@ const PROJECTS = [
     description:
       "A WebSocket-powered chat application with rooms, typing indicators, read receipts, and end-to-end encrypted messages.",
     stack: ["React", "Socket.IO", "Express", "Redis"],
-    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?q=80&w=1400",
   },
   {
@@ -35,7 +33,6 @@ const PROJECTS = [
     description:
       "A high-performance storefront with cart persistence, Stripe checkout, product filters, and admin dashboard.",
     stack: ["Next.js", "Stripe", "PostgreSQL", "Prisma"],
-    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1400",
   },
   {
@@ -45,7 +42,6 @@ const PROJECTS = [
     description:
       "A RESTful API with JWT auth, role-based access, background jobs, and full test coverage using Jest and Supertest.",
     stack: ["Node.js", "Express", "MongoDB", "Jest"],
-    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?q=80&w=1400",
   },
   {
@@ -55,7 +51,6 @@ const PROJECTS = [
     description:
       "A minimal, animation-heavy portfolio with custom cursor, seamless scroll, and 3D transitions. Won college design award.",
     stack: ["React", "Framer Motion", "GSAP", "Tailwind"],
-    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1400",
   },
 ];
