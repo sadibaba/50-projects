@@ -4,10 +4,49 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Anthology — Stories in Motion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="loader-container">
+        <div class="loader-content">
+          <div class="loader-clock" id="loader-clock"></div>
+          <div class="loader-text" id="loader-text">Preparing your experience...</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
+    <style>
+      /* Loading screen styles */
+      .loader-container {
+        position: fixed;
+        inset: 0;
+        background-color: #0A0F0D;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-family: 'Bebas Neue', sans-serif;
+        color: #D4A15D;
+      }
+      .loader-content {
+        text-align: center;
+      }
+      .loader-clock {
+        font-size: 6rem;
+        letter-spacing: 0.1em;
+        line-height: 1;
+        margin-bottom: 1rem;
+      }
+      .loader-text {
+        font-size: 1.25rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.7;
+      }
+    </style>
   </body>
 </html>
