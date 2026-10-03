@@ -6,8 +6,8 @@ import {
   unlikePost,
   getComments,
   updateUserProfile,
+  getImageUrl,
 } from "../api/api";
-
 const UserDashboard = ({
   activeTab,
   blogs: initialBlogs,
@@ -126,65 +126,65 @@ const UserDashboard = ({
   // ─── Avatar Upload ────────────────────────────────────────────────────────
   const handleAvatarClick = () => fileInputRef.current?.click();
 
- // Replace the handleAvatarChange function in UserDashboard.jsx
-const handleAvatarChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  // Replace the handleAvatarChange function in UserDashboard.jsx
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  if (!file.type.startsWith("image/")) {
-    alert("Please select an image file.");
-    return;
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    alert("Image must be under 5MB.");
-    return;
-  }
-
-  // Show local preview immediately
-  const reader = new FileReader();
-  reader.onload = (ev) => setAvatarPreview(ev.target.result);
-  reader.readAsDataURL(file);
-
-  setAvatarUploading(true);
-  try {
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    const response = await updateUserProfile(formData, true);
-    
-    // Extract avatar URL from response (it should be relative path)
-    let newAvatarUrl = response?.user?.avatar || response?.avatar;
-    
-    if (newAvatarUrl) {
-      // Store relative path directly without converting to full URL
-      localStorage.setItem("userAvatar", newAvatarUrl);
-      
-      // Update user object in parent
-      onUserUpdate?.({ avatar: newAvatarUrl });
-      
-      // Clear preview after successful upload
-      setAvatarPreview(null);
-      setAvatarKey(Date.now()); // Force refresh
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
     }
-  } catch (err) {
-    console.error("Avatar upload error:", err);
-    setAvatarPreview(null);
-    alert("Failed to upload avatar. Please try again.");
-  } finally {
-    setAvatarUploading(false);
-  }
-};
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be under 5MB.");
+      return;
+    }
 
-// Update the avatar display to properly handle relative paths
-const currentAvatar = (() => {
-  const avatar = avatarPreview || user?.avatar;
-  if (!avatar) return null;
-  if (avatar.startsWith('http')) return avatar;
-  if (avatar.startsWith('/uploads')) return `http://localhost:5000${avatar}`;
-  return avatar;
-})();
+    // Show local preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target.result);
+    reader.readAsDataURL(file);
 
-const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
+    setAvatarUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await updateUserProfile(formData, true);
+
+      // Extract avatar URL from response (it should be relative path)
+      let newAvatarUrl = response?.user?.avatar || response?.avatar;
+
+      if (newAvatarUrl) {
+        // Store relative path directly without converting to full URL
+        localStorage.setItem("userAvatar", newAvatarUrl);
+
+        // Update user object in parent
+        onUserUpdate?.({ avatar: newAvatarUrl });
+
+        // Clear preview after successful upload
+        setAvatarPreview(null);
+        setAvatarKey(Date.now()); // Force refresh
+      }
+    } catch (err) {
+      console.error("Avatar upload error:", err);
+      setAvatarPreview(null);
+      alert("Failed to upload avatar. Please try again.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  // Update the avatar display to properly handle relative paths
+  const currentAvatar = (() => {
+    const avatar = avatarPreview || user?.avatar;
+    if (!avatar) return null;
+    if (avatar.startsWith("http")) return avatar;
+    if (avatar.startsWith("/uploads")) return `http://localhost:5000${avatar}`;
+    return avatar;
+  })();
+
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
   // ─── Helpers ──────────────────────────────────────────────────────────────
   // const currentAvatar = avatarPreview || user?.avatar;
   // const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=8b5cf6&color=fff&size=200`;
@@ -332,10 +332,22 @@ const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(use
                 >
                   {/* Image */}
                   <div className="relative h-44 overflow-hidden flex-shrink-0">
-                    <img
+                    {/* <img
                       src={
                         blog.image?.url ||
                         blog.image ||
+                        "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800"
+                      }
+                      alt={blog.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800";
+                      }}
+                    /> */}
+                    <img
+                      src={
+                        getImageUrl(blog.image) ||
                         "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800"
                       }
                       alt={blog.title}
@@ -528,7 +540,6 @@ const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(use
     );
   }
 
-  
   // ════════════════════════════════════════════════════════════════════════════
   // LIKES TAB — real data from post.likes array
   // ════════════════════════════════════════════════════════════════════════════
@@ -554,10 +565,22 @@ const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(use
                   className="bg-gray-800/50 rounded-xl p-5 border border-gray-800 hover:border-pink-900/50 transition-colors flex items-center gap-4"
                 >
                   {/* Thumbnail */}
-                  {(post.image?.url || post.image) && (
+                  {/* {(post.image?.url || post.image) && (
                     <div className="w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
                       <img
                         src={post.image?.url || post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )} */}
+                  {getImageUrl(post.image) && (
+                    <div className="w-20 h-16 rounded-lg overflow-hidden flex-shrink-0 hidden sm:block">
+                      <img
+                        src={getImageUrl(post.image)}
                         alt={post.title}
                         className="w-full h-full object-cover"
                         onError={(e) => {

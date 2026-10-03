@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getPosts, followUser, unfollowUser, getUserByUsername } from "../api/api";
+import { getPosts, followUser, unfollowUser, getUserByUsername, getImageUrl } from "../api/api";
 import EditProfileModal from "./EditProfileModal";
 import { motion, AnimatePresence, animate } from "framer-motion";
 import gsap from "gsap";
@@ -277,7 +277,8 @@ const UserProfile = () => {
         authorName: blog.authorName || blog.author?.name || blog.author || "Anonymous",
         authorId: blog.authorId || blog.author?._id,
         date: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Unknown date",
-        category: blog.category || "Uncategorized", image: blog.image?.url || blog.image || null,
+        // category: blog.category || "Uncategorized", image: blog.image?.url || blog.image || null,
+        category: blog.category || "Uncategorized", image: getImageUrl(blog.image),
         readTime: blog.readTime || `${Math.ceil((blog.content?.split(" ").length || 0) / 200) || 5} min read`,
         likes: blog.likes?.length || 0, likesArray: blog.likes || [], comments: blog.comments?.length || 0,
         views: blog.views || 0, createdAt: blog.createdAt,

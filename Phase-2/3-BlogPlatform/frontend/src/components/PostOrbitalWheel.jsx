@@ -1,13 +1,20 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../api/api";
 
 gsap.registerPlugin(ScrollTrigger);
 
 /* ═══════ TUNING ═══════ */
-const SCROLL_PER_POST = 70;   // vh of scrolling per post (zyada = slow)
-const TOP_OFFSET = 120;       // px — navbar ke neeche se card shuru
+const SCROLL_PER_POST = 70; // vh of scrolling per post (zyada = slow)
+const TOP_OFFSET = 120; // px — navbar ke neeche se card shuru
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800";
 
@@ -52,7 +59,7 @@ const PostOrbitalWheel = ({ posts }) => {
 
   const labels = useMemo(
     () => posts.map((p, i) => p.title || p.category || `Post ${i + 1}`),
-    [posts]
+    [posts],
   );
 
   /* ═══════ Main scroll animation ═══════ */
@@ -207,12 +214,19 @@ const PostOrbitalWheel = ({ posts }) => {
       }}
     >
       {/* sticky tabhi kaam karta hai jab koi ancestor overflow:hidden na ho */}
-      <div ref={viewportRef} className="sticky top-0 h-screen w-full overflow-hidden">
+      <div
+        ref={viewportRef}
+        className="sticky top-0 h-screen w-full overflow-hidden"
+      >
         {/* soft glow peeche focused card ke */}
         <div
           aria-hidden
           className="pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"
-          style={{ top: centerY, width: itemWidth * 2.2, height: itemHeight * 1.2 }}
+          style={{
+            top: centerY,
+            width: itemWidth * 2.2,
+            height: itemHeight * 1.2,
+          }}
         />
 
         {/* Cards */}
@@ -225,11 +239,27 @@ const PostOrbitalWheel = ({ posts }) => {
             <figure
               key={post.id}
               className="pow-item absolute left-0 top-0 m-0 cursor-pointer overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/40"
-              style={{ width: itemWidth, height: itemHeight, willChange: "transform" }}
-              onClick={() => (i === activeIndex ? navigate(`/blog/${post.id}`) : goTo(i))}
+              style={{
+                width: itemWidth,
+                height: itemHeight,
+                willChange: "transform",
+              }}
+              onClick={() =>
+                i === activeIndex ? navigate(`/blog/${post.id}`) : goTo(i)
+              }
             >
-              <img
+              {/* <img
                 src={post.image || FALLBACK_IMG}
+                alt={post.title}
+                draggable={false}
+                className="absolute inset-0 h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = FALLBACK_IMG;
+                }}
+              /> */}
+              <img
+                src={getImageUrl(post.image) || FALLBACK_IMG}
                 alt={post.title}
                 draggable={false}
                 className="absolute inset-0 h-full w-full object-cover"
@@ -268,16 +298,24 @@ const PostOrbitalWheel = ({ posts }) => {
             }}
           >
             <div ref={titleTrackRef} className="flex w-max items-center">
-              <span ref={titleStartRef} aria-hidden className="block h-px shrink-0" />
+              <span
+                ref={titleStartRef}
+                aria-hidden
+                className="block h-px shrink-0"
+              />
               {labels.map((label, i) => {
                 const d = Math.abs(i - activeIndex);
-                const opacity = d === 0 ? 1 : d === 1 ? 0.55 : d === 2 ? 0.3 : 0.15;
+                const opacity =
+                  d === 0 ? 1 : d === 1 ? 0.55 : d === 2 ? 0.3 : 0.15;
                 return (
                   <button
                     key={`${label}-${i}`}
                     data-idx={i}
                     onClick={() => goTo(i)}
-                    style={{ opacity, transform: `scale(${d === 0 ? 1 : 0.95})` }}
+                    style={{
+                      opacity,
+                      transform: `scale(${d === 0 ? 1 : 0.95})`,
+                    }}
                     className={`mr-3 inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-6 py-2 text-sm font-medium transition-all duration-300 ${
                       i === activeIndex
                         ? "border-accent/60 bg-accent/10 text-text-primary"
@@ -288,7 +326,11 @@ const PostOrbitalWheel = ({ posts }) => {
                   </button>
                 );
               })}
-              <span ref={titleEndRef} aria-hidden className="block h-px shrink-0" />
+              <span
+                ref={titleEndRef}
+                aria-hidden
+                className="block h-px shrink-0"
+              />
             </div>
           </div>
 
@@ -297,13 +339,25 @@ const PostOrbitalWheel = ({ posts }) => {
             className="pointer-events-auto mt-1 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-xs font-bold text-primary transition-all hover:scale-105 hover:bg-amber-300"
           >
             Read Story
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
             </svg>
           </button>
 
           {n > 1 && activeIndex === 0 && (
-            <p className="animate-bounce text-[11px] text-text-secondary/70">✦ scroll karo, posts ghoomengi ✦</p>
+            <p className="animate-bounce text-[11px] text-text-secondary/70">
+              ✦ scroll karo, posts ghoomengi ✦
+            </p>
           )}
         </div>
       </div>

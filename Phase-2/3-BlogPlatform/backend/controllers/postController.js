@@ -1,39 +1,38 @@
 import Post from '../models/postModel.js';
 import User from '../models/userModel.js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Helper: create a simple error with status code
-const createError = (message, statusCode) => {
-    const err = new Error(message);
-    err.statusCode = statusCode;
-    return err;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ─────────────────────────────────────────────────────────
+// HELPER: delete local file safely
+// ─────────────────────────────────────────────────────────
+const deleteLocalFile = async (relativePath) => {
+    if (!relativePath) return;
+    try {
+        const fullPath = path.join(__dirname, '..', relativePath);
+        await fs.unlink(fullPath);
+    } catch (err) {
+        // File may already be gone — safe to ignore
+        console.warn('Could not delete local file:', relativePath, err.message);
+    }
 };
 
-// @desc    Create a new post with image
-// @route   POST /api/posts
-// @access  Private
-export const createPost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// CREATE POST
+// ─────────────────────────────────────────────────────────
+export const createPost = async (req, res) => {
     try {
-        console.log('=== CREATE POST ===');
-        console.log('Body:', req.body);
-        console.log('File:', req.file);
-        console.log('User:', req.user?._id, req.user?.name);
-
         const { title, content, category, tags, excerpt } = req.body;
 
-        if (!title?.trim()) {
-            return res.status(400).json({ success: false, message: 'Title is required' });
-        }
-        if (!content?.trim()) {
-            return res.status(400).json({ success: false, message: 'Content is required' });
-        }
-        if (!category?.trim()) {
-            return res.status(400).json({ success: false, message: 'Category is required' });
-        }
-        if (!req.user || !req.user._id) {
-            return res.status(401).json({ success: false, message: 'User not authenticated' });
-        }
+        if (!title?.trim()) return res.status(400).json({ success: false, message: 'Title is required' });
+        if (!content?.trim()) return res.status(400).json({ success: false, message: 'Content is required' });
+        if (!category?.trim()) return res.status(400).json({ success: false, message: 'Category is required' });
+        if (!req.user?._id) return res.status(401).json({ success: false, message: 'User not authenticated' });
 
-        // Build post data — use req.user directly (protect middleware already populates it)
         const postData = {
             title: title.trim(),
             content: content.trim(),
@@ -43,56 +42,40 @@ export const createPost = async (req, res, next) => {
             category: category.trim(),
             tags: tags
                 ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()).filter(Boolean))
-                : []
+                : [],
         };
 
-        // Image from Cloudinary (multer-storage-cloudinary sets req.file.path & req.file.filename)
+        // LOCAL DISK: image stored as /uploads/posts/<filename>
         if (req.file) {
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    postData.image = {
-        url: req.file.path, 
-        publicId: req.file.filename
-    };
-}
+            postData.image = {
+                url: `/uploads/posts/${req.file.filename}`,
+                publicId: null, // no cloudinary
+            };
+        }
 
-        console.log('Creating post with data:', postData);
         const post = await Post.create(postData);
-        console.log('Post created:', post._id);
 
         return res.status(201).json({
             success: true,
-            post  // frontend checks response.post
+            post,
         });
-
     } catch (error) {
-        console.error('=== CREATE POST ERROR ===');
-        console.error('Name:', error.name);
-        console.error('Message:', error.message);
-        console.error('Stack:', error.stack);
-
-        // Mongoose validation error — give a helpful message
+        console.error('Create post error:', error.message);
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(e => e.message).join(', ');
             return res.status(400).json({ success: false, message: messages });
         }
-
-        return res.status(500).json({
-            success: false,
-            message: error.message || 'Server error while creating post'
-        });
+        return res.status(500).json({ success: false, message: error.message || 'Server error while creating post' });
     }
 };
 
-// @desc    Update post
-// @route   PUT /api/posts/:id
-// @access  Private
-export const updatePost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// UPDATE POST
+// ─────────────────────────────────────────────────────────
+export const updatePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post not found' });
-        }
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
         if (post.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Not authorized to update this post' });
@@ -108,24 +91,19 @@ export const updatePost = async (req, res, next) => {
             ? tags
             : tags.split(',').map(t => t.trim()).filter(Boolean);
 
+        // Replace image if new file uploaded
         if (req.file) {
-            // Delete old cloudinary image if it exists
-            if (post.image?.publicId) {
-                try {
-                    const { cloudinary } = await import('../config/cloudinary.js');
-                    await cloudinary.uploader.destroy(post.image.publicId);
-                } catch (e) {
-                    console.warn('Could not delete old image:', e.message);
-                }
+            // Delete old local image
+            if (post.image?.url) {
+                await deleteLocalFile(post.image.url);
             }
             post.image = {
-                url: req.file.path,
-                publicId: req.file.filename
+                url: `/uploads/posts/${req.file.filename}`,
+                publicId: null,
             };
         }
 
         await post.save();
-
         return res.status(200).json({ success: true, post });
     } catch (error) {
         console.error('Update post error:', error.message);
@@ -137,32 +115,24 @@ export const updatePost = async (req, res, next) => {
     }
 };
 
-// @desc    Delete post
-// @route   DELETE /api/posts/:id
-// @access  Private
-export const deletePost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// DELETE POST
+// ─────────────────────────────────────────────────────────
+export const deletePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post not found' });
-        }
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
         if (post.author.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Not authorized to delete this post' });
         }
 
-        if (post.image?.publicId) {
-            try {
-                const { cloudinary } = await import('../config/cloudinary.js');
-                await cloudinary.uploader.destroy(post.image.publicId);
-            } catch (e) {
-                console.warn('Could not delete image from Cloudinary:', e.message);
-            }
+        // Delete local image file
+        if (post.image?.url) {
+            await deleteLocalFile(post.image.url);
         }
 
         await post.deleteOne();
-
         return res.status(200).json({ success: true, message: 'Post deleted successfully' });
     } catch (error) {
         console.error('Delete post error:', error.message);
@@ -170,19 +140,19 @@ export const deletePost = async (req, res, next) => {
     }
 };
 
-// @desc    Get all posts
-// @route   GET /api/posts
-// @access  Public
-export const getPosts = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// GET ALL POSTS
+// ─────────────────────────────────────────────────────────
+export const getPosts = async (req, res) => {
     try {
         const posts = await Post.find()
-            .populate('author', 'name email')
-            .sort({ createdAt: -1 }); // newest first
+            .populate('author', 'name email avatar')
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
             success: true,
             count: posts.length,
-            data: posts
+            data: posts,
         });
     } catch (error) {
         console.error('Get posts error:', error.message);
@@ -190,20 +160,18 @@ export const getPosts = async (req, res, next) => {
     }
 };
 
-// @desc    Get single post
-// @route   GET /api/posts/:id
-// @access  Public
-export const getPost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// GET SINGLE POST
+// ─────────────────────────────────────────────────────────
+export const getPost = async (req, res) => {
     try {
         const post = await Post.findByIdAndUpdate(
             req.params.id,
             { $inc: { views: 1 } },
             { new: true }
-        ).populate('author', 'name email');
+        ).populate('author', 'name email avatar');
 
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post not found' });
-        }
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
         return res.status(200).json({ success: true, data: post });
     } catch (error) {
@@ -212,16 +180,13 @@ export const getPost = async (req, res, next) => {
     }
 };
 
-// @desc    Like a post
-// @route   PUT /api/posts/:id/like
-// @access  Private
-export const likePost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// LIKE POST
+// ─────────────────────────────────────────────────────────
+export const likePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post not found' });
-        }
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
         const userId = req.user._id.toString();
         if (post.likes.map(id => id.toString()).includes(userId)) {
@@ -239,16 +204,13 @@ export const likePost = async (req, res, next) => {
     }
 };
 
-// @desc    Unlike a post
-// @route   PUT /api/posts/:id/unlike
-// @access  Private
-export const unlikePost = async (req, res, next) => {
+// ─────────────────────────────────────────────────────────
+// UNLIKE POST
+// ─────────────────────────────────────────────────────────
+export const unlikePost = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-
-        if (!post) {
-            return res.status(404).json({ success: false, message: 'Post not found' });
-        }
+        if (!post) return res.status(404).json({ success: false, message: 'Post not found' });
 
         const userId = req.user._id.toString();
         if (!post.likes.map(id => id.toString()).includes(userId)) {
@@ -265,16 +227,3 @@ export const unlikePost = async (req, res, next) => {
         return res.status(500).json({ success: false, message: error.message || 'Server error' });
     }
 };
-
-
-
-// export const postData = {
-//   title: title.trim(),
-//   content: content.trim(),
-//   excerpt: excerpt?.trim() || content.trim().substring(0, 150),
-//   author: req.user._id,
-//   authorId: req.user._id, // Add this line
-//   authorName: req.user.name,
-//   category: category.trim(),
-//   tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim()).filter(Boolean)) : []
-// };

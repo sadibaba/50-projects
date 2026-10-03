@@ -1,6 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { getImageUrl } from '../api/api';
+
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
 
 const BlogCard = ({ blog, onReadMore, currentUserId }) => {
   const navigate = useNavigate();
@@ -14,13 +17,8 @@ const BlogCard = ({ blog, onReadMore, currentUserId }) => {
   const likes = blog.likesCount || blog.likes?.length || 0;
   const comments = blog.commentsCount || blog.comments?.length || 0;
   const isOwner = currentUserId === blog.authorId;
-  const image = (() => {
-    if (!blog.image) return 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
-    if (typeof blog.image === 'string') return blog.image;
-    if (blog.image.url) return blog.image.url;
-    if (blog.image.data) return blog.image.data;
-    return 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974';
-  })();
+
+  const image = getImageUrl(blog.image) || FALLBACK_IMG;
 
   const handleReadMore = () => {
     if (onReadMore) { onReadMore(id); } else { navigate(`/blog/${id}`); }
@@ -38,7 +36,12 @@ const BlogCard = ({ blog, onReadMore, currentUserId }) => {
       className="group bg-secondary/50 rounded-2xl overflow-hidden border border-secondary/50 hover:border-accent/30 transition-all duration-300 hover:shadow-2xl hover:shadow-accent/5"
     >
       <div className="relative h-48 overflow-hidden cursor-pointer" onClick={handleReadMore}>
-        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=1974'; }} />
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => { e.target.src = FALLBACK_IMG; }}
+        />
         <div className="absolute top-4 left-4">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/80 text-accent text-xs font-medium backdrop-blur-sm">{category}</span>
         </div>

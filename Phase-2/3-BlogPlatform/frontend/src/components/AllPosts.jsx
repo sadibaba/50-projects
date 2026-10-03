@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPosts } from '../api/api';
+import { getPosts, getImageUrl } from '../api/api';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -125,14 +125,15 @@ const AllPosts = () => {
     author: blog.author,
     date: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Unknown date',
     category: blog.category || 'Uncategorized',
-    image: (() => {
-      if (blog.image) {
-        if (typeof blog.image === 'string') return blog.image;
-        if (blog.image.url) return blog.image.url;
-        if (blog.image.data) return blog.image.data;
-      }
-      return null;
-    })(),
+    // image: (() => {
+    //   if (blog.image) {
+    //     if (typeof blog.image === 'string') return blog.image;
+    //     if (blog.image.url) return blog.image.url;
+    //     if (blog.image.data) return blog.image.data;
+    //   }
+    //   return null;
+    // })(),
+    image: getImageUrl(blog.image),
     readTime: blog.readTime || `${Math.ceil((blog.content?.split(' ').length || 0) / 200) || 3} min read`,
     likes: blog.likes?.length || 0,
     likesArray: blog.likes || [],

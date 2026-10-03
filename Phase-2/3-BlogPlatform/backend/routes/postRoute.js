@@ -6,10 +6,10 @@ import {
     getPosts,
     getPost,
     likePost,
-    unlikePost
+    unlikePost,
 } from '../controllers/postController.js';
 import { protect } from '../middlewares/UserMiddleware.js';
-import upload from '../middlewares/uploadMiddleware.js';
+import { uploadPostImage } from '../middlewares/localUpload.js';
 import { postLimiter } from '../middlewares/rateLimiter.js';
 
 const router = express.Router();
@@ -19,8 +19,8 @@ router.get('/', getPosts);
 router.get('/:id', getPost);
 
 // Protected
-router.post('/', protect, postLimiter, upload.single('image'), createPost);
-router.put('/:id', protect, upload.single('image'), updatePost);
+router.post('/', protect, postLimiter, uploadPostImage.single('image'), createPost);
+router.put('/:id', protect, uploadPostImage.single('image'), updatePost);
 router.delete('/:id', protect, deletePost);
 
 // Like / Unlike

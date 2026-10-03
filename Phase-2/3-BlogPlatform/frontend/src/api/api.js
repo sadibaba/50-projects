@@ -1,5 +1,29 @@
 const API_URL = "http://localhost:5000/api";
 import { requestQueue } from '../utils/requestQueue';
+const BASE_URL = "http://localhost:5000";
+
+// Convert any image path to a full URL
+export const getImageUrl = (image) => {
+  if (!image) return null;
+  
+  // Already a full URL
+  if (typeof image === 'string') {
+    if (image.startsWith('http')) return image;
+    if (image.startsWith('/uploads')) return `${BASE_URL}${image}`;
+    return image;
+  }
+  
+  // Object form { url, publicId }
+  if (typeof image === 'object') {
+    const url = image.url || image.data;
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('/uploads')) return `${BASE_URL}${url}`;
+    return url;
+  }
+  
+  return null;
+};
 
 // Remove these lines if they don't exist at the top of your file:
 // let postsCache = null;
