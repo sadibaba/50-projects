@@ -15,7 +15,7 @@ const PROJECTS = [
     description:
       "A cinematic blogging platform with real-time likes, comments, follow system, and an orbital 3D post wheel. Built from scratch as a final-year project.",
     stack: ["React", "Node.js", "MongoDB", "GSAP", "Tailwind"],
-    // TODO: apna screenshot URL yahan daalo
+    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?q=80&w=1400",
   },
   {
@@ -25,7 +25,7 @@ const PROJECTS = [
     description:
       "A WebSocket-powered chat application with rooms, typing indicators, read receipts, and end-to-end encrypted messages.",
     stack: ["React", "Socket.IO", "Express", "Redis"],
-    // TODO: apna screenshot URL yahan daalo
+    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1611606063065-ee7946f0787a?q=80&w=1400",
   },
   {
@@ -35,7 +35,7 @@ const PROJECTS = [
     description:
       "A high-performance storefront with cart persistence, Stripe checkout, product filters, and admin dashboard.",
     stack: ["Next.js", "Stripe", "PostgreSQL", "Prisma"],
-    // TODO: apna screenshot URL yahan daalo
+    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1400",
   },
   {
@@ -45,7 +45,7 @@ const PROJECTS = [
     description:
       "A RESTful API with JWT auth, role-based access, background jobs, and full test coverage using Jest and Supertest.",
     stack: ["Node.js", "Express", "MongoDB", "Jest"],
-    // TODO: apna screenshot URL yahan daalo
+    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?q=80&w=1400",
   },
   {
@@ -55,7 +55,7 @@ const PROJECTS = [
     description:
       "A minimal, animation-heavy portfolio with custom cursor, seamless scroll, and 3D transitions. Won college design award.",
     stack: ["React", "Framer Motion", "GSAP", "Tailwind"],
-    // TODO: apna screenshot URL yahan daalo
+    // TODO: apna screenshot URL/path yahan daalo
     screenshot: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1400",
   },
 ];
@@ -66,7 +66,7 @@ const About = () => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.utils.toArray(".project-card").forEach((card, i) => {
+      gsap.utils.toArray(".project-card").forEach((card) => {
         gsap.fromTo(
           card,
           { y: 80, opacity: 0, rotateX: -10, filter: "blur(8px)" },
@@ -153,7 +153,7 @@ const About = () => {
           <div className="absolute inset-x-4 top-20 bottom-0 rounded-3xl bg-primary/70 backdrop-blur-md -z-10 pointer-events-none border border-secondary/30"></div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5 mb-10">
-            {/* Avatar */}
+            {/* Avatar — uses your local image */}
             <motion.div
               initial={{ scale: 0.6, opacity: 0, rotate: -8 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -168,13 +168,12 @@ const About = () => {
                 }}
               ></div>
               <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-primary overflow-hidden bg-secondary">
-                {/* TODO: apni personal image ka URL yahan daalo */}
                 <img
-                  src="https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?q=80&w=400"
-                  alt="Creator"
+                  src={creatorImage}
+                  alt="Saad — Full-Stack Developer"
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.target.src = "https://ui-avatars.com/api/?name=Creator&background=1C2B27&color=D4A15D&size=200";
+                    e.target.src = "https://ui-avatars.com/api/?name=Saad&background=1C2B27&color=D4A15D&size=200";
                   }}
                 />
               </div>
@@ -189,8 +188,9 @@ const About = () => {
                 Saad — Full-Stack Developer
               </h1>
               <p className="text-text-secondary text-sm max-w-2xl font-serif italic mb-4">
-                I build cinematic web experiences. Obsessed with clean architecture, seamless animation, and interfaces that feel alive. 
-                Currently finishing my CS degree while shipping production-grade apps.
+                I build cinematic web experiences. Obsessed with clean architecture, seamless animation,
+                and interfaces that feel alive. Currently finishing my CS degree while shipping
+                production-grade apps.
               </p>
               <div className="flex flex-wrap gap-2 text-text-secondary text-xs">
                 <span className="rounded-full border border-secondary/50 bg-secondary/40 px-3 py-1">
@@ -220,18 +220,21 @@ const About = () => {
               </h2>
               <div className="space-y-4 text-text-secondary text-sm leading-relaxed font-serif">
                 <p>
-                  I started writing code on a borrowed laptop in 2022 — building small HTML pages that no one saw. 
-                  Fast forward to today, I've shipped full-stack platforms, real-time apps, and design systems 
-                  used by real people.
+                  I started writing code on a borrowed laptop in 2022 — building small HTML pages
+                  that no one saw. Fast forward to today, I've shipped full-stack platforms,
+                  real-time apps, and design systems used by real people.
                 </p>
                 <p>
-                  My approach: <span className="text-accent font-semibold">treat every project like a film</span>. 
-                  The pacing matters. The transitions matter. The silence between interactions matters. 
-                  I don't just build — I compose.
+                  My approach:{" "}
+                  <span className="text-accent font-semibold">
+                    treat every project like a film
+                  </span>
+                  . The pacing matters. The transitions matter. The silence between interactions
+                  matters. I don't just build — I compose.
                 </p>
                 <p>
-                  When I'm not coding, I'm studying typography, watching film breakdowns, or drinking too much chai 
-                  while debugging something that worked five minutes ago.
+                  When I'm not coding, I'm studying typography, watching film breakdowns, or
+                  drinking too much chai while debugging something that worked five minutes ago.
                 </p>
               </div>
             </motion.div>
@@ -275,28 +278,27 @@ const About = () => {
                 </h2>
               </div>
               <span className="text-text-secondary text-sm">
-                5 projects
+                {PROJECTS.length} projects
               </span>
             </div>
 
             <div className="space-y-8">
               {PROJECTS.map((project, i) => (
-                <motion.div
-                  key={i}
-                  className="project-card group"
-                  initial={false}
-                >
+                <motion.div key={i} className="project-card group" initial={false}>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center rounded-3xl border border-secondary/50 bg-secondary/30 backdrop-blur-sm p-6 hover:border-accent/40 transition-all duration-500">
                     {/* Screenshot */}
                     <div
-                      className={`relative h-64 lg:h-80 rounded-2xl overflow-hidden border border-secondary/40 ${i % 2 === 1 ? "lg:order-2" : ""}`}
+                      className={`relative h-64 lg:h-80 rounded-2xl overflow-hidden border border-secondary/40 ${
+                        i % 2 === 1 ? "lg:order-2" : ""
+                      }`}
                     >
                       <img
                         src={project.screenshot}
                         alt={project.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={(e) => {
-                          e.target.src = "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?q=80&w=1400";
+                          e.target.src =
+                            "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?q=80&w=1400";
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
