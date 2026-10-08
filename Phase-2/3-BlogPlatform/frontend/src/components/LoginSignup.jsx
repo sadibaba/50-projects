@@ -8,7 +8,7 @@ const LoginSignup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'reader' });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -32,8 +32,9 @@ const LoginSignup = () => {
           localStorage.setItem('userName', response.name);
           localStorage.setItem('userEmail', response.email);
           localStorage.setItem('userRole', response.role || 'reader');
+          localStorage.setItem('hasSeenTutorial', response.hasSeenTutorial ? 'true' : 'false');
           setSuccess('Login successful! Redirecting...');
-          setTimeout(() => navigate('/home'), 1500);
+          setTimeout(() => navigate('/home'), 1200);
         } else {
           setError(response.message || 'Login failed');
         }
@@ -50,9 +51,10 @@ const LoginSignup = () => {
           localStorage.setItem('userId', response._id || response.id);
           localStorage.setItem('userName', response.name);
           localStorage.setItem('userEmail', response.email);
-          localStorage.setItem('userRole', response.role || formData.role);
+          localStorage.setItem('userRole', 'reader');
+          localStorage.setItem('hasSeenTutorial', 'false');  // 👈 New user → tutorial
           setSuccess('Account created! Redirecting...');
-          setTimeout(() => navigate('/home'), 1500);
+          setTimeout(() => navigate('/home'), 1200);
         } else {
           setSuccess('Account created! Please log in.');
           setTimeout(() => { setIsLogin(true); setSuccess(''); }, 2000);
@@ -67,10 +69,9 @@ const LoginSignup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary p-4 relative overflow-hidden">
-      {/* Animated background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-gradient-shift"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/50 rounded-full blur-3xl animate-gradient-shift" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/50 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <motion.div
@@ -81,8 +82,8 @@ const LoginSignup = () => {
       >
         <div className="glass rounded-3xl p-8 sm:p-10 shadow-2xl">
           <div className="text-center mb-8">
-            <h1 className="font-display text-4xl text-text-primary tracking-wider">Anthology</h1>
-            <p className="text-text-secondary text-sm mt-2">Stories in motion.</p>
+            <h1 className="font-display text-4xl text-text-primary tracking-wider">Chronica</h1>
+            <p className="text-text-secondary text-sm mt-2 font-serif">Where remarkable lives become timeless stories.</p>
           </div>
 
           <div className="flex mb-8 bg-primary/50 rounded-full p-1">
@@ -107,68 +108,42 @@ const LoginSignup = () => {
             {!isLogin && (
               <div>
                 <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required
                   className="w-full px-4 py-3 bg-primary/50 border border-secondary/50 rounded-lg text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent focus:border-transparent text-sm transition-all"
-                  placeholder="John Doe"
-                />
+                  placeholder="John Doe" />
               </div>
             )}
             <div>
               <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required
                 className="w-full px-4 py-3 bg-primary/50 border border-secondary/50 rounded-lg text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent focus:border-transparent text-sm transition-all"
-                placeholder="you@example.com"
-              />
+                placeholder="you@example.com" />
             </div>
             <div>
               <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+              <input type="password" name="password" value={formData.password} onChange={handleChange} required
                 className="w-full px-4 py-3 bg-primary/50 border border-secondary/50 rounded-lg text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent focus:border-transparent text-sm transition-all"
-                placeholder="••••••••"
-              />
+                placeholder="••••••••" />
             </div>
             {!isLogin && (
-              <>
-                <div>
-                  <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">Confirm Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 bg-primary/50 border border-secondary/50 rounded-lg text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent focus:border-transparent text-sm transition-all"
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div>
-                  <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">I want to join as a</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, role: 'reader' }))} className={`py-3 px-4 rounded-lg border text-sm transition-all ${formData.role === 'reader' ? 'bg-accent/20 border-accent text-accent' : 'bg-primary/50 border-secondary/50 text-text-secondary hover:border-accent/50'}`}>Reader</button>
-                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, role: 'author' }))} className={`py-3 px-4 rounded-lg border text-sm transition-all ${formData.role === 'author' ? 'bg-accent/20 border-accent text-accent' : 'bg-primary/50 border-secondary/50 text-text-secondary hover:border-accent/50'}`}>Author</button>
-                  </div>
-                </div>
-              </>
+              <div>
+                <label className="block text-text-secondary text-xs mb-2 uppercase tracking-wider">Confirm Password</label>
+                <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} required
+                  className="w-full px-4 py-3 bg-primary/50 border border-secondary/50 rounded-lg text-text-primary placeholder-text-secondary focus:ring-2 focus:ring-accent focus:border-transparent text-sm transition-all"
+                  placeholder="••••••••" />
+              </div>
             )}
-            <button type="submit" disabled={loading} className="w-full py-3 bg-accent text-primary font-bold rounded-lg hover:bg-amber-300 transition-all duration-300 disabled:opacity-50 text-sm tracking-wider">
+            <button type="submit" disabled={loading}
+              className="w-full py-3 bg-accent text-primary font-bold rounded-lg hover:bg-amber-300 transition-all duration-300 disabled:opacity-50 text-sm tracking-wider">
               {loading ? 'Processing...' : (isLogin ? 'Login to your account' : 'Create your account')}
             </button>
           </form>
+
+          {!isLogin && (
+            <p className="text-center text-text-secondary text-xs mt-6 font-serif">
+              By signing up, you agree to read, engage, and celebrate remarkable lives.
+            </p>
+          )}
         </div>
       </motion.div>
     </div>

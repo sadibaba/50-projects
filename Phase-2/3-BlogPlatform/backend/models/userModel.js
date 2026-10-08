@@ -7,26 +7,16 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["admin", "reader"],   
+      enum: ["admin", "reader"],
       default: "reader",
     },
     bio: {
       type: String,
       maxlength: 200,
-      default: "Famous people enthusiast. Exploring the world one story at a time.",
+      default: "Curious reader exploring stories of remarkable people.",
     },
-    avatar: {
-      type: String,
-      default: "",
-    },
-    followers: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    }],
-    following: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    }],
+    avatar: { type: String, default: "" },
+    hasSeenTutorial: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

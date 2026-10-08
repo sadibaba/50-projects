@@ -545,11 +545,22 @@ export const checkFollowing = async (userId) => {
 };
 
 
+
 export const getUserByUsername = async (username) => {
   try {
     return await getData(`users/by-username/${username}`);
   } catch (error) {
     console.error('Get user by username error:', error);
     throw error;
+  }
+};
+
+
+export const markTutorialSeen = async () => {
+  try {
+    return await postData('users/tutorial-seen', {});
+  } catch (error) {
+    console.error('Mark tutorial seen error:', error);
+    return { success: false };
   }
 };

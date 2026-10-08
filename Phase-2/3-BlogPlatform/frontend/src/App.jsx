@@ -1,70 +1,84 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { useEffect } from "react";
-import LoginSignup from "./components/LoginSignup";
-import Home from "./components/Home";
-import AllPosts from "./components/AllPosts";
-import UserProfile from "./components/UserProfile";
-import BlogDetail from "./components/BlogDetail";
-import Dashboard from "./components/Dashboard";
+import { useEffect, useState, Suspense, lazy } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
+import OnboardingTutorial from "./components/OnboardingTutorial";
 import "./App.css";
 import Cursor from "./components/Cursor";
 import Navbar from "./components/Navbar";
-import About from "./components/About";
-import Contact from "./components/Contact";
 
+/* ── Lazy loaded pages (fast processing) ─────────────────── */
+const LoginSignup = lazy(() => import("./components/LoginSignup"));
+const Home = lazy(() => import("./components/Home"));
+const AllPosts = lazy(() => import("./components/AllPosts"));
+const AccountPage = lazy(() => import("./components/AccountPage"));
+const BlogDetail = lazy(() => import("./components/BlogDetail"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const About = lazy(() => import("./components/About"));
+const Contact = lazy(() => import("./components/Contact"));
+const Details = lazy(() => import("./components/Details"));
+
+/* ── Page loader (suspense fallback) ─────────────────────── */
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-primary">
+    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent" />
+  </div>
+);
+
+/* ── Routes ──────────────────────────────────────────────── */
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Navigate to="/auth" />} />
-        <Route path="/auth" element={<LoginSignup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/posts" element={<AllPosts />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/blog/:id" element={<BlogDetail />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/profile/:username" element={<UserProfile />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Navigate to="/auth" />} />
+          <Route path="/auth" element={<LoginSignup />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/posts" element={<AllPosts />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/details" element={<Details />} />
+          <Route path="/contact" element={<Contact />} />
+          {/* ❌ /profile, /profile/:username — REMOVED */}
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 };
 
+/* ── Main App ────────────────────────────────────────────── */
 function App() {
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  /* Show tutorial only if logged in AND hasn't seen it yet */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const seen = localStorage.getItem("hasSeenTutorial");
+    if (token && seen !== "true") {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  /* Custom cursor logic */
   useEffect(() => {
     const cursorDot = document.querySelector(".cursor-dot");
     const cursorOutline = document.querySelector(".cursor-outline");
-
     if (!cursorDot || !cursorOutline) return;
 
     const moveCursor = (e) => {
-      const posX = e.clientX;
-      const posY = e.clientY;
-
-      cursorDot.style.left = `${posX}px`;
-      cursorDot.style.top = `${posY}px`;
-
+      cursorDot.style.left = `${e.clientX}px`;
+      cursorDot.style.top = `${e.clientY}px`;
       cursorOutline.animate(
-        {
-          left: `${posX}px`,
-          top: `${posY}px`,
-        },
-        { duration: 500, fill: "forwards" },
+        { left: `${e.clientX}px`, top: `${e.clientY}px` },
+        { duration: 500, fill: "forwards" }
       );
     };
 
     const handleMouseOver = (e) => {
       if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-        document.body.classList.add("cursor-hover");
         cursorOutline.style.transform = "translate(-50%, -50%) scale(1.5)";
         cursorOutline.style.backgroundColor = "rgba(212, 161, 93, 0.2)";
         cursorOutline.style.borderColor = "var(--color-accent)";
@@ -73,7 +87,6 @@ function App() {
 
     const handleMouseOut = (e) => {
       if (e.target.closest('a, button, input, textarea, [role="button"]')) {
-        document.body.classList.remove("cursor-hover");
         cursorOutline.style.transform = "translate(-50%, -50%) scale(1)";
         cursorOutline.style.backgroundColor = "transparent";
         cursorOutline.style.borderColor = "var(--color-text-secondary)";
@@ -91,14 +104,24 @@ function App() {
     };
   }, []);
 
+  const handleTutorialComplete = () => {
+    localStorage.setItem("hasSeenTutorial", "true");
+    setShowTutorial(false);
+  };
+
   return (
-    <Router>
-      <Cursor />
-      <div className="App bg-primary text-text-primary">
-        <Navbar />
-        <AnimatedRoutes />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Cursor />
+        <div className="App bg-primary text-text-primary">
+          <Navbar />
+          <AnimatedRoutes />
+          {showTutorial && (
+            <OnboardingTutorial onComplete={handleTutorialComplete} />
+          )}
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 
