@@ -11,7 +11,7 @@ const generateToken = (id) => {
 // AUTH: Register
 // ─────────────────────────────────────────────────────────
 export const registerUser = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;  // 👈 role remove karo
     try {
         const userExists = await User.findOne({ email });
         if (userExists) return res.status(400).json({ message: 'User already exists' });
@@ -21,8 +21,8 @@ export const registerUser = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role,
-            bio: 'Passionate writer and reader. Exploring the world one story at a time.',
+            role: 'reader',   
+            bio: 'Famous people enthusiast. Exploring the world one story at a time.',
         });
 
         return res.status(201).json({

@@ -32,7 +32,7 @@ router.post('/:userId/unfollow', protect, unfollowUser);
 router.get('/:userId/followers', protect, getFollowers);
 router.get('/:userId/following', protect, getFollowing);
 
-// Public view of a user (also works if not logged in)
+// Public view
 router.get('/by-username/:username', getUserByUsername);
 
 export default router;

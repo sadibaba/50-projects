@@ -7,13 +7,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["admin", "author", "reader"],
+      enum: ["admin", "reader"],   
       default: "reader",
     },
     bio: {
       type: String,
       maxlength: 200,
-      default: "Passionate writer and reader. Exploring the world one story at a time.",
+      default: "Famous people enthusiast. Exploring the world one story at a time.",
     },
     avatar: {
       type: String,

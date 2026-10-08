@@ -5,7 +5,7 @@ import { createCategory, getCategories } from '../controllers/categoryController
 const router = express.Router();
 
 router.route('/')
-  .get(getCategories)
-  .post(protect, adminOnly, createCategory);
+  .get(getCategories)                          
+  .post(protect, adminOnly, createCategory);   
 
 export default router;
