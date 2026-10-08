@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -6,6 +12,8 @@ import OnboardingTutorial from "./components/OnboardingTutorial";
 import "./App.css";
 import Cursor from "./components/Cursor";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import CookieBanner from "./components/CookieBanner";
 
 /* ── Lazy loaded pages (fast processing) ─────────────────── */
 const LoginSignup = lazy(() => import("./components/LoginSignup"));
@@ -17,6 +25,15 @@ const Dashboard = lazy(() => import("./components/Dashboard"));
 const About = lazy(() => import("./components/About"));
 const Contact = lazy(() => import("./components/Contact"));
 const Details = lazy(() => import("./components/Details"));
+
+/* ── Legal pages ─────────────────────────────────────────── */
+const Terms = lazy(() => import("./components/legal/Terms"));
+const Privacy = lazy(() => import("./components/legal/Privacy"));
+const Cookies = lazy(() => import("./components/legal/Cookies"));
+const Disclaimer = lazy(() => import("./components/legal/Disclaimer"));
+const AcceptableUse = lazy(() => import("./components/legal/AcceptableUse"));
+const DMCA = lazy(() => import("./components/legal/DMCA"));
+const RefundPolicy = lazy(() => import("./components/legal/RefundPolicy"));
 
 /* ── Page loader (suspense fallback) ─────────────────────── */
 const PageLoader = () => (
@@ -32,17 +49,31 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Suspense fallback={<PageLoader />}>
         <Routes location={location} key={location.pathname}>
+          {/* Auth / Public */}
           <Route path="/" element={<Navigate to="/auth" />} />
           <Route path="/auth" element={<LoginSignup />} />
           <Route path="/home" element={<Home />} />
           <Route path="/posts" element={<AllPosts />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Info pages */}
           <Route path="/about" element={<About />} />
           <Route path="/details" element={<Details />} />
           <Route path="/contact" element={<Contact />} />
-          {/* ❌ /profile, /profile/:username — REMOVED */}
+
+          {/* Legal pages */}
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/cookies" element={<Cookies />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/acceptable-use" element={<AcceptableUse />} />
+          <Route path="/dmca" element={<DMCA />} />
+          <Route path="/refund" element={<RefundPolicy />} />
+
+          {/* 404 fallback (optional) */}
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </Suspense>
     </AnimatePresence>
@@ -116,6 +147,8 @@ function App() {
         <div className="App bg-primary text-text-primary">
           <Navbar />
           <AnimatedRoutes />
+          <Footer />
+          <CookieBanner />
           {showTutorial && (
             <OnboardingTutorial onComplete={handleTutorialComplete} />
           )}

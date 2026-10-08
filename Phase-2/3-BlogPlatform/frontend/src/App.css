@@ -107,3 +107,53 @@ html { scroll-behavior: smooth; }
 /* Light mode adjustments */
 [data-theme="light"] .glass { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
 [data-theme="light"] body { background-image: radial-gradient(ellipse at top, rgba(184,135,62,0.04), transparent 60%); }
+
+
+
+/* Legal content typography */
+.legal-content h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.75rem;
+  letter-spacing: 0.03em;
+  color: var(--color-text-primary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.legal-content h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.legal-content p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+.legal-content ul,
+.legal-content ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: var(--color-text-secondary);
+}
+.legal-content li {
+  font-family: 'Cormorant Garamond', serif;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+.legal-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.legal-content strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.legal-content hr {
+  border-color: rgba(255, 255, 255, 0.06);
+  margin: 2rem 0;
+}
