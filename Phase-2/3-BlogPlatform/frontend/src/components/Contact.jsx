@@ -71,23 +71,32 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-primary relative overflow-hidden">
-      {/* ─── Cinematic Background ─── */}
+      {/* ─── Cinematic Background (theme-aware) ─── */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary via-[#0d1412] to-primary"></div>
+        {/* Base gradient — uses theme primary */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary via-primary/95 to-primary"></div>
+
+        {/* Glowing orbs — theme variables */}
         <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-accent/[0.06] blur-[120px] animate-pulse-slow"></div>
         <div className="absolute top-[40%] right-[-15%] w-[700px] h-[700px] rounded-full bg-secondary/60 blur-[140px] animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-accent/[0.04] blur-[100px] animate-pulse-slow" style={{ animationDelay: "4s" }}></div>
+
+        {/* Grain texture */}
         <div
           className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           }}
         ></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+
+        {/* Vignette — light/dark aware */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.15)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+
+        {/* Grid lines — theme accent */}
         <div
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `linear-gradient(rgba(212,161,93,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(212,161,93,0.3) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)`,
             backgroundSize: "80px 80px",
           }}
         ></div>
@@ -138,7 +147,7 @@ const Contact = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: i * 0.1 }}
                 whileHover={{ y: -6 }}
-                className="group relative rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-6 overflow-hidden transition-all duration-500 hover:border-accent/50"
+                className="group relative rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-6 overflow-hidden transition-all duration-500 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5"
               >
                 {/* Glow on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
