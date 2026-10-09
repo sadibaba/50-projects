@@ -8,7 +8,7 @@ const CreateBlogModal = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const categories = ['Technology', 'Lifestyle', 'Travel', 'Food', 'Health', 'Business', 'Entertainment', 'Education'];
+  const categories = ['Technology', 'Lifestyle', 'Travel', 'Science','Leaders','Scientists','Inventors' ,'Inspiration', 'Food', 'Health', 'Business', 'Entertainment', 'Education'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
