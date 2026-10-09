@@ -1,9 +1,8 @@
-// src/components/Footer.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 
 const Footer = () => (
-  <footer className="relative z-10 bg-primary/80 backdrop-blur-sm border-t border-secondary/30 mt-20">
+  <footer className="relative z-10 bg-secondary/40 backdrop-blur-sm border-t border-secondary/30 mt-0">
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
         {/* Brand */}

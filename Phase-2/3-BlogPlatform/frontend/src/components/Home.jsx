@@ -324,33 +324,32 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary">
-      {/* Floating write button — only admin */}
-      {user?.role === "admin" && (
-        <button
-          onClick={handleCreateBlog}
-          className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-accent rounded-full shadow-lg flex items-center justify-center hover:bg-amber-300 transition-all duration-300 hover:scale-110"
-          aria-label="Write blog"
-        >
-          <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-      )}
+  <div className="bg-primary">      
+    {user?.role === "admin" && (
+      <button
+        onClick={handleCreateBlog}
+        className="fixed bottom-8 right-8 z-40 w-14 h-14 bg-accent rounded-full shadow-lg flex items-center justify-center hover:bg-amber-300 transition-all duration-300 hover:scale-110"
+        aria-label="Write blog"
+      >
+        <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+    )}
 
-      <HeroSection />
-      <AboutSection />
-      <FeaturedSection blogs={blogs} loading={loading} />
-      <ContactSection />
+    <HeroSection />
+    <AboutSection />
+    <FeaturedSection blogs={blogs} loading={loading} />
+    <ContactSection />
 
-      {showCreateModal && (
-        <CreateBlogModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
-    </div>
-  );
+    {showCreateModal && (
+      <CreateBlogModal
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={handleCreateSuccess}
+      />
+    )}
+  </div>
+);
 };
 
 export default Home;

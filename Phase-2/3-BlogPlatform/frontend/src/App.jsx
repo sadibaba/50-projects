@@ -45,38 +45,47 @@ const PageLoader = () => (
 /* ── Routes ──────────────────────────────────────────────── */
 const AnimatedRoutes = () => {
   const location = useLocation();
+
+  const isAuthPage = location.pathname === "/auth";
+
   return (
-    <AnimatePresence mode="wait">
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={location} key={location.pathname}>
-          {/* Auth / Public */}
-          <Route path="/" element={<Navigate to="/auth" />} />
-          <Route path="/auth" element={<LoginSignup />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/posts" element={<AllPosts />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+    <>
+      <AnimatePresence mode="wait">
+        <Suspense fallback={<PageLoader />}>
+          <Routes location={location} key={location.pathname}>
+            {/* Auth / Public */}
+            <Route path="/" element={<Navigate to="/auth" />} />
+            <Route path="/auth" element={<LoginSignup />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/posts" element={<AllPosts />} />
+            <Route path="/blog/:id" element={<BlogDetail />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Info pages */}
-          <Route path="/about" element={<About />} />
-          <Route path="/details" element={<Details />} />
-          <Route path="/contact" element={<Contact />} />
+            {/* Info pages */}
+            <Route path="/about" element={<About />} />
+            <Route path="/details" element={<Details />} />
+            <Route path="/contact" element={<Contact />} />
 
-          {/* Legal pages */}
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/cookies" element={<Cookies />} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/acceptable-use" element={<AcceptableUse />} />
-          <Route path="/dmca" element={<DMCA />} />
-          <Route path="/refund" element={<RefundPolicy />} />
+            {/* Legal pages */}
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/acceptable-use" element={<AcceptableUse />} />
+            <Route path="/dmca" element={<DMCA />} />
+            <Route path="/refund" element={<RefundPolicy />} />
 
-          {/* 404 fallback (optional) */}
-          <Route path="*" element={<Navigate to="/home" />} />
-        </Routes>
-      </Suspense>
-    </AnimatePresence>
+            {/* 404 fallback */}
+            <Route path="*" element={<Navigate to="/home" />} />
+          </Routes>
+        </Suspense>
+      </AnimatePresence>
+
+      {!isAuthPage && <Footer />}
+
+      {!isAuthPage && <CookieBanner />}
+    </>
   );
 };
 
@@ -144,11 +153,11 @@ function App() {
     <ThemeProvider>
       <Router>
         <Cursor />
-        <div className="App bg-primary text-text-primary">
+        <div className="App bg-primary text-text-primary min-h-screen flex flex-col">
           <Navbar />
-          <AnimatedRoutes />
-          <Footer />
-          <CookieBanner />
+          <main className="flex-1">
+            <AnimatedRoutes />
+          </main>
           {showTutorial && (
             <OnboardingTutorial onComplete={handleTutorialComplete} />
           )}
