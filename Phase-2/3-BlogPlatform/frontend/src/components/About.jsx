@@ -97,19 +97,35 @@ const About = () => {
 
   return (
     <div ref={pageRef} className="min-h-screen bg-primary relative overflow-hidden">
-      {/* ─── Cinematic Background ─── */}
+      {/* ─── Cinematic Background (theme-aware) ─── */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary via-[#0d1412] to-primary"></div>
+        {/* Base gradient — uses theme primary variable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary via-primary/95 to-primary"></div>
+
+        {/* Glowing orbs — theme accent & secondary */}
         <div className="absolute top-[-15%] left-[-10%] w-[600px] h-[600px] rounded-full bg-accent/[0.06] blur-[120px] animate-pulse-slow"></div>
         <div className="absolute top-[40%] right-[-15%] w-[700px] h-[700px] rounded-full bg-secondary/60 blur-[140px] animate-pulse-slow" style={{ animationDelay: "2s" }}></div>
         <div className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-accent/[0.04] blur-[100px] animate-pulse-slow" style={{ animationDelay: "4s" }}></div>
+
+        {/* Grain texture */}
         <div
           className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
           }}
         ></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+
+        {/* Vignette — light/dark aware */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.15)_100%)] dark:bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+
+        {/* Grid lines — theme accent */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)`,
+            backgroundSize: "80px 80px",
+          }}
+        ></div>
       </div>
 
       {/* ─── Content ─── */}
@@ -127,10 +143,11 @@ const About = () => {
           </button>
         </div>
 
-        {/* Cover */}
+        {/* Cover — theme-aware gradients */}
         <div className="about-cover relative h-56 sm:h-72 overflow-hidden">
           <div className="about-cover-inner absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0A0F0D] via-[#15211D] to-[#0A0F0D]"></div>
+            {/* Replaced hardcoded #0A0F0D with theme variables */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-primary"></div>
             <div className="absolute top-0 left-[20%] w-[400px] h-[400px] rounded-full bg-accent/[0.08] blur-[100px]"></div>
             <div className="absolute bottom-0 right-[15%] w-[400px] h-[400px] rounded-full bg-accent/[0.06] blur-[100px]"></div>
             <div
@@ -145,10 +162,11 @@ const About = () => {
 
         {/* Profile Header */}
         <div className="container mx-auto px-4 relative -mt-32 sm:-mt-40">
-          <div className="absolute inset-x-4 top-20 bottom-0 rounded-3xl bg-primary/70 backdrop-blur-md -z-10 pointer-events-none border border-secondary/30"></div>
+          {/* Glass card — theme-aware background */}
+          <div className="absolute inset-x-4 top-20 bottom-0 rounded-3xl bg-primary/80 dark:bg-primary/70 backdrop-blur-md -z-10 pointer-events-none border border-secondary/30 shadow-lg shadow-black/5 dark:shadow-none"></div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5 mb-10">
-            {/* Avatar — uses your local image */}
+            {/* Avatar */}
             <motion.div
               initial={{ scale: 0.6, opacity: 0, rotate: -8 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -174,7 +192,7 @@ const About = () => {
               </div>
             </motion.div>
 
-            {/* Info */}
+            {/* Info — theme-aware text colors */}
             <div className="text-text-primary pb-1">
               <p className="text-accent text-xs uppercase tracking-[0.3em] mb-2 font-medium">
                 About the Creator
@@ -201,14 +219,14 @@ const About = () => {
             </div>
           </div>
 
-          {/* Bio Section */}
+          {/* Bio Section — theme-aware cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="lg:col-span-2 rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-8"
+              className="lg:col-span-2 rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-8 shadow-sm dark:shadow-none"
             >
               <h2 className="font-display text-2xl text-text-primary mb-4">
                 The Story
@@ -239,7 +257,7 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.15 }}
-              className="rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-8"
+              className="rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm p-8 shadow-sm dark:shadow-none"
             >
               <h2 className="font-display text-2xl text-text-primary mb-4">
                 Focus
@@ -280,7 +298,7 @@ const About = () => {
             <div className="space-y-8">
               {PROJECTS.map((project, i) => (
                 <motion.div key={i} className="project-card group" initial={false}>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center rounded-3xl border border-secondary/50 bg-secondary/30 backdrop-blur-sm p-6 hover:border-accent/40 transition-all duration-500">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center rounded-3xl border border-secondary/50 bg-secondary/30 backdrop-blur-sm p-6 hover:border-accent/40 transition-all duration-500 shadow-sm dark:shadow-none">
                     {/* Screenshot */}
                     <div
                       className={`relative h-64 lg:h-80 rounded-2xl overflow-hidden border border-secondary/40 ${
@@ -330,14 +348,14 @@ const About = () => {
             </div>
           </div>
 
-          {/* CTA */}
+          {/* CTA — theme-aware */}
           <div className="mb-20 text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="inline-block rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm px-10 py-10"
+              className="inline-block rounded-3xl border border-secondary/50 bg-secondary/40 backdrop-blur-sm px-10 py-10 shadow-sm dark:shadow-none"
             >
               <p className="text-accent text-xs uppercase tracking-[0.3em] mb-3 font-medium">
                 Let's work together

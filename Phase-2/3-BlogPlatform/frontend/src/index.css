@@ -1,16 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;700&family=Inter:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════
+   THEME VARIABLES — Light (default) & Dark
+   ═══════════════════════════════════════════════════════════ */
+:root,
+[data-theme="light"] {
+  /* ☀️ LIGHT MODE */
+  --color-primary: #F5F1EA;
+  --color-secondary: #E8E2D6;
+  --color-accent: #B8873E;
+  --color-text-primary: #1A1F1D;
+  --color-text-secondary: #5A6660;
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --shadow-glow: rgba(184, 135, 62, 0.15);
+  --scrollbar-track: #F5F1EA;
+}
 
-:root {
+[data-theme="dark"] {
+  /* 🌙 DARK MODE */
   --color-primary: #0A0F0D;
   --color-secondary: #1C2B27;
   --color-accent: #D4A15D;
   --color-text-primary: #EAEAEA;
   --color-text-secondary: #8A9B96;
   --glass: rgba(28, 43, 39, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-glow: rgba(212, 161, 93, 0.15);
+  --scrollbar-track: #0A0F0D;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════ */
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -18,10 +41,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-primary);
   color: var(--color-text-primary);
-  cursor: none; /* Hide default cursor */
+  cursor: none;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Custom cursor */
+/* Light mode subtle background glow */
+[data-theme="light"] body {
+  background-image: radial-gradient(ellipse at top, rgba(184, 135, 62, 0.04), transparent 60%);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════════════════════════ */
 .cursor-dot,
 .cursor-outline {
   position: fixed;
@@ -32,13 +63,11 @@ body {
   z-index: 9999;
   pointer-events: none;
 }
-
 .cursor-dot {
   width: 8px;
   height: 8px;
   background-color: var(--color-accent);
 }
-
 .cursor-outline {
   width: 40px;
   height: 40px;
@@ -46,33 +75,27 @@ body {
   transition: all 0.2s ease-out;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #e0b278; }
 
-::-webkit-scrollbar-track {
-  background: var(--color-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-accent);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #e0b278;
-}
-
-/* Glassmorphism utility */
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════ */
 .glass {
   background: var(--glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+}
+[data-theme="light"] .glass {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
-/* Text gradient */
 .text-gradient {
   background: linear-gradient(90deg, var(--color-accent), #f0c98a);
   -webkit-background-clip: text;
@@ -80,12 +103,8 @@ body {
   background-clip: text;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
-/* Section styling */
 .section {
   min-height: 100vh;
   display: flex;
@@ -116,52 +135,76 @@ html {
   line-height: 1.6;
 }
 
-/* Parallax container */
-.parallax {
-  perspective: 1000px;
-  transform-style: preserve-3d;
-}
-
-/* Slow pulse for glowing orbs */
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.15); }
 }
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
 
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
-}
-
-/* 3D card hover */
 .post-card-item {
   transform-origin: center;
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.post-card-item:hover { transform: translateY(-8px); }
 
-.post-card-item:hover {
-  transform: translateY(-8px);
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ═══════════════════════════════════════════════════════════
+   LEGAL CONTENT TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════ */
+.legal-content h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.75rem;
+  letter-spacing: 0.03em;
+  color: var(--color-text-primary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.legal-content h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.legal-content p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+}
+.legal-content ul,
+.legal-content ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: var(--color-text-secondary);
+}
+.legal-content li {
+  font-family: 'Cormorant Garamond', serif;
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+.legal-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.legal-content strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.legal-content hr {
+  border-color: rgba(255, 255, 255, 0.06);
+  margin: 2rem 0;
 }
 
-/* Hide scrollbar utility */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-
-html, body, #root {
-  min-height: 100vh;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-}
-
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT ROOT
+   ═══════════════════════════════════════════════════════════ */
+html, body, #root { min-height: 100vh; }
+#root { display: flex; flex-direction: column; }
 .App {
   min-height: 100vh;
   display: flex;
@@ -169,7 +212,4 @@ html, body, #root {
   position: relative;
   z-index: 1;
 }
-
-main {
-  flex: 1;
-}
+main { flex: 1; }
