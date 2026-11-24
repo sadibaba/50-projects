@@ -2,14 +2,18 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IComment extends Document {
   text: string;
-  userId: mongoose.Types.ObjectId;
-  pinId: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  pin: mongoose.Types.ObjectId;
+  createdAt: Date;
 }
 
-const CommentSchema = new Schema<IComment>({
-  text: { type: String, required: true },
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  pinId: { type: Schema.Types.ObjectId, ref: "Pin", required: true }
-}, { timestamps: true });
+const commentSchema = new Schema<IComment>(
+  {
+    text: { type: String, required: true, trim: true, maxlength: 1000 },
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    pin: { type: Schema.Types.ObjectId, ref: "Pin", required: true, index: true },
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model<IComment>("Comment", CommentSchema);
+export default mongoose.model<IComment>("Comment", commentSchema);

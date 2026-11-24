@@ -1,53 +1,40 @@
-import api from './api';
-import { Pin, CreatePinData } from '@/types';
+import api from "./api";
+import { Pin } from "@/types";
 
 export const pinService = {
-  async getAllPins(): Promise<Pin[]> {
-    const response = await api.get('/pins');
-    return response.data;
+  async list(params: Record<string, string | number | undefined>) {
+    const response = await api.get("/pins", { params });
+    return response.data as { pins: Pin[]; page: number; total: number; hasMore: boolean };
   },
-
-  async getPinById(id: string): Promise<Pin> {
+  async get(id: string) {
     const response = await api.get(`/pins/${id}`);
-    return response.data;
+    return response.data as Pin;
   },
-
-  async createPin(data: CreatePinData): Promise<Pin> {
-    const response = await api.post('/pins', data);
-    return response.data;
+  async create(data: Record<string, unknown>) {
+    const response = await api.post("/pins", data);
+    return response.data as Pin;
   },
-
-  async deletePin(id: string): Promise<void> {
+  async update(id: string, data: Record<string, unknown>) {
+    const response = await api.put(`/pins/${id}`, data);
+    return response.data as Pin;
+  },
+  async remove(id: string) {
     await api.delete(`/pins/${id}`);
   },
-
-  async likePin(id: string): Promise<void> {
+  async like(id: string) {
     const response = await api.put(`/pins/${id}/like`);
-    return response.data;
+    return response.data as { liked: boolean; likesCount: number };
   },
-
-  async unlikePin(id: string): Promise<void> {
+  async unlike(id: string) {
     const response = await api.put(`/pins/${id}/unlike`);
-    return response.data;
+    return response.data as { liked: boolean; likesCount: number };
   },
-
-  async savePin(id: string): Promise<void> {
-    const response = await api.put(`/pins/${id}/save`);
-    return response.data;
+  async save(id: string, boardId?: string) {
+    const response = await api.put(`/pins/${id}/save`, { boardId });
+    return response.data as { saved: boolean; savesCount: number };
   },
-
-  async unsavePin(id: string): Promise<void> {
+  async unsave(id: string) {
     const response = await api.put(`/pins/${id}/unsave`);
-    return response.data;
-  },
-
-  async getFeed(): Promise<Pin[]> {
-    const response = await api.get('/feed');
-    return response.data;
-  },
-
-  async search(query: string): Promise<{ pins: Pin[]; boards: any[] }> {
-    const response = await api.get(`/search?query=${encodeURIComponent(query)}`);
-    return response.data;
+    return response.data as { saved: boolean; savesCount: number };
   },
 };

@@ -1,36 +1,25 @@
 import { Response } from "express";
-import { AuthRequest } from "../types/authRequest";
 import Notification from "../models/notification.model";
+import { AsyncRequest } from "../types/authRequest";
+import { asyncHandler } from "../utils/http";
 
-export const getNotifications = async (req: AuthRequest, res: Response) => {
-  try {
-    const currentUserId = req.user?.id;
-    if (!currentUserId) return res.status(401).json({ error: "Unauthorized" });
+export const list = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const notifications = await Notification.find({ recipient: req.userId })
+    .populate("actor", "username name avatar")
+    .populate("pin", "title imageUrl")
+    .sort({ createdAt: -1 })
+    .limit(50)
+    .lean();
+  const unread = await Notification.countDocuments({ recipient: req.userId, read: false });
+  res.json({ notifications, unread });
+});
 
-    const notifications = await Notification.find({ userId: currentUserId })
-      .sort({ createdAt: -1 })
-      .populate("fromUser", "username email")
-      .populate("pinId", "title imageUrl");
+export const markRead = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  await Notification.updateOne({ _id: req.params.id, recipient: req.userId }, { read: true });
+  res.json({ message: "Marked as read" });
+});
 
-    res.json(notifications);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const markAsRead = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const currentUserId = req.user?.id;
-
-    const notification = await Notification.findOne({ _id: id, userId: currentUserId });
-    if (!notification) return res.status(404).json({ error: "Notification not found" });
-
-    notification.isRead = true;
-    await notification.save();
-
-    res.json({ message: "Notification marked as read" });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
+export const markAllRead = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  await Notification.updateMany({ recipient: req.userId, read: false }, { read: true });
+  res.json({ message: "All notifications marked as read" });
+});

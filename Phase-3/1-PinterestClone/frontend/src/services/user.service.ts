@@ -1,30 +1,25 @@
-import api from './api';
-import { User } from '@/types';
+import api from "./api";
+import { ProfileResponse, User } from "@/types";
 
 export const userService = {
-  async getUserProfile(id: string): Promise<{
-    user: User;
-    followersCount: number;
-    followingCount: number;
-    pins: any[];
-    boards: any[];
-  }> {
-    const response = await api.get(`/users/${id}/profile`);
-    return response.data;
+  async profile(idOrUsername: string) {
+    const response = await api.get(`/users/${idOrUsername}/profile`);
+    return response.data as ProfileResponse;
   },
-
-  async followUser(id: string): Promise<void> {
+  async follow(id: string) {
     const response = await api.put(`/users/${id}/follow`);
-    return response.data;
+    return response.data as { following: boolean; followersCount: number };
   },
-
-  async unfollowUser(id: string): Promise<void> {
+  async unfollow(id: string) {
     const response = await api.put(`/users/${id}/unfollow`);
+    return response.data as { following: boolean; followersCount: number };
+  },
+  async search(q: string) {
+    const response = await api.get("/users/search", { params: { q } });
+    return response.data as User[];
+  },
+  async saved() {
+    const response = await api.get("/users/me/saved");
     return response.data;
   },
-
-  async updateProfile(data: { username?: string; bio?: string; profilePicture?: string }): Promise<User> {
-  const response = await api.put('/users/profile/update', data);
-  return response.data.user;
-},
 };

@@ -1,67 +1,52 @@
-// backend/src/controllers/comment.controller.ts
 import { Response } from "express";
-import { AuthRequest } from "../types/authRequest";
 import Comment from "../models/comments";
 import Pin from "../models/pin.model";
+import { AsyncRequest } from "../types/authRequest";
+import { ApiError, asyncHandler } from "../utils/http";
+import { notify } from "../utils/notify";
 
-export const addComment = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params; 
-    const { text } = req.body;
-    const currentUserId = req.user?.id;
+export const getComments = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const comments = await Comment.find({ pin: req.params.id })
+    .populate("user", "username name avatar")
+    .sort({ createdAt: -1 })
+    .lean();
+  res.json(comments);
+});
 
-    if (!currentUserId) return res.status(401).json({ error: "Unauthorized" });
+export const addComment = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  if (!req.userId) throw new ApiError(401, "Authentication required");
+  const text = String(req.body.text || "").trim();
+  if (!text) throw new ApiError(400, "Comment text is required");
 
-    const pin = await Pin.findById(id);
-    if (!pin) return res.status(404).json({ error: "Pin not found" });
+  const pin = await Pin.findById(req.params.id);
+  if (!pin) throw new ApiError(404, "Pin not found");
 
-    const comment = new Comment({
-      text,
-      userId: currentUserId,
-      pinId: id
-    });
+  const comment = await Comment.create({ text, user: req.userId, pin: pin._id });
+  pin.commentsCount = (pin.commentsCount || 0) + 1;
+  await pin.save();
+  await notify({ recipient: String(pin.createdBy), actor: req.userId, type: "comment", pin: String(pin._id) });
 
-    await comment.save();
-    
-    // Populate user data before returning
-    const populatedComment = await Comment.findById(comment._id).populate("userId", "username email profilePicture bio");
+  const populated = await Comment.findById(comment._id)
+    .populate("user", "username name avatar")
+    .lean();
 
-    res.json({ message: "Comment added", comment: populatedComment });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  res.status(201).json(populated);
+});
+
+export const deleteComment = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  if (!req.userId) throw new ApiError(401, "Authentication required");
+  const comment = await Comment.findById(req.params.id);
+  if (!comment) throw new ApiError(404, "Comment not found");
+
+  const pin = await Pin.findById(comment.pin);
+  const isOwner = String(comment.user) === req.userId;
+  const isPinOwner = pin && String(pin.createdBy) === req.userId;
+  if (!isOwner && !isPinOwner) throw new ApiError(403, "You cannot delete this comment");
+
+  await comment.deleteOne();
+  if (pin) {
+    pin.commentsCount = Math.max(0, (pin.commentsCount || 1) - 1);
+    await pin.save();
   }
-};
-
-export const getComments = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params; 
-    const comments = await Comment.find({ pinId: id })
-      .populate("userId", "username email profilePicture bio")
-      .sort({ createdAt: -1 });
-
-    res.json(comments);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-export const deleteComment = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params; 
-    const currentUserId = req.user?.id;
-
-    if (!currentUserId) return res.status(401).json({ error: "Unauthorized" });
-
-    const comment = await Comment.findById(id);
-    if (!comment) return res.status(404).json({ error: "Comment not found" });
-
-    if (comment.userId.toString() !== currentUserId) {
-      return res.status(403).json({ error: "Not allowed" });
-    }
-
-    await comment.deleteOne();
-    res.json({ message: "Comment deleted" });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
+  res.json({ message: "Comment deleted" });
+});

@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { getNotifications, markAsRead } from "../controllers/notification.controller";
+import { list, markRead, markAllRead } from "../controllers/notification.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
 const router = Router();
-
-router.get("/", authMiddleware, getNotifications);
-router.put("/:id/read", authMiddleware, markAsRead);
-
+router.get("/", authMiddleware, list);
+router.put("/read-all", authMiddleware, markAllRead);
+router.put("/:id/read", authMiddleware, markRead);
 export default router;

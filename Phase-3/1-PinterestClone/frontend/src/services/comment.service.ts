@@ -1,18 +1,16 @@
-import api from './api';
-import { Comment } from '@/types';
+import api from "./api";
+import { Comment } from "@/types";
 
 export const commentService = {
-  async getComments(pinId: string): Promise<Comment[]> {
+  async list(pinId: string) {
     const response = await api.get(`/pins/${pinId}/comments`);
-    return Array.isArray(response.data) ? response.data : [];
+    return response.data as Comment[];
   },
-
-  async addComment(pinId: string, text: string): Promise<Comment> {
+  async add(pinId: string, text: string) {
     const response = await api.post(`/pins/${pinId}/comments`, { text });
-    return response.data.comment || response.data;
+    return response.data as Comment;
   },
-
-  async deleteComment(commentId: string): Promise<void> {
-    await api.delete(`/comments/${commentId}`);
+  async remove(id: string) {
+    await api.delete(`/comments/${id}`);
   },
 };

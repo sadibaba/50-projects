@@ -1,19 +1,14 @@
-'use client';
-
-import Link from 'next/link';
-import Button from '@/components/common/Button';
+import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="text-center">
-        <h1 className="text-9xl font-bold text-primary">404</h1>
-        <h2 className="text-2xl font-semibold text-gray-900 mt-4 mb-2">Page not found</h2>
-        <p className="text-gray-600 mb-8">Sorry, we couldn't find the page you're looking for.</p>
-        <Link href="/">
-          <Button variant="primary">
-            Go back home
-          </Button>
+    <div className="grid min-h-[70vh] place-items-center px-4 text-center">
+      <div>
+        <p className="text-8xl font-black text-brand">404</p>
+        <h1 className="mt-4 text-2xl font-bold">Page not found</h1>
+        <p className="mt-2 text-gray-500">The idea you were looking for may have moved.</p>
+        <Link href="/" className="mt-6 inline-flex rounded-full bg-brand px-6 py-3 font-semibold text-white hover:bg-brand-dark">
+          Back to home
         </Link>
       </div>
     </div>

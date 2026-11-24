@@ -1,254 +1,131 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { IoHeartOutline, IoHeart, IoBookmarkOutline, IoBookmark, IoArrowBackOutline, IoShareOutline } from 'react-icons/io5';
-import { useAuth } from '@/context/AuthContext';
-import { pinService } from '@/services/pin.service';
-import CommentSection from '@/components/comments/CommentSection';
-import Button from '@/components/common/Button';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { IoArrowBackOutline, IoHeart, IoHeartOutline, IoBookmark, IoBookmarkOutline, IoShareSocialOutline, IoDownloadOutline, IoChatbubbleOutline, IoEyeOutline } from "react-icons/io5";
+import { useAuth } from "@/context/AuthContext";
+import { pinService } from "@/services/pin.service";
+import { Pin } from "@/types";
+import Button from "@/components/common/Button";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import Comments from "@/components/comments/Comments";
+import PinGrid from "@/components/pins/PinGrid";
+import SaveToBoardModal from "@/components/pins/SaveToBoardModal";
+import { downloadImage, sharePin } from "@/lib/share";
+import toast from "react-hot-toast";
 
 export default function PinDetailPage() {
-  const params = useParams();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
-  const [pin, setPin] = useState<any>(null);
+  const { isAuthenticated } = useAuth();
+  const [pin, setPin] = useState<Pin | null>(null);
   const [loading, setLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [savingPin, setSavingPin] = useState<Pin | null>(null);
+  const [saveOpen, setSaveOpen] = useState(false);
 
   useEffect(() => {
-    if (params.id) {
-      fetchPinDetails();
-    }
-  }, [params.id]);
+    pinService.get(id)
+      .then(setPin)
+      .catch(() => toast.error("Pin not found"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  useEffect(() => {
-    if (pin && user) {
-      const liked = pin.likes?.includes(user._id);
-      setIsLiked(liked);
-      setLikeCount(pin.likes?.length || 0);
-      
-      const saved = pin.saves?.includes(user._id);
-      setIsSaved(saved);
-    }
-  }, [pin, user]);
-
-  const fetchPinDetails = async () => {
+  const toggleLike = async () => {
+    if (!pin) return;
     try {
-      const data = await pinService.getPinById(params.id as string);
-      setPin(data);
-    } catch (error) {
-      console.error('Failed to fetch pin:', error);
-      toast.error('Failed to load pin');
-    } finally {
-      setLoading(false);
+      const data = pin.liked ? await pinService.unlike(pin._id) : await pinService.like(pin._id);
+      setPin({ ...pin, liked: data.liked, likesCount: data.likesCount });
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
-  const handleLike = async () => {
-    if (!isAuthenticated) {
-      toast.error('Please login to like');
-      router.push('/login');
-      return;
-    }
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      if (isLiked) {
-        await pinService.unlikePin(pin._id);
-        setIsLiked(false);
-        setLikeCount(prev => prev - 1);
-        toast.success('Unliked!');
-      } else {
-        await pinService.likePin(pin._id);
-        setIsLiked(true);
-        setLikeCount(prev => prev + 1);
-        toast.success('Liked!');
-      }
-    } catch (error) {
-      console.error('Like action failed:', error);
-      toast.error('Something went wrong');
-    } finally {
-      setIsProcessing(false);
-    }
+  const share = async () => {
+    if (!pin) return;
+    const result = await sharePin(pin._id, pin.title);
+    if (result === "copied") toast.success("Link copied");
   };
 
-  const handleSave = async () => {
-    if (!isAuthenticated) {
-      toast.error('Please login to save');
-      router.push('/login');
-      return;
-    }
-    if (isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      if (isSaved) {
-        await pinService.unsavePin(pin._id);
-        setIsSaved(false);
-        toast.success('Removed from saved');
-      } else {
-        await pinService.savePin(pin._id);
-        setIsSaved(true);
-        toast.success('Saved!');
-      }
-    } catch (error) {
-      console.error('Save action failed:', error);
-      toast.error('Something went wrong');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/pin/${pin._id}`);
-      toast.success('Link copied to clipboard!');
-    } catch (error) {
-      toast.error('Failed to copy link');
-    }
-  };
-
-  const handleCreatorClick = (e: React.MouseEvent, userId: string) => {
-    e.preventDefault();
-    router.push(`/profile/${userId}`);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!pin) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-semibold text-gray-900">Pin not found</h2>
-        <Button onClick={() => router.push('/')} className="mt-4">
-          Go Home
-        </Button>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner size="lg" />;
+  if (!pin) return <div className="py-24 text-center"><h1 className="text-2xl font-bold">Pin not found</h1><Button onClick={() => router.push("/")} className="mt-4">Go home</Button></div>;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <button
-        onClick={() => router.back()}
-        className="mb-6 flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
-      >
-        <IoArrowBackOutline size={20} />
-        Back
+    <div className="mx-auto max-w-6xl px-3 py-4 sm:px-5 sm:py-8">
+      <button onClick={() => router.back()} className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100">
+        <IoArrowBackOutline /> Back
       </button>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl overflow-hidden"
-      >
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Image */}
-          <div className="relative min-h-[400px] bg-gray-100">
-            {!imageError ? (
-              <img
-                src={pin.imageUrl}
-                alt={pin.title}
-                className="w-full h-full object-cover"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full min-h-[400px]">
-                <p className="text-gray-500">Failed to load image</p>
-              </div>
-            )}
+
+      <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm lg:grid lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="relative bg-gray-100">
+          {pin.type === "video" && pin.videoUrl ? (
+            <video src={pin.videoUrl} poster={pin.posterUrl || pin.imageUrl} controls playsInline className="max-h-[80vh] w-full bg-black object-contain" />
+          ) : (
+            <img src={pin.imageUrl} alt={pin.title} className="max-h-[80vh] w-full object-contain" />
+          )}
+        </div>
+
+        <div className="flex flex-col p-5 sm:p-7">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <button onClick={share} className="grid h-10 w-10 place-items-center rounded-full hover:bg-gray-100" aria-label="Share"><IoShareSocialOutline size={21} /></button>
+              <button onClick={() => downloadImage(pin.imageUrl, pin.title)} className="grid h-10 w-10 place-items-center rounded-full hover:bg-gray-100" aria-label="Download"><IoDownloadOutline size={21} /></button>
+              <button onClick={toggleLike} className="flex items-center gap-1.5 rounded-full px-3 py-2 hover:bg-gray-100" aria-label="Like">
+                {pin.liked ? <IoHeart className="text-brand" size={21} /> : <IoHeartOutline size={21} />} {pin.likesCount}
+              </button>
+            </div>
+            <Button onClick={() => isAuthenticated ? setSaveOpen(true) : router.push("/login")} size="sm">
+              {pin.saved ? <><IoBookmark /> Saved</> : "Save"}
+            </Button>
           </div>
-          
-          {/* Content */}
-          <div className="p-6">
-            {/* Creator Info */}
-            <div className="flex items-center justify-between mb-4">
-              <div 
-                onClick={(e) => handleCreatorClick(e, pin.createdBy?._id)}
-                className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg overflow-hidden bg-gradient-to-r from-primary to-red-500">
-                  {pin.createdBy?.profilePicture ? (
-                    <img 
-                      src={pin.createdBy.profilePicture} 
-                      alt={pin.createdBy.username}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    pin.createdBy?.username?.[0]?.toUpperCase() || 'U'
-                  )}
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">{pin.createdBy?.username || 'User'}</p>
-                  <p className="text-sm text-gray-500">Creator</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <button
-                  onClick={handleLike}
-                  disabled={isProcessing}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                >
-                  {isLiked ? (
-                    <IoHeart className="text-red-500" size={24} />
-                  ) : (
-                    <IoHeartOutline size={24} />
-                  )}
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isProcessing}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                >
-                  {isSaved ? (
-                    <IoBookmark className="text-primary" size={24} />
-                  ) : (
-                    <IoBookmarkOutline size={24} />
-                  )}
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="p-3 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <IoShareOutline size={24} />
-                </button>
-              </div>
+
+          <div className="mt-5 flex items-center gap-2 text-xs text-gray-500">
+            <span className="flex items-center gap-1"><IoEyeOutline /> {pin.views} views</span>
+            <span>·</span>
+            <span className="rounded-full bg-gray-100 px-2 py-1 font-medium text-gray-700">{pin.category}</span>
+          </div>
+
+          <h1 className="mt-3 text-3xl font-black leading-tight">{pin.title}</h1>
+          {pin.description && <p className="mt-3 whitespace-pre-line text-sm leading-6 text-gray-600">{pin.description}</p>}
+
+          <Link href={`/profile/${pin.createdBy?.username}`} className="mt-5 flex items-center gap-3 rounded-2xl p-2 hover:bg-gray-50">
+            <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-gray-200 font-bold">
+              {pin.createdBy?.avatar ? <img src={pin.createdBy.avatar} alt="" className="h-full w-full object-cover" /> : pin.createdBy?.username?.[0]?.toUpperCase()}
+            </span>
+            <span>
+              <span className="block text-sm font-semibold">{pin.createdBy?.name || pin.createdBy?.username}</span>
+              <span className="block text-xs text-gray-500">@{pin.createdBy?.username}</span>
+            </span>
+          </Link>
+
+          {pin.tags?.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {pin.tags.map((tag) => (
+                <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-200">#{tag}</Link>
+              ))}
             </div>
-            
-            {/* Like Count */}
-            <div className="flex items-center gap-2 mb-4">
-              <IoHeart className={isLiked ? "text-red-500" : "text-gray-400"} size={20} />
-              <span className="text-gray-700">{likeCount} {likeCount === 1 ? 'like' : 'likes'}</span>
-            </div>
-            
-            {/* Title & Description */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{pin.title}</h1>
-            {pin.description && (
-              <p className="text-gray-600 mb-6 leading-relaxed">{pin.description}</p>
-            )}
-            
-            {/* Comments Section */}
-            <div className="border-t border-gray-200 pt-6">
-              <CommentSection pinId={pin._id} />
-            </div>
+          )}
+
+          <div className="mt-5 flex items-center gap-2 text-xs text-gray-500">
+            <IoChatbubbleOutline /> {pin.commentsCount} comments
+            {pin.sourceUrl && <>· <a href={pin.sourceUrl} target="_blank" rel="noreferrer" className="underline">Source: {pin.sourceName}</a></>}
+          </div>
+
+          <div className="mt-6 border-t border-gray-100 pt-5">
+            <Comments pinId={pin._id} />
           </div>
         </div>
-      </motion.div>
+      </div>
+
+      {pin.related && pin.related.length > 0 && (
+        <section className="mt-10">
+          <h2 className="mb-4 text-xl font-bold">More like this</h2>
+          <PinGrid pins={pin.related} onSave={setSavingPin} />
+        </section>
+      )}
+
+      {saveOpen && <SaveToBoardModal pin={pin} onClose={() => setSaveOpen(false)} onSaved={(updated) => setPin({ ...pin, ...updated })} />}
+      {savingPin && <SaveToBoardModal pin={savingPin} onClose={() => setSavingPin(null)} onSaved={(updated) => setPin((current) => current ? { ...current, related: current.related?.map((item) => item._id === updated._id ? { ...item, ...updated } : item) } : current)} />}
     </div>
   );
 }

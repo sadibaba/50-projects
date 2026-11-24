@@ -1,41 +1,26 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  headers: { "Content-Type": "application/json" },
 });
 
-// Request interceptor to add token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-      toast.error('Session expired. Please login again.');
-    } else if (error.response?.data?.error) {
-      toast.error(error.response.data.error);
-    } else {
-      toast.error('Something went wrong. Please try again.');
+    const message = error.response?.data?.error || error.message || "Something went wrong";
+    error.message = message;
+    if (error.response?.status === 401 && typeof window !== "undefined" && localStorage.getItem("token")) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("current_user");
     }
     return Promise.reject(error);
   }

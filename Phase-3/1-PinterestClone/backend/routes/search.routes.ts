@@ -1,9 +1,7 @@
 import { Router } from "express";
 import { search } from "../controllers/search.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { optionalAuth } from "../middleware/auth.middleware";
 
 const router = Router();
-
-router.get("/", authMiddleware, search);
-
+router.get("/", optionalAuth, search);
 export default router;

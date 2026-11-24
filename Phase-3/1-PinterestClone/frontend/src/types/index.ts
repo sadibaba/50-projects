@@ -1,102 +1,97 @@
 export interface User {
   _id: string;
   username: string;
-  email: string;
-  profilePicture?: string;
-  bio?: string;
+  name: string;
+  email?: string;
+  bio: string;
+  avatar: string;
+  cover: string;
+  website: string;
+  location: string;
   followers: string[];
   following: string[];
   createdAt: string;
-  updatedAt: string;
 }
-
 
 export interface Pin {
   _id: string;
   title: string;
-  description?: string;
+  description: string;
   imageUrl: string;
+  videoUrl?: string;
+  posterUrl?: string;
+  type: "image" | "video";
+  category: string;
+  tags: string[];
+  sourceName: string;
+  sourceUrl: string;
   createdBy: User;
-  board?: Board;
+  board?: { _id: string; name: string } | string;
   likes: string[];
   saves: string[];
+  likesCount: number;
+  savesCount: number;
+  commentsCount: number;
+  liked: boolean;
+  saved: boolean;
+  views: number;
+  width: number;
+  height: number;
   createdAt: string;
-  updatedAt: string;
+  related?: Pin[];
 }
 
 export interface Board {
   _id: string;
   name: string;
-  description?: string;
+  description: string;
+  cover: string;
+  isSecret: boolean;
   createdBy: User;
-  pins: string[];
+  pins: Pin[];
+  pinsCount: number;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface Comment {
   _id: string;
   text: string;
-  userId: User | string;
-  pinId: string;
+  user: User;
+  pin: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface Notification {
   _id: string;
-  userId: string;
-  type: 'follow' | 'like' | 'comment' | 'save';
-  fromUser: User;
-  pinId?: Pin;
-  isRead: boolean;
+  recipient: string;
+  actor: User;
+  type: "like" | "comment" | "follow" | "save";
+  pin?: { _id: string; title: string; imageUrl: string };
+  read: boolean;
   createdAt: string;
 }
 
-export interface ApiResponse<T = any> {
-  success?: boolean;
-  message?: string;
-  error?: string;
-  data?: T;
+export interface ProfileResponse {
+  user: User;
+  pins: Pin[];
+  boards: Board[];
+  saved: Pin[];
+  followers: User[];
+  following: User[];
+  followersCount: number;
+  followingCount: number;
+  totalLikes: number;
+  isFollowing: boolean;
 }
 
-export interface AuthResponse {
-  token: string;
-  user?: User;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterCredentials {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export interface CreatePinData {
-  title: string;
-  description?: string;
-  imageUrl: string;
-  board?: string;
-}
-
-export interface UnsplashImage {
+export interface FreeImage {
   id: string;
-  urls: {
-    raw: string;
-    full: string;
-    regular: string;
-    small: string;
-    thumb: string;
-  };
-  user: {
-    name: string;
-    username: string;
-  };
+  title: string;
   alt_description: string;
-  description: string;
-  likes: number;
+  urls: { regular: string; small: string; thumb: string };
+  user: { name: string; username: string };
+  sourceName: string;
+  sourceUrl: string;
+  width: number;
+  height: number;
 }

@@ -1,151 +1,108 @@
 import { Response } from "express";
-import { AuthRequest } from "../types/authRequest";
+import mongoose from "mongoose";
 import User from "../models/user.model";
 import Pin from "../models/pin.model";
 import Board from "../models/board.model";
-import mongoose from "mongoose";
+import { AsyncRequest } from "../types/authRequest";
+import { ApiError, asyncHandler, publicUser } from "../utils/http";
+import { notify } from "../utils/notify";
 
-export const followUser = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const currentUserId = req.user?.id;
-
-    if (!currentUserId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    if (id === currentUserId) {
-      return res.status(400).json({ error: "You cannot follow yourself" });
-    }
-
-    const userToFollow = await User.findById(id);
-    const currentUser = await User.findById(currentUserId);
-
-    if (!userToFollow || !currentUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const currentUserObjectId = new mongoose.Types.ObjectId(currentUserId);
-
-    if (!userToFollow.followers.some(f => f.equals(currentUserObjectId))) {
-      userToFollow.followers.push(currentUserObjectId);
-      currentUser.following.push(userToFollow._id);
-      await userToFollow.save();
-      await currentUser.save();
-    }
-
-    res.json({ 
-      message: "Followed successfully",
-      followersCount: userToFollow.followers.length 
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+const findUser = async (value: string) => {
+  if (mongoose.isValidObjectId(value)) {
+    const byId = await User.findById(value);
+    if (byId) return byId;
   }
+  return User.findOne({ username: value.toLowerCase() });
 };
 
-export const unfollowUser = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const currentUserId = req.user?.id;
+export const getProfile = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const user = await findUser(String(req.params.id));
+  if (!user) throw new ApiError(404, "User not found");
 
-    if (!currentUserId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+  const isOwn = String(user._id) === req.userId;
+  const [pins, boards, followers, following] = await Promise.all([
+    Pin.find({ createdBy: user._id }).populate("createdBy", "username name avatar").sort({ createdAt: -1 }).lean(),
+    Board.find({ createdBy: user._id, ...(isOwn ? {} : { isSecret: false }) }).populate("pins", "imageUrl title").lean(),
+    User.find({ _id: { $in: user.followers } }).select("username name avatar").lean(),
+    User.find({ _id: { $in: user.following } }).select("username name avatar").lean(),
+  ]);
 
-    const userToUnfollow = await User.findById(id);
-    const currentUser = await User.findById(currentUserId);
+  const saved = isOwn
+    ? await Pin.find({ saves: user._id }).populate("createdBy", "username name avatar").sort({ createdAt: -1 }).lean()
+    : [];
 
-    if (!userToUnfollow || !currentUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
+  res.json({
+    user: publicUser(user, isOwn),
+    pins,
+    boards: boards.map((board) => ({ ...board, pinsCount: board.pins?.length || 0 })),
+    saved,
+    followers,
+    following,
+    followersCount: user.followers.length,
+    followingCount: user.following.length,
+    totalLikes: pins.reduce((total: number, pin: any) => total + (pin.likes?.length || 0), 0),
+    isFollowing: Boolean(req.userId && user.followers.some((id) => String(id) === req.userId)),
+  });
+});
 
-    userToUnfollow.followers = userToUnfollow.followers.filter(
-      (f) => f.toString() !== currentUserId
-    );
-    currentUser.following = currentUser.following.filter(
-      (f) => f.toString() !== id
-    );
+export const follow = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  if (!req.userId) throw new ApiError(401, "Authentication required");
+  if (String(req.params.id) === req.userId) throw new ApiError(400, "You cannot follow yourself");
 
-    await userToUnfollow.save();
-    await currentUser.save();
+  const target = await User.findById(req.params.id);
+  const current = await User.findById(req.userId);
+  if (!target || !current) throw new ApiError(404, "User not found");
 
-    res.json({ 
-      message: "Unfollowed successfully",
-      followersCount: userToUnfollow.followers.length 
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  if (!target.followers.some((id) => String(id) === req.userId)) {
+    target.followers.push(new mongoose.Types.ObjectId(req.userId));
+    current.following.push(target._id);
+    await Promise.all([target.save(), current.save()]);
+    await notify({ recipient: String(target._id), actor: req.userId, type: "follow" });
   }
-};
 
+  res.json({ following: true, followersCount: target.followers.length });
+});
 
-export const getUserProfile = async (req: AuthRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id).select("-password");
-    if (!user) return res.status(404).json({ error: "User not found" });
-    
-    const pins = await Pin.find({ createdBy: id })
-      .sort({ createdAt: -1 })
-      .populate("createdBy", "username email profilePicture bio"); // Add profilePicture
-    
-    const boards = await Board.find({ createdBy: id });
-    
-    const totalLikes = pins.reduce((total, pin) => total + (pin.likes?.length || 0), 0);
-    
-    res.json({
-      user,
-      followersCount: user.followers.length,
-      followingCount: user.following.length,
-      totalLikes,
-      pins,
-      boards
-    });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
+export const unfollow = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  if (!req.userId) throw new ApiError(401, "Authentication required");
+  const target = await User.findById(req.params.id);
+  const current = await User.findById(req.userId);
+  if (!target || !current) throw new ApiError(404, "User not found");
 
+  target.followers = target.followers.filter((id) => String(id) !== req.userId);
+  current.following = current.following.filter((id) => String(id) !== req.params.id);
+  await Promise.all([target.save(), current.save()]);
+  res.json({ following: false, followersCount: target.followers.length });
+});
 
-export const updateProfile = async (req: AuthRequest, res: Response) => {
-  try {
-    const currentUserId = req.user?.id;
-    const { username, bio, profilePicture, coverPhoto } = req.body;
+export const followers = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const user = await findUser(String(req.params.id));
+  if (!user) throw new ApiError(404, "User not found");
+  const list = await User.find({ _id: { $in: user.followers } }).select("username name avatar bio").lean();
+  res.json(list);
+});
 
-    if (!currentUserId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+export const following = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const user = await findUser(String(req.params.id));
+  if (!user) throw new ApiError(404, "User not found");
+  const list = await User.find({ _id: { $in: user.following } }).select("username name avatar bio").lean();
+  res.json(list);
+});
 
-    const user = await User.findById(currentUserId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+export const searchUsers = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const q = String(req.query.q || "").trim();
+  if (!q) return res.json([]);
+  const users = await User.find({
+    $or: [{ username: { $regex: q, $options: "i" } }, { name: { $regex: q, $options: "i" } }],
+  })
+    .select("username name avatar bio followers")
+    .limit(12)
+    .lean();
+  res.json(users);
+});
 
-    if (username) user.username = username;
-    if (bio !== undefined) user.bio = bio;
-    if (profilePicture !== undefined) user.profilePicture = profilePicture;
-    if (coverPhoto !== undefined) user.coverPhoto = coverPhoto;
-
-    await user.save();
-
-    const { password, ...userWithoutPassword } = user.toObject();
-    res.json({ message: "Profile updated successfully", user: userWithoutPassword });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-
-
-export const getCurrentUser = async (req: AuthRequest, res: Response) => {
-  try {
-    const currentUserId = req.user?.id;
-    const user = await User.findById(currentUserId).select("-password");
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.json(user);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
+export const savedPins = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  if (!req.userId) throw new ApiError(401, "Authentication required");
+  const pins = await Pin.find({ saves: req.userId }).populate("createdBy", "username name avatar").sort({ createdAt: -1 }).lean();
+  res.json(pins);
+});

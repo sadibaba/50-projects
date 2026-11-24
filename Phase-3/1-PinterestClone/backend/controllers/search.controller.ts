@@ -1,20 +1,30 @@
 import { Response } from "express";
-import { AuthRequest } from "../types/authRequest";
 import Pin from "../models/pin.model";
 import Board from "../models/board.model";
+import User from "../models/user.model";
+import { AsyncRequest } from "../types/authRequest";
+import { asyncHandler } from "../utils/http";
 
-export const search = async (req: AuthRequest, res: Response) => {
-  try {
-    const { query } = req.query;
-    if (!query) return res.status(400).json({ error: "Query is required" });
+export const search = asyncHandler(async (req: AsyncRequest, res: Response) => {
+  const q = String(req.query.q || "").trim();
+  if (!q) return res.json({ pins: [], boards: [], users: [] });
 
-    const searchTerm = String(query); 
+  const regex = { $regex: q, $options: "i" };
+  const [pins, boards, users] = await Promise.all([
+    Pin.find({ $or: [{ title: regex }, { description: regex }, { tags: regex }, { category: regex }] })
+      .populate("createdBy", "username name avatar")
+      .limit(40)
+      .lean(),
+    Board.find({ isSecret: false, $or: [{ name: regex }, { description: regex }] })
+      .populate("createdBy", "username name avatar")
+      .populate("pins", "imageUrl title")
+      .limit(12)
+      .lean(),
+    User.find({ $or: [{ username: regex }, { name: regex }] })
+      .select("username name avatar bio followers")
+      .limit(12)
+      .lean(),
+  ]);
 
-    const pins = await Pin.find({ title: { $regex: searchTerm, $options: "i" } });
-    const boards = await Board.find({ name: { $regex: searchTerm, $options: "i" } });
-
-    res.json({ pins, boards });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-};
+  res.json({ pins, boards, users });
+});

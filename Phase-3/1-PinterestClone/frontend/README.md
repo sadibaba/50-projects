@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pinboard Frontend
 
-## Getting Started
+Next.js 16 App Router client for Pinboard. See the [project README](../README.md)
+for product notes, API documentation and backend setup.
 
-First, run the development server:
+## Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build
+npm start
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` from `.env.example` and set:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
 
-## Learn More
+## Routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/` | Public | Home feed, categories and guest hero |
+| `/explore` | Public | Popular pins by category |
+| `/reels` | Public | Vertical video feed |
+| `/search` | Public | Pins, boards and people |
+| `/pin/[id]` | Public | Pin details, comments and related pins |
+| `/profile/[id]` | Public | Profile, pins, boards and saved pins |
+| `/board/[id]` | Public or owner | Board detail |
+| `/boards` | Public or owner | Boards overview |
+| `/login`, `/register` | Public | Authentication |
+| `/create-pin` | Authenticated | Create a pin |
+| `/saved` | Authenticated | Saved pins |
+| `/notifications` | Authenticated | Notification list |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## State
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `AuthContext` owns the JWT, current user and profile updates.
+- Each page owns its data fetching and loading state.
+- The Axios service layer adds the bearer token to requests.
+- Toasts provide action feedback.

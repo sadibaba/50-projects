@@ -1,13 +1,14 @@
 import { Router } from "express";
-import { followUser, unfollowUser ,getUserProfile ,updateProfile , getCurrentUser } from "../controllers/user.controller";
-import { authMiddleware } from "../middleware/auth.middleware";
+import { getProfile, follow, unfollow, followers, following, searchUsers, savedPins } from "../controllers/user.controller";
+import { authMiddleware, optionalAuth } from "../middleware/auth.middleware";
 
 const router = Router();
-
-router.put("/:id/follow", authMiddleware, followUser);
-router.put("/:id/unfollow", authMiddleware, unfollowUser);
-router.get("/:id/profile", authMiddleware, getUserProfile);
-router.put("/profile/update", authMiddleware, updateProfile);
-router.get("/me", authMiddleware, getCurrentUser);
-
+router.get("/search", optionalAuth, searchUsers);
+router.get("/me/saved", authMiddleware, savedPins);
+router.get("/:id/followers", optionalAuth, followers);
+router.get("/:id/following", optionalAuth, following);
+router.get("/:id/profile", optionalAuth, getProfile);
+router.get("/:id", optionalAuth, getProfile);
+router.put("/:id/follow", authMiddleware, follow);
+router.put("/:id/unfollow", authMiddleware, unfollow);
 export default router;

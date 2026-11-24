@@ -1,32 +1,24 @@
-import api from './api';
-import { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/types';
+import api from "./api";
 
 export const authService = {
-  async register(data: RegisterCredentials): Promise<{ message: string }> {
-    const response = await api.post('/auth/register', data);
+  async login(data: { email: string; password: string }) {
+    const response = await api.post("/auth/login", data);
     return response.data;
   },
-
-  async login(data: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/login', data);
-    const { token } = response.data;
-    localStorage.setItem('token', token);
+  async register(data: { username: string; email: string; password: string }) {
+    const response = await api.post("/auth/register", data);
     return response.data;
   },
-
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('current_user');
+  async me() {
+    const response = await api.get("/auth/me");
+    return response.data;
   },
-
-  getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
-    }
-    return null;
+  async updateMe(data: Record<string, unknown>) {
+    const response = await api.put("/auth/me", data);
+    return response.data;
   },
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+  async changePassword(data: { currentPassword: string; newPassword: string }) {
+    const response = await api.put("/auth/me/password", data);
+    return response.data;
   },
 };

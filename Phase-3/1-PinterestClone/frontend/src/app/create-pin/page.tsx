@@ -1,390 +1,176 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter ,  useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { IoCloudUploadOutline, IoLinkOutline, IoImagesOutline } from 'react-icons/io5';
-import { usePins } from '@/hooks/usePins';
-import Button from '@/components/common/Button';
-import Input from '@/components/common/Input';
-import UnsplashImagePicker from '@/components/common/UnsplashImagePicker';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { IoCloudUploadOutline, IoImagesOutline, IoLinkOutline, IoCloseOutline } from "react-icons/io5";
+import { useAuth } from "@/context/AuthContext";
+import { pinService } from "@/services/pin.service";
+import { boardService } from "@/services/board.service";
+import { discoverService } from "@/services/discover.service";
+import { Board, FreeImage } from "@/types";
+import Button from "@/components/common/Button";
+import Input from "@/components/common/Input";
+import FreeImagePicker from "@/components/pins/FreeImagePicker";
+import toast from "react-hot-toast";
+
+const categories = ["Inspiration", "Travel", "Interiors", "Food", "Fashion", "Art", "Nature", "Tech", "Wellness", "Photography", "Architecture", "Plants", "Books"];
 
 export default function CreatePinPage() {
   const router = useRouter();
-  const { createPin } = usePins();
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    imageUrl: '',
-  });
-  const [imagePreview, setImagePreview] = useState('');
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [showUnsplashPicker, setShowUnsplashPicker] = useState(false);
-  const [uploadMethod, setUploadMethod] = useState<'url' | 'drag'>('url');
-  const [dragActive, setDragActive] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const searchParams = useSearchParams();
-  const imageFromSearch = searchParams.get('image');
-  const titleFromSearch = searchParams.get('title');
-
+  const { isAuthenticated, loading } = useAuth();
+  const [form, setForm] = useState({ title: "", description: "", imageUrl: "", videoUrl: "", category: "Inspiration", tags: "", boardId: "" });
+  const [source, setSource] = useState({ sourceName: "Uploaded", sourceUrl: "", width: 600, height: 900 });
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [mode, setMode] = useState<"free" | "upload" | "url">("free");
 
   useEffect(() => {
-  if (imageFromSearch) {
-    handleImageUrlChange(imageFromSearch);
-    setFormData(prev => ({ ...prev, title: titleFromSearch || '' }));
-  }
-}, [imageFromSearch, titleFromSearch]);
+    if (!loading && !isAuthenticated) router.push("/login");
+  }, [loading, isAuthenticated, router]);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (isAuthenticated) boardService.list({ mine: 1 }).then(setBoards).catch(() => setBoards([]));
+  }, [isAuthenticated]);
 
-  const handleImageUrlChange = (url: string) => {
-    setFormData({ ...formData, imageUrl: url });
-    setImagePreview(url);
-    setImageError(false); // Reset error when new URL is entered
-  };
-
-  const handleUnsplashSelect = (imageUrl: string) => {
-    handleImageUrlChange(imageUrl);
-    setShowUnsplashPicker(false);
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
-    toast.error('Failed to load image. Please check the URL.');
-  };
-
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  }, []);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        handleImageUrlChange(imageUrl);
-      };
-      reader.readAsDataURL(file);
-      toast.success('Image loaded!');
-    } else {
-      toast.error('Please drop an image file');
-    }
-  }, []);
-
-  const compressImage = (file: File, maxSizeMB = 1): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          
-          // Max dimensions
-          const maxWidth = 1200;
-          const maxHeight = 1200;
-          
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          // Compress to JPEG with 0.7 quality
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          resolve(compressedDataUrl);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      if (file.size > 5 * 1024 * 1024) { // If larger than 5MB
-        toast.loading('Compressing image...');
-        try {
-          const compressedUrl = await compressImage(file);
-          handleImageUrlChange(compressedUrl);
-          toast.dismiss();
-          toast.success('Image compressed and loaded!');
-        } catch (error) {
-          toast.dismiss();
-          toast.error('Failed to compress image');
-        }
-      } else {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageUrl = e.target?.result as string;
-          handleImageUrlChange(imageUrl);
-          toast.success('Image loaded!');
-        };
-        reader.readAsDataURL(file);
-      }
-    } else {
-      toast.error('Please select an image file');
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.title.trim()) {
-      toast.error('Please add a title');
-      return;
-    }
-    if (!formData.imageUrl.trim()) {
-      toast.error('Please add an image URL or upload an image');
-      return;
-    }
-    if (imageError) {
-      toast.error('Please fix the image URL before publishing');
-      return;
-    }
-
-    setLoading(true);
+  const upload = async (file: File) => {
+    if (!file.type.startsWith("image/")) return toast.error("Choose an image file");
+    setUploading(true);
     try {
-      await createPin(formData);
-      toast.success('Pin created successfully!');
-      router.push('/');
-    } catch (err) {
-      console.error('Failed to create pin:', err);
-      toast.error('Failed to create pin');
+      const data = await discoverService.upload(file);
+      setForm((current) => ({ ...current, imageUrl: data.url }));
+      setSource({ sourceName: "Uploaded", sourceUrl: "", width: 600, height: 900 });
+      toast.success("Image uploaded");
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
-      setLoading(false);
+      setUploading(false);
     }
   };
 
-  if (!mounted) return null;
+  const chooseFree = (image: FreeImage) => {
+    setForm((current) => ({ ...current, imageUrl: image.urls.regular }));
+    setSource({ sourceName: image.sourceName, sourceUrl: image.sourceUrl, width: image.width, height: image.height });
+    setPickerOpen(false);
+  };
+
+  const publish = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!form.title.trim()) return toast.error("Add a title");
+    if (!form.imageUrl) return toast.error("Add an image");
+
+    setPublishing(true);
+    try {
+      const pin = await pinService.create({
+        title: form.title.trim(),
+        description: form.description.trim(),
+        imageUrl: form.imageUrl,
+        category: form.category,
+        tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        boardId: form.boardId || undefined,
+        videoUrl: form.videoUrl.trim() || undefined,
+        sourceName: source.sourceName,
+        sourceUrl: source.sourceUrl,
+        width: source.width,
+        height: source.height,
+      });
+      toast.success("Pin published");
+      router.push(`/pin/${pin._id}`);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  if (loading) return null;
 
   return (
-    <>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl overflow-hidden"
-        >
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">Create new pin</h1>
-            <p className="text-gray-600 mt-1">Share your ideas with the world</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-6">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Image Upload Section */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image *
-                </label>
-                
-                {/* Upload Method Tabs */}
-                <div className="flex gap-2 mb-4">
-                  <button
-                    type="button"
-                    onClick={() => setUploadMethod('url')}
-                    className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                      uploadMethod === 'url' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <IoLinkOutline className="inline mr-1" size={16} />
-                    URL
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUploadMethod('drag')}
-                    className={`flex-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                      uploadMethod === 'drag' 
-                        ? 'bg-primary text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <IoCloudUploadOutline className="inline mr-1" size={16} />
-                    Drag & Drop
-                  </button>
-                </div>
-
-                {imagePreview ? (
-                  <div className="relative rounded-lg overflow-hidden border border-gray-200">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-auto object-cover max-h-96"
-                      onError={handleImageError}
-                    />
-                    {imageError && (
-                      <div className="absolute inset-0 bg-red-50 flex items-center justify-center">
-                        <p className="text-red-500 text-sm">Failed to load image</p>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleImageUrlChange('')}
-                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-lg hover:bg-gray-100 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    {uploadMethod === 'url' ? (
-                      <div className="space-y-3">
-                        <Input
-                          type="url"
-                          value={formData.imageUrl}
-                          onChange={(e) => handleImageUrlChange(e.target.value)}
-                          placeholder="https://picsum.photos/id/104/500/500"
-                        />
-                        <div className="bg-blue-50 rounded-lg p-3">
-                          <p className="text-xs text-blue-600 mb-2">Try these example URLs:</p>
-                          <button
-                            type="button"
-                            onClick={() => handleImageUrlChange("https://picsum.photos/id/104/500/500")}
-                            className="text-xs text-blue-700 hover:underline block mb-1"
-                          >
-                            📷 https://picsum.photos/id/104/500/500 (Mountain)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleImageUrlChange("https://picsum.photos/id/30/500/500")}
-                            className="text-xs text-blue-700 hover:underline block mb-1"
-                          >
-                            ☕ https://picsum.photos/id/30/500/500 (Coffee)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleImageUrlChange("https://picsum.photos/id/89/500/500")}
-                            className="text-xs text-blue-700 hover:underline block"
-                          >
-                            🌊 https://picsum.photos/id/89/500/500 (Ocean)
-                          </button>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          fullWidth
-                          onClick={() => setShowUnsplashPicker(true)}
-                        >
-                          <IoImagesOutline className="mr-2" />
-                          Browse Free Images
-                        </Button>
-                      </div>
-                    ) : (
-                      <div
-                        onDragEnter={handleDrag}
-                        onDragLeave={handleDrag}
-                        onDragOver={handleDrag}
-                        onDrop={handleDrop}
-                        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                          dragActive ? 'border-primary bg-primary/5' : 'border-gray-300'
-                        }`}
-                      >
-                        <IoCloudUploadOutline className="mx-auto text-gray-400 text-4xl mb-2" />
-                        <p className="text-sm text-gray-600 mb-2">
-                          Drag & drop an image here
-                        </p>
-                        <p className="text-xs text-gray-500 mb-3">or</p>
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                          />
-                          <span className="text-primary hover:underline text-sm">
-                            Browse files
-                          </span>
-                        </label>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Pin Details */}
-              <div className="space-y-4">
-                <Input
-                  label="Title *"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Add a title"
-                  required
-                />
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={6}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                    placeholder="Tell everyone what your pin is about"
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    loading={loading}
-                  >
-                    Publish
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </motion.div>
+    <div className="mx-auto max-w-6xl px-3 py-5 sm:px-5 sm:py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-black tracking-tight">Create a pin</h1>
+        <p className="mt-1 text-sm text-gray-500">Use a free image, upload your own, or paste an image URL.</p>
       </div>
 
-      {showUnsplashPicker && (
-        <UnsplashImagePicker
-          onSelect={handleUnsplashSelect}
-          onClose={() => setShowUnsplashPicker(false)}
-        />
-      )}
-    </>
+      <form onSubmit={publish} className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-4 flex rounded-full bg-gray-100 p-1 text-sm">
+            {[
+              { id: "free", label: "Free images", icon: IoImagesOutline },
+              { id: "upload", label: "Upload", icon: IoCloudUploadOutline },
+              { id: "url", label: "URL", icon: IoLinkOutline },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <button key={item.id} type="button" onClick={() => setMode(item.id as typeof mode)} className={`flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 font-semibold ${mode === item.id ? "bg-white shadow" : "text-gray-500"}`}>
+                  <Icon size={16} /> {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {form.imageUrl ? (
+            <div className="relative overflow-hidden rounded-2xl bg-gray-100">
+              <img src={form.imageUrl} alt="Preview" className="max-h-[560px] w-full object-contain" />
+              <button type="button" onClick={() => setForm({ ...form, imageUrl: "" })} className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white shadow" aria-label="Remove image">
+                <IoCloseOutline size={20} />
+              </button>
+            </div>
+          ) : (
+            <div className="grid min-h-[320px] place-items-center rounded-2xl border-2 border-dashed border-gray-300 p-6 text-center">
+              {mode === "free" && <div><p className="font-semibold">Find a free image</p><p className="mt-1 text-sm text-gray-500">Picsum, no key required.</p><Button type="button" className="mt-4" onClick={() => setPickerOpen(true)}>Browse free images</Button></div>}
+              {mode === "upload" && (
+                <label className="cursor-pointer">
+                  <IoCloudUploadOutline className="mx-auto text-4xl text-gray-400" />
+                  <p className="mt-3 font-semibold">{uploading ? "Uploading..." : "Upload an image"}</p>
+                  <p className="text-sm text-gray-500">PNG, JPG or WebP up to 8 MB</p>
+                  <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(event) => event.target.files?.[0] && upload(event.target.files[0])} />
+                </label>
+              )}
+              {mode === "url" && (
+                <div className="w-full max-w-sm text-left">
+                  <label className="mb-1.5 block text-sm font-medium">Image URL</label>
+                  <input value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} placeholder="https://..." className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-brand" />
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="mt-3 text-xs text-gray-500">Source: {source.sourceName}{source.sourceUrl && <> · <a href={source.sourceUrl} target="_blank" rel="noreferrer" className="underline">original</a></>}</p>
+        </section>
+
+        <section className="space-y-4 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <Input label="Title" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} placeholder="A clear, useful title" maxLength={160} required />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium">Description</label>
+            <textarea value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} rows={5} maxLength={1000} placeholder="What makes this idea useful?" className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-brand" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium">Category</label>
+              <select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand">
+                {categories.map((category) => <option key={category}>{category}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium">Board</label>
+              <select value={form.boardId} onChange={(event) => setForm({ ...form, boardId: event.target.value })} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand">
+                <option value="">No board</option>
+                {boards.map((board) => <option key={board._id} value={board._id}>{board.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <Input label="Tags" value={form.tags} onChange={(event) => setForm({ ...form, tags: event.target.value })} placeholder="interior, minimal, small space" />
+          <Input label="Video URL (optional)" value={form.videoUrl} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} placeholder="https://...mp4 — makes this a Reel" />
+          <div className="flex gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
+            <Button type="submit" loading={publishing} fullWidth>Publish pin</Button>
+          </div>
+        </section>
+      </form>
+
+      {pickerOpen && <FreeImagePicker onSelect={chooseFree} onClose={() => setPickerOpen(false)} />}
+    </div>
   );
 }
