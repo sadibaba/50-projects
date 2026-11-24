@@ -115,9 +115,9 @@ export const cardData = [
   },
 ];
 const CardList = () => (
-  <div className="h-screen w-screen flex justify-center items-center flex-wrap">
-    {cardData.map((card, index) => (
-      <Card key={index} {...card} />
+  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {cardData.map((card) => (
+      <Card key={card.name} {...card} />
     ))}
   </div>
 );

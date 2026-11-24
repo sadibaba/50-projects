@@ -1,67 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-    href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
-    rel="stylesheet"
-/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
-<body class="h-screen w-screen bg-[url('https://plus.unsplash.com/premium_vector-1744039444725-b0f5f2a6fcc0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-auto bg-fixed">
-    <div class="main flex relative">
-        <div  class="logo ml-24 mt-12 h-14 w-14 m-8  rounded-full overflow-hidden ">
-            <img src="https://plus.unsplash.com/premium_vector-1683121254296-15e9db71c45f?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt=""
-            class="h-full w-full object-cover "
-            >
+<body class="min-h-screen bg-gradient-to-br from-sky-950 via-slate-900 to-indigo-950 text-white">
+  <main class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-10">
+    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-400/20 text-sky-300">
+          <i class="ri-cloud-line text-2xl" aria-hidden="true"></i>
         </div>
-         <div class="flex absolute bottom-20 left-20 ">
-            <h1 class="main-degree text-8xl"></h1>
-            <div>
-                <h2 class="city text-6xl font-bold "></h2>
-                <p class=" date text-md ml-2"></p>
-            </div>
-            <i class="ri-moon-cloudy-fill text-5xl"></i>
+        <div>
+          <h1 class="text-xl font-semibold sm:text-2xl">Weather Dashboard</h1>
+          <p class="text-sm text-sky-200/60">Live conditions from Open-Meteo.</p>
         </div>
-        <div class="side h-screen w-1/3 relative backdrop-blur-md ml-auto border-2 border-gray-600">
-            <div class="flex items-center px-8 py-2 text-2xl mt-8 h-1/6 w-1/3 text-white">
-                <input type="text" placeholder="Search Location..."
-                class="search-bar grow outline-none text-gray-700 placeholder-gray-400 bg-transparent "
-                >
-                <button class="search-button text-gray-500 hover:text-blue-500">
-                    <i class="ri-search-line"></i>
-                </button>
-            </div>
-            <div class="border-t-[0.5px] ml-12 border-b-[0.5px] border-white h-1/2 w-[65%] px-8 py-2  text-white">
-                <h1 class="text-white/30 mb-4">Weather Details...</h1>
-                <p class="font-bold text-white/40">ThunderStorm with light Drills</p>
-                <div class="flex justify-between mt-8">
-                    <div class="space-y-4">
-                    <h1>Temp-max </h1>
-                    <h1>Tem-min</h1>
-                    <h1>Humidity</h1>
-                    <h1>Cloudy</h1>
-                    <h1>Wind</h1>
-                    </div>
-                    <div class="space-y-4">
-                        <h1 class="temp-max ri-temp-hot-line"></h1>
-                        <h1 class="temp-min ri-temp-hot-line"></h1>
-                        <h1 class="humidity ri-drop-line"> </h1>
-                        <h1 class="cloudy ri-sun-cloudy-line"> </h1>
-                        <h1 class="wind ri-windy-line"></h1>
-                    </div>
-                 </div>
-            </div>
-            <!-- <div class="ml-12">
-                <h1 class="text-white/30">Today Weather Forecast...</h1>
-                <div>
+      </div>
 
-                </div> -->
+      <form id="searchForm" class="flex w-full gap-2 sm:w-96" role="search">
+        <label for="cityInput" class="sr-only">City name</label>
+        <input
+          id="cityInput"
+          type="search"
+          placeholder="Search a city, for example Karachi"
+          autocomplete="off"
+          class="w-full rounded-full border border-white/10 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-sky-200/40 outline-none backdrop-blur focus:border-sky-400"
+        />
+        <button
+          type="submit"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-500 hover:bg-sky-400"
+          aria-label="Search weather"
+        >
+          <i class="ri-search-line" aria-hidden="true"></i>
+        </button>
+      </form>
+    </header>
+
+    <p id="status" class="mt-4 min-h-5 text-sm text-sky-200/70" role="status" aria-live="polite">
+      Loading weather...
+    </p>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+      <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl sm:p-10">
+        <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl"></div>
+        <p id="date" class="text-sm text-sky-200/70"></p>
+        <div class="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-sm uppercase tracking-[0.2em] text-sky-300/70">Current temperature</p>
+            <div class="mt-2 flex items-start gap-2">
+              <span id="temperature" class="text-6xl font-semibold leading-none sm:text-8xl">--</span>
+              <span class="mt-2 text-2xl text-sky-200">°C</span>
             </div>
+            <h2 id="city" class="mt-4 text-2xl font-semibold sm:text-3xl">Search for a city</h2>
+            <p id="condition" class="mt-1 text-sky-200/70">Current conditions</p>
+          </div>
+          <div class="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 text-sky-200">
+            <i id="conditionIcon" class="ri-sun-cloudy-line text-5xl" aria-hidden="true"></i>
+          </div>
         </div>
+      </section>
+
+      <aside class="rounded-3xl border border-white/10 bg-slate-900/60 p-6 backdrop-blur-xl">
+        <h2 class="text-lg font-semibold">Weather details</h2>
+        <dl class="mt-5 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">Feels like</dt>
+            <dd id="feelsLike" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">Humidity</dt>
+            <dd id="humidity" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">Wind</dt>
+            <dd id="wind" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">Cloud cover</dt>
+            <dd id="clouds" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">High</dt>
+            <dd id="tempMax" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+          <div class="rounded-2xl bg-white/5 p-4">
+            <dt class="text-xs text-sky-200/60">Low</dt>
+            <dd id="tempMin" class="mt-1 text-xl font-semibold">--</dd>
+          </div>
+        </dl>
+        <p class="mt-5 text-xs leading-relaxed text-sky-200/50">
+          Data from Open-Meteo. No API key required.
+        </p>
+      </aside>
     </div>
-    <script src="index.js"></script>
+  </main>
+
+  <script src="index.js"></script>
 </body>
 </html>

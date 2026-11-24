@@ -17,6 +17,8 @@ const calculate = document.getElementById("calculate");
 
 const bmiValue = document.getElementById("bmiValue");
 const bmiBadge = document.getElementById("bmiBadge");
+const healthyRange = document.getElementById("healthyRange");
+const statusEl = document.getElementById("status");
 
 let inputTarget = "weight";
 let weightRaw = "";
@@ -83,6 +85,40 @@ function updateBMI() {
   const cat = bmiCategory(bmi);
   bmiBadge.textContent = cat.label;
   bmiBadge.className = "badge " + cat.color;
+
+  const height = formatNum(heightRaw);
+  const heightM = heightUnit === "cm" ? height / 100 : height * 0.0254;
+
+  if (heightM > 0) {
+    const minKg = 18.5 * heightM * heightM;
+    const maxKg = 24.9 * heightM * heightM;
+    const toDisplay = (kg) =>
+      weightUnit === "kg" ? kg : kg * 2.2046226218;
+
+    healthyRange.textContent = `Healthy weight range for this height: ${toDisplay(minKg).toFixed(1)}–${toDisplay(maxKg).toFixed(1)} ${weightUnit}.`;
+  } else {
+    healthyRange.textContent = "Enter a height to see the healthy weight range.";
+  }
+
+  if (bmi > 0 && cat.label !== "—") {
+    statusEl.textContent = `BMI ${bmi.toFixed(1)} falls in the ${cat.label.toLowerCase()} range.`;
+  } else {
+    statusEl.textContent = "";
+  }
+}
+
+function convertWeight(nextUnit) {
+  if (nextUnit === weightUnit) return;
+  const value = formatNum(weightRaw);
+  const converted = nextUnit === "lb" ? value * 2.2046226218 : value / 2.2046226218;
+  weightRaw = value > 0 ? converted.toFixed(2).replace(/\.?0+$/, "") : "";
+}
+
+function convertHeight(nextUnit) {
+  if (nextUnit === heightUnit) return;
+  const value = formatNum(heightRaw);
+  const converted = nextUnit === "in" ? value / 2.54 : value * 2.54;
+  heightRaw = value > 0 ? converted.toFixed(2).replace(/\.?0+$/, "") : "";
 }
 
 keypadButtons.forEach((btn) => {
@@ -121,6 +157,7 @@ targetHeightBtn.addEventListener("click", () => {
 });
 
 kgBtn.addEventListener("click", () => {
+  if (weightUnit === "lb") convertWeight("kg");
   weightUnit = "kg";
   kgBtn.classList.add("bg-neutral-600");
   lbBtn.classList.remove("bg-neutral-600");
@@ -128,6 +165,7 @@ kgBtn.addEventListener("click", () => {
   updateBMI();
 });
 lbBtn.addEventListener("click", () => {
+  if (weightUnit === "kg") convertWeight("lb");
   weightUnit = "lb";
   lbBtn.classList.add("bg-neutral-600");
   kgBtn.classList.remove("bg-neutral-600");
@@ -136,6 +174,7 @@ lbBtn.addEventListener("click", () => {
 });
 
 cmBtn.addEventListener("click", () => {
+  if (heightUnit === "in") convertHeight("cm");
   heightUnit = "cm";
   cmBtn.classList.add("bg-neutral-600");
   inBtn.classList.remove("bg-neutral-600");
@@ -143,6 +182,7 @@ cmBtn.addEventListener("click", () => {
   updateBMI();
 });
 inBtn.addEventListener("click", () => {
+  if (heightUnit === "cm") convertHeight("in");
   heightUnit = "in";
   inBtn.classList.add("bg-neutral-600");
   cmBtn.classList.remove("bg-neutral-600");
@@ -170,6 +210,41 @@ calculate.addEventListener("click", () => {
   calculate.classList.add("scale-95");
   setTimeout(() => calculate.classList.remove("scale-95"), 120);
   updateBMI();
+
+  if (formatNum(weightRaw) <= 0 || formatNum(heightRaw) <= 0) {
+    statusEl.textContent = "Enter both a weight and a height to calculate BMI.";
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+  if (/^[0-9]$/.test(event.key)) {
+    if (inputTarget === "weight") {
+      weightRaw = safeAppend(weightRaw, event.key);
+    } else {
+      heightRaw = safeAppend(heightRaw, event.key);
+    }
+    updateDisplays();
+    updateBMI();
+  } else if (event.key === ".") {
+    if (inputTarget === "weight") {
+      weightRaw = safeAppend(weightRaw, ".");
+    } else {
+      heightRaw = safeAppend(heightRaw, ".");
+    }
+    updateDisplays();
+    updateBMI();
+  } else if (event.key === "Backspace") {
+    event.preventDefault();
+    if (inputTarget === "weight") {
+      weightRaw = weightRaw.slice(0, -1);
+    } else {
+      heightRaw = heightRaw.slice(0, -1);
+    }
+    updateDisplays();
+    updateBMI();
+  }
 });
 
 kgBtn.classList.add("bg-neutral-600");

@@ -1,30 +1,24 @@
 import { Link } from "react-router-dom";
 
-
-const Card = ({name,image,description}) => {
-  return (
-    // <div className="h-screen w-screen flex justify-center items-center">
-      <div className="flex flex-col justify-start p-4 m-4 items-center h-[70%] w-[300px] bg-gray-300 rounded-3xl shrink-0">
-        <div className="h-1/3 w-[85%]  rounded-2xl  overflow-hidden ">
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover"
-          />
-        </div>
-        <div className="items-center flex flex-col mt-8 w-[85%] mb-12">
-          <h1 className="text-2xl font-bold ">{name}</h1>
-          <p className="text-sm break-all text-center">{description}</p>
-        </div>
-        <Link to={`/profile/${name}`}>
-        <button 
-         className="bg-[#9b7b63] h-8 w-24 rounded-2xl hover:bg-[#815c3f]">
-          Read More
-        </button>
-        </Link>
-      </div>
-    // </div>
-  );
-};
+const Card = ({ name, image, description }) => (
+  <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-[#dcc7b5] bg-white/80 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <img
+      src={image}
+      alt={`Portrait of ${name}`}
+      loading="lazy"
+      className="h-48 w-full object-cover sm:h-52"
+    />
+    <div className="flex flex-1 flex-col p-5">
+      <h2 className="text-xl font-semibold">{name}</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+      <Link
+        to={`/profile/${encodeURIComponent(name)}`}
+        className="mt-5 inline-flex w-fit items-center rounded-full bg-[#8a6448] px-5 py-2 text-sm font-medium text-white hover:bg-[#6f4e37]"
+      >
+        Read story
+      </Link>
+    </div>
+  </article>
+);
 
 export default Card;

@@ -22,23 +22,27 @@ and those are documented per project in this repository.
 
 ## Phase 1: Vanilla JavaScript
 
-The first phase focuses on fundamentals without frameworks.
+The first phase focuses on fundamentals: DOM APIs, events, localStorage, public
+APIs and responsive layouts. Two projects use React and Vite; the rest run as
+static HTML with JavaScript.
 
 | # | Project | Main technologies |
 | --- | --- | --- |
-| 1 | To-do list | JavaScript, localStorage |
-| 2 | Calculator | JavaScript |
-| 3 | Quiz web app | JavaScript, questions API |
-| 4 | React pin board | React, CSS |
-| 5 | Weather web app | Public weather API |
-| 6 | Quote generator | Quote API |
-| 7 | Currency converter | Currency API |
-| 8 | Countdown timer | JavaScript, Date |
-| 9 | Image slider | JavaScript, CSS |
-| 10 | Colour picker | HTML, CSS, JavaScript |
-| 11 | Blog frontend | React, static data |
-| 12 | Tip calculator | JavaScript |
-| 13 | BMI calculator | JavaScript |
+| 1 | [To-do dashboard](<Phase-1/1-To-do/README.md>) | JavaScript, localStorage, calendar |
+| 2 | [Calculator](<Phase-1/2-Calculator/README.md>) | JavaScript, keyboard input |
+| 3 | [Quiz web app](<Phase-1/3-Quiz-web/README.md>) | JavaScript, OpenTDB API |
+| 4 | [React image gallery](<Phase-1/4-react_Pin/README.md>) | React, Vite, Pixabay API |
+| 5 | [Weather dashboard](<Phase-1/5-Weather_web_app/README.md>) | JavaScript, Open-Meteo API |
+| 6 | [Quote generator](<Phase-1/6-Quote Generator/README.md>) | JavaScript, DummyJSON |
+| 7 | [Currency converter](<Phase-1/7-Currency Converter/README.md>) | JavaScript, exchange-rate API |
+| 8 | [Countdown timer](<Phase-1/8-Countdown Timer/README.md>) | JavaScript, Date, localStorage |
+| 9 | [Image gallery](<Phase-1/9-Image_Slider/README.md>) | JavaScript, search and keyboard navigation |
+| 10 | [Colour picker](<Phase-1/10-colorPicker/README.md>) | JavaScript, colour conversion, clipboard |
+| 11 | [Travel blog](<Phase-1/11-Blog/README.md>) | React, Vite, React Router |
+| 12 | [Tip calculator](<Phase-1/12-Tip-c/README.md>) | JavaScript, keypad input |
+| 13 | [BMI calculator](<Phase-1/13-BMI/README.md>) | JavaScript, unit conversion |
+
+[Phase 1 documentation](Phase-1/README.md)
 
 ## Phase 2: Full-stack applications
 

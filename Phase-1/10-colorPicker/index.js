@@ -108,7 +108,9 @@
         btn.textContent = 'Copied!';
         setTimeout(() => (btn.textContent = old), 1200);
       } catch {
-        alert('Copy failed. Try manually selecting and copying.');
+        el.focus();
+        el.select();
+        contrastNote.textContent = 'Clipboard access was blocked. The value is selected; copy it manually.';
       }
     }
     copyHexBtn.addEventListener('click', () => copyText(hexInput, copyHexBtn));

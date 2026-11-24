@@ -7,84 +7,117 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-900 antialiased">
-  <div class="max-w-3xl mx-auto px-6 py-10">
-    <header class="mb-6">
-      <h1 class="text-2xl font-semibold tracking-tight">Color Picker Tool</h1>
-      <p class="text-sm text-gray-600">Pick a color, see it live, and copy HEX/RGB/HSL.</p>
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <header class="mb-8">
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">Color Picker</h1>
+      <p class="text-sm sm:text-base text-gray-600 mt-1">
+        Pick a color, preview it, check its contrast and copy the HEX, RGB or HSL value.
+      </p>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-      <div class="space-y-4">
-        <label for="colorInput" class="block text-sm font-medium text-gray-700">Pick color</label>
-        <input
-          id="colorInput"
-          type="color"
-          class="h-12 w-24 p-0 border border-gray-300 rounded shadow-sm cursor-pointer"
-          value="#4f46e5"
-        />
-
-        <label for="hexInput" class="block text-sm font-medium text-gray-700">HEX</label>
-        <div class="flex gap-2">
-          <input
-            id="hexInput"
-            type="text"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            value="#4f46e5"
-            placeholder="#000000"
-          />
-          <button
-            id="copyHex"
-            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
-          >
-            Copy
-          </button>
-        </div>
-
-        <label class="block text-sm font-medium text-gray-700">RGB</label>
-        <div class="flex gap-2">
-          <input
-            id="rgbOutput"
-            type="text"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-100"
-            readonly
-          />
-          <button
-            id="copyRgb"
-            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
-          >
-            Copy
-          </button>
-        </div>
-
-        <label class="block text-sm font-medium text-gray-700">HSL</label>
-        <div class="flex gap-2">
-          <input
-            id="hslOutput"
-            type="text"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-100"
-            readonly
-          />
-          <button
-            id="copyHsl"
-            class="px-3 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 active:scale-[0.99]"
-          >
-            Copy
-          </button>
-        </div>
-      </div>
-
-      <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-gray-200">
-        <div class="p-6">
-               class="h-40 rounded-lg border-2 border-white shadow-inner"
-               style="background-color: #4f46e5;">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <section class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6 space-y-5">
+        <div>
+          <label for="colorInput" class="block text-sm font-medium text-gray-700 mb-2">
+            Pick a color
+          </label>
+          <div class="flex items-center gap-4">
+            <input
+              id="colorInput"
+              type="color"
+              value="#4f46e5"
+              class="h-14 w-24 p-0 border border-gray-300 rounded-lg shadow-sm cursor-pointer"
+            />
+            <p class="text-sm text-gray-500">
+              Use the picker or type a HEX value on the right.
+            </p>
           </div>
-          <p id="contrastNote" class="mt-3 text-xs text-gray-600"></p>
         </div>
-      </div>
+
+        <div>
+          <label for="hexInput" class="block text-sm font-medium text-gray-700 mb-2">
+            HEX
+          </label>
+          <div class="flex gap-2">
+            <input
+              id="hexInput"
+              type="text"
+              value="#4f46e5"
+              placeholder="#000000"
+              spellcheck="false"
+              autocomplete="off"
+              class="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button
+              id="copyHex"
+              type="button"
+              class="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 active:scale-[0.99]"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label for="rgbOutput" class="block text-sm font-medium text-gray-700 mb-2">
+            RGB
+          </label>
+          <div class="flex gap-2">
+            <input
+              id="rgbOutput"
+              type="text"
+              readonly
+              class="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 font-mono text-sm"
+            />
+            <button
+              id="copyRgb"
+              type="button"
+              class="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 active:scale-[0.99]"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label for="hslOutput" class="block text-sm font-medium text-gray-700 mb-2">
+            HSL
+          </label>
+          <div class="flex gap-2">
+            <input
+              id="hslOutput"
+              type="text"
+              readonly
+              class="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-lg bg-gray-100 font-mono text-sm"
+            />
+            <button
+              id="copyHsl"
+              type="button"
+              class="px-3 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 active:scale-[0.99]"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-5 sm:p-6">
+          <div
+            id="preview"
+            class="h-48 sm:h-56 rounded-xl border-2 border-white shadow-inner"
+            style="background-color: #4f46e5;"
+            aria-label="Color preview"
+          ></div>
+          <p id="contrastNote" class="mt-4 text-sm text-gray-600" aria-live="polite"></p>
+        </div>
+        <div class="border-t border-gray-100 bg-gray-50 px-5 py-4 text-sm text-gray-500">
+          Built with HTML, CSS and JavaScript. HEX edits and the native picker stay in sync.
+        </div>
+      </section>
     </div>
-      Built with HTML + JS + Tailwind. Edit HEX or use the color picker—everything stays in sync.
-    </footer>
-  </div>
+  </main>
 
   <script src="index.js"></script>
+</body>
+</html>

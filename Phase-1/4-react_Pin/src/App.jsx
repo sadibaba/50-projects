@@ -1,11 +1,9 @@
-import Images from './components/images'
+import ImageGallery from "./components/images";
 
-const App = () => {
-  return (
-      <div class='h-screen w-screen bg-blue-950'>
-        <Images/> 
-      </div>
-  )
-}
+const App = () => (
+  <div className="min-h-screen bg-slate-950">
+    <ImageGallery />
+  </div>
+);
 
-export default App
+export default App;

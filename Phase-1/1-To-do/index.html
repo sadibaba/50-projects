@@ -9,13 +9,44 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
       rel="stylesheet"
     />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { min-height: 100%; }
+      body {
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        overflow-x: hidden;
+      }
+      .nav {
+        width: 100%;
+        background-size: cover;
+        background-position: top center;
+      }
+      #dashboardGrid { height: auto; min-height: calc(100vh - 6rem); }
+      #eventTracker { width: 100%; height: auto; min-height: 24rem; }
+      #calendarGrid button { width: 100%; }
+      @media (max-width: 1023px) {
+        #dashboardGrid { grid-template-columns: 1fr !important; height: auto !important; }
+        .sideBar { margin: 1rem; }
+        #dashboardGrid .content { padding: 1.25rem !important; }
+        #dashboardGrid .Task { justify-content: flex-start !important; flex-wrap: nowrap; }
+        #eventTracker { margin-top: 1rem; }
+      }
+      @media (max-width: 640px) {
+        #dashboardGrid .Task { gap: 0.75rem; }
+        #dashboardGrid .Task > div { flex: 0 0 15rem; }
+        .profile h1 { margin-left: 0; }
+        .profile .logo { margin-left: 0.5rem; }
+      }
+    </style>
   </head>
   <body
     class="bg-[url('https://plus.unsplash.com/premium_vector-1722950274237-580f74ace94a?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')]"
   >
     <div class="main flex flex-col h-full w-full relative">
       <nav
-        class="nav h-24 bg-[url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyFBKKx_7wgUXmQadI8WkhAtoA2aBMVxB-_OzFvAmyzv82SDxMgb04CLrbgyevxaWxU5s&usqp=CAU')] relative inset-0 w-screen object-fit bg-top"
+        class="nav h-24 bg-[url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyFBKKx_7wgUXmQadI8WkhAtoA2aBMVxB-_OzFvAmyzv82SDxMgb04CLrbgyevxaWxU5s&usqp=CAU')] relative inset-0 w-full object-fit bg-top"
       ></nav>
       <div class="profile flex flex-col relative">
         <svg
@@ -26,7 +57,7 @@
           I’m the calm in chaos, the fire behind silence.
         </p>
       </div>
-      <div class="grid grid-cols-[20%_80%] h-screen">
+      <div id="dashboardGrid" class="grid grid-cols-[20%_80%] h-screen">
         <div
           class="sideBar mt-5 bg-white/10 rounded-2xl backdrop-blur-[2px] h-auto"
         >
@@ -128,20 +159,8 @@
                 Add
               </button>
             </div>
-            <p class="px-2 py-1 text-sm">
-              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
-              enim.
-            </p>
-            <p class="px-2 py-1 text-sm">
-              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
-              enim.
-            </p>
-            <p class="px-2 py-1 text-sm">
-              &gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Mauris metus nulla, hendrerit quis velit ut, gravida molestie
-              enim.
+            <p id="notesEmpty" class="px-2 py-1 text-sm text-white/60">
+              No notes yet. Use Add to write one.
             </p>
           </div>
         </div>
@@ -211,7 +230,7 @@
               </footer>
             </div>
           </div>
-          <div class="flex gap-6 mt-8 justify-end">
+          <div class="flex flex-col lg:flex-row gap-6 mt-8 justify-end">
             <div
               id="eventTracker"
               class="bg-white/30 backdrop-blur-sm h-[600px] w-[800px]"
@@ -228,8 +247,8 @@
                 </div>
                 <div class="h-[4px] bg-white/70 rounded-full mb-2"></div>
                 <div class="flex justify-between text-white mb-4">
-                  <h1 class="font-bold">October 2025</h1>
-                  <h1>< Today ></h1>
+                  <h1 id="calendarMonth" class="font-bold">Calendar</h1>
+                  <button id="calendarToday" type="button" class="text-sm text-white/70 hover:text-white">Today</button>
                 </div>
 
                 <!-- Weekdays -->
@@ -244,61 +263,19 @@
                 </div>
 
                 <!-- Dates Grid -->
-                <div class="grid grid-cols-7 gap-2 text-white text-center">
-                  <!-- Previous month tail -->
-                  <div class="opacity-30">28</div>
-                  <div class="opacity-30">29</div>
-                  <div class="opacity-30">30</div>
-                  <div class="opacity-30">1</div>
-                  <div class="opacity-30">2</div>
-                  <div class="opacity-30">3</div>
-                  <div class="opacity-30">4</div>
-
-                  <!-- October dates -->
-                  <div class="bg-white/10 rounded-md py-2">5</div>
-                  <div class="bg-white/10 rounded-md py-2">6</div>
-                  <div class="bg-white/10 rounded-md py-2">7</div>
-                  <div class="bg-white/10 rounded-md py-2">8</div>
-                  <div class="bg-white/10 rounded-md py-2">9</div>
-                  <div class="bg-white/10 rounded-md py-2">10</div>
-                  <div class="bg-white/10 rounded-md py-2">11</div>
-
-                  <div class="bg-white/10 rounded-md py-2">12</div>
-                  <div class="bg-white/10 rounded-md py-2">13</div>
-                  <div class="bg-white/10 rounded-md py-2">14</div>
-                  <div class="bg-white/10 rounded-md py-2">15</div>
-                  <div class="bg-white/10 rounded-md py-2">16</div>
-                  <div class="bg-white/10 rounded-md py-2">17</div>
-                  <div class="bg-white/10 rounded-md py-2">18</div>
-
-                  <div class="bg-white/10 rounded-md py-2">19</div>
-                  <div class="bg-white/10 rounded-md py-2">20</div>
-                  <div class="bg-white/10 rounded-md py-2">21</div>
-                  <div class="bg-white/10 rounded-md py-2">22</div>
-                  <div class="bg-white/10 rounded-md py-2">23</div>
-                  <div class="bg-white/10 rounded-md py-2">24</div>
-                  <div class="bg-white/10 rounded-md py-2">25</div>
-
-                  <div class="bg-red-500 text-white rounded-md py-2 font-bold">
-                    26
-                  </div>
-                  <!-- Highlighted date -->
-                  <div class="bg-white/10 rounded-md py-2">27</div>
-                  <div class="bg-white/10 rounded-md py-2">28</div>
-                  <div class="bg-white/10 rounded-md py-2">29</div>
-                  <div class="opacity-30">30</div>
-                  <div class="opacity-30">31</div>
-                  <div class="opacity-30">1</div>
-                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-2 text-white text-center"></div>
+                <p id="eventDetails" class="mt-4 text-sm text-white/80" role="status" aria-live="polite">
+                  Select a date to see its events.
+                </p>
               </div>
             </div>
             <div class="flex flex-col gap-16">
               <div
-                id="video"
+                id="videoCard"
                 class="rounded-md h-96 w-[200px] overflow-hidden relative"
               >
                 <video
-                id="video"
+                id="bgVideo"
                   autoplay
                   muted
                   loop
@@ -335,7 +312,7 @@
 
                 <!-- Now Playing -->
                 <div class="text-white text-xs mb-2">
-                  🎵 Now Playing: Background Music
+                  Now playing: Background Music
                 </div>
 
                 <!-- Scrollable Playlist -->
@@ -367,6 +344,27 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div id="inputModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 p-4">
+      <form id="inputForm" class="w-full max-w-sm rounded-2xl bg-white p-5 text-gray-900 shadow-2xl">
+        <h2 id="inputTitle" class="text-lg font-semibold">Add item</h2>
+        <label for="inputValue" class="sr-only">Item text</label>
+        <input
+          id="inputValue"
+          type="text"
+          maxlength="120"
+          class="mt-3 w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <div class="mt-4 flex justify-end gap-2">
+          <button id="inputCancel" type="button" class="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700">
+            Cancel
+          </button>
+          <button type="submit" class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500">
+            Save
+          </button>
+        </div>
+      </form>
     </div>
 
     <script src="script.js"></script>

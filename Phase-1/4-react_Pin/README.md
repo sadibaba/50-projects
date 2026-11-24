@@ -1,16 +1,74 @@
-# React + Vite
+# React Image Gallery
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive image gallery built with React and Vite. It searches Pixabay photos
+and loads additional pages as the user scrolls.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Search by keyword.
+- Infinite scrolling with duplicate protection.
+- Responsive grid from two to four columns.
+- Loading, empty, error and end-of-results states.
+- Accessible labels and lazy-loaded images.
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- Vite
+- Tailwind CSS
+- `react-infinite-scroll-component`
+- Pixabay API
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cp .env.example .env
+# Add your own Pixabay API key to .env
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+## Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_PIXABAY_API_KEY` | Yes | Pixabay API key used by the client |
+
+The API key is read from Vite's client environment. A client-side key is visible
+to users, so use a restricted key and monitor its usage. If a key was ever
+committed to source control, rotate it.
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the build |
+| `npm run lint` | ESLint |
+
+## Project structure
+
+```text
+4-react_Pin/
+├── src/
+│   ├── App.jsx
+│   ├── components/images.jsx
+│   ├── index.css
+│   └── main.jsx
+├── .env.example
+├── index.html
+└── vite.config.js
+```
+
+## Known limitations
+
+- The Pixabay free tier has request limits.
+- The API key is exposed to the browser by design for a static application.
+- There is no local cache; repeating a search makes new requests.
+
+## License
+
+MIT

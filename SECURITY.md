@@ -16,6 +16,7 @@ If you have ever committed any of the following, rotate the credential before
 using the project:
 
 - the OMDB API key that was stored in `5-movie browser/frontend/.env`,
+- the Pixabay API key that was embedded in `4-react_Pin/src/components/images.jsx`,
 - the Cloudinary cloud name, API key and secret that appeared in the Blog
   Platform environment example,
 - any administrator password used by the Blog seed script,

@@ -2,6 +2,8 @@ const billDisplay = document.getElementById("billDisplay");
 const tipPercent = document.getElementById("tipPercent");
 const splitCount = document.getElementById("splitCount");
 const splitTotal = document.getElementById("splitTotal");
+const grandTotal = document.getElementById("grandTotal");
+const statusEl = document.getElementById("status");
 
 const tipMinus = document.getElementById("tipMinus");
 const tipPlus = document.getElementById("tipPlus");
@@ -36,6 +38,7 @@ function updateDisplays() {
   const grand = bill + tipAmount;
   const perHead = split > 0 ? grand / split : grand;
   splitTotal.textContent = formatMoney(perHead);
+  grandTotal.textContent = formatMoney(grand);
 }
 
 function handleKeypadInput(k) {
@@ -93,6 +96,27 @@ splitPlus.addEventListener("click", () => {
 confirm.addEventListener("click", () => {
   confirm.classList.add("scale-95");
   setTimeout(() => confirm.classList.remove("scale-95"), 120);
+  statusEl.textContent = `Applied: ${formatMoney(parseBill())} bill, ${tip}% tip, split between ${split}.`;
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+  if (/^[0-9]$/.test(event.key)) {
+    handleKeypadInput(event.key);
+  } else if (event.key === ".") {
+    handleKeypadInput(".");
+  } else if (event.key === "Backspace") {
+    event.preventDefault();
+    billRaw = billRaw.slice(0, -1);
+    updateDisplays();
+  } else if (event.key === "Escape") {
+    billRaw = "";
+    tip = 10;
+    split = 1;
+    updateDisplays();
+    statusEl.textContent = "";
+  }
 });
 
 updateDisplays();

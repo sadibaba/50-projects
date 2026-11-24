@@ -1,16 +1,71 @@
-# React + Vite
+# Travel Blog
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small React blog with a responsive story grid and a detail page for each
+profile.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Responsive card grid: one column on mobile, up to four on large screens.
+- Client-side routing with React Router.
+- Detail page with portrait, description and full story.
+- Back link and not-found state.
+- Local data in `src/components/cardList.jsx`; no backend required.
+- Accessible image alt text and semantic article elements.
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- Vite
+- Tailwind CSS
+- React Router
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cd "11-Blog"
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`.
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the build |
+| `npm run lint` | ESLint |
+
+## Project structure
+
+```text
+11-Blog/
+├── src/
+│   ├── App.jsx
+│   ├── components/card.jsx
+│   ├── components/cardList.jsx
+│   ├── components/profile.jsx
+│   ├── index.css
+│   └── main.jsx
+├── index.html
+└── vite.config.js
+```
+
+## Data
+
+`cardList.jsx` contains fourteen profiles with a name, image, short description
+and a long story. The data is demo content; replace it with your own.
+
+## Known limitations
+
+- The stories are static and very long; the detail page is intentionally simple.
+- Images are loaded from Unsplash.
+- There is no search, pagination or admin editor.
+- The `lenis` dependency is present but not used by the current UI.
+- There are no automated tests.
+
+## License
+
+MIT

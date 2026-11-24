@@ -46,9 +46,11 @@
             <span id="bmiBadge" class="badge bg-neutral-600">—</span>
           </div>
           <div class="text-right">
-            <span id="bmiValue" class="text-xl font-semibold tracking-wide">0.0</span>
+            <span id="bmiValue" class="text-xl font-semibold tracking-wide" aria-live="polite">0.0</span>
           </div>
         </div>
+        <p id="healthyRange" class="text-sm text-neutral-400" role="status" aria-live="polite"></p>
+        <p id="status" class="min-h-5 text-sm text-emerald-300" role="status" aria-live="polite"></p>
       </div>
       <div class="grid grid-cols-3 gap-3 no-select">
         <button class="key rounded-xl bg-neutral-700 hover:bg-neutral-600 p-4 text-center text-lg font-medium" data-key="7">7</button>

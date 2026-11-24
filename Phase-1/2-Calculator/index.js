@@ -183,3 +183,34 @@
       }
     });
   });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const key = event.key;
+
+    if (/^[0-9]$/.test(key)) {
+      appendDigit(Number(key));
+    } else if (key === '.') {
+      appendDot();
+    } else if (key === '+') {
+      chooseOperator('+');
+    } else if (key === '-') {
+      chooseOperator('-');
+    } else if (key === '*' || key.toLowerCase() === 'x') {
+      chooseOperator('*');
+    } else if (key === '/') {
+      chooseOperator('/');
+    } else if (key === 'Enter' || key === '=') {
+      event.preventDefault();
+      pressEquals();
+    } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+      allClear();
+    } else if (key === '%') {
+      percent();
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+  });

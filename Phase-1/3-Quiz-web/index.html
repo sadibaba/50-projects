@@ -1,50 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz-web</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body
-    class="flex item-center justify-center bg-[url('./img/bg.jpg')] h-screen w-screen bg-cover bg-center"
-  >
-  <div
-  class="flex item-center justify-center h-[60%] w-1/2 backdrop-blur-lg rounded-2xl mt-32"
-  >
-  <div class="item-center justify-center">
-    <div class="ml-44">
-        <h1 class="text-3xl font-bold text-gray-700">video-Games Quiz</h1>
-    </div>
-        <p class="Question bg-transparent w-full text-4xl wrap-break-word text-white">
-        </p>
-        <div class="h-0.5 w-full mt-8 bg-gray-400"></div>
-        <div class="options button grid grid-cols-2 gap-4 mt-3 text-3xl w-full">
-          <button
-            class="option1 bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-xl"
-          >
-          </button>
-          <button
-            class="option2 bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-xl"
-          >
-          </button>
-          <button
-            class="option3 bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-xl"
-          >
-          </button>
-          <button
-            class="option4 bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-xl"
-          >
-          </button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Game Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: linear-gradient(rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.9)), url("./img/bg.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white flex items-center justify-center p-4">
+  <main class="w-full max-w-3xl">
+    <section class="rounded-3xl border border-white/10 bg-white/10 p-5 shadow-2xl backdrop-blur-xl sm:p-8">
+      <header class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.25em] text-emerald-300">Video games</p>
+          <h1 class="mt-1 text-2xl font-semibold sm:text-3xl">Knowledge quiz</h1>
         </div>
-        <h1 class="counter text-gray-400 ml-80 mt-6 text-4xl">0</h1>
-      </div>
-    </div>
+        <div class="text-left sm:text-right">
+          <p id="counter" class="text-sm text-white/60">Question 1 of 10</p>
+          <p id="score" class="text-sm text-emerald-300">Score: 0</p>
+        </div>
+      </header>
 
-    <script src="index.js"></script>
-  </body>
+      <div class="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
+        <div id="progress" class="h-full w-0 rounded-full bg-emerald-400 transition-all duration-300"></div>
+      </div>
+
+      <p id="status" class="mt-6 min-h-6 text-sm text-white/70" role="status" aria-live="polite">
+        Loading questions...
+      </p>
+
+      <h2 id="question" class="mt-2 min-h-20 text-xl font-medium leading-snug sm:text-2xl"></h2>
+
+      <div id="options" class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2"></div>
+
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          id="next"
+          type="button"
+          class="rounded-full bg-emerald-500 px-6 py-2.5 font-semibold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-40"
+          disabled
+        >
+          Next question
+        </button>
+        <button
+          id="restart"
+          type="button"
+          class="hidden rounded-full border border-white/20 px-6 py-2.5 text-sm font-medium hover:bg-white/10"
+        >
+          Play again
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="index.js"></script>
+</body>
 </html>

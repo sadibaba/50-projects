@@ -21,23 +21,77 @@ document.addEventListener('DOMContentLoaded', function() {
     updateClock();
     setInterval(updateClock, 1000);
     
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || {
-        todo: [],
-        progress: [],
-        finished: []
+    let storedTasks = {};
+    try {
+        storedTasks = JSON.parse(localStorage.getItem('tasks')) || {};
+    } catch {
+        storedTasks = {};
+    }
+
+    let tasks = {
+        todo: Array.isArray(storedTasks.todo) ? storedTasks.todo : [],
+        progress: Array.isArray(storedTasks.progress) ? storedTasks.progress : [],
+        finished: Array.isArray(storedTasks.finished) ? storedTasks.finished : []
     };
     
     const todoCounter = document.querySelector('#todoCounter');
     const progressCounter = document.querySelector('#progressCounter');
-    const finishedCounter = document.querySelectorAll('#finishedCounter')[1];
+    const finishedCounter = document.querySelector('#finishedCounter');
     
     const tasksContainer = document.getElementById('tasks');
     const progressContainer = document.getElementById('progressTask');
-    const finishedContainer = document.querySelector('.bg-emerald-900\\/10');
+    const finishedContainer = document.querySelector('#finishedTask .overflow-y-auto');
     
     const addTodoBtn = document.getElementById('addNewTask');
     const addProgressBtn = document.getElementById('addProgress');
-    const addFinishedBtn = document.querySelector('.bg-emerald-600\\/20');
+    const addFinishedBtn = document.querySelector('#finishedTask footer');
+
+    const inputModal = document.getElementById('inputModal');
+    const inputForm = document.getElementById('inputForm');
+    const inputTitle = document.getElementById('inputTitle');
+    const inputValue = document.getElementById('inputValue');
+    const inputCancel = document.getElementById('inputCancel');
+
+    let resolveInput = null;
+
+    function closeInput(value) {
+        inputModal.classList.add('hidden');
+        inputModal.classList.remove('flex');
+        if (resolveInput) {
+            resolveInput(value);
+            resolveInput = null;
+        }
+    }
+
+    function askText(title, placeholder = '') {
+        inputTitle.textContent = title;
+        inputValue.value = '';
+        inputValue.placeholder = placeholder;
+        inputModal.classList.remove('hidden');
+        inputModal.classList.add('flex');
+        inputValue.focus();
+
+        return new Promise((resolve) => {
+            resolveInput = resolve;
+        });
+    }
+
+    inputForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const value = inputValue.value.trim();
+        closeInput(value || null);
+    });
+
+    inputCancel.addEventListener('click', () => closeInput(null));
+    inputModal.addEventListener('click', (event) => {
+        if (event.target === inputModal) closeInput(null);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !inputModal.classList.contains('hidden')) {
+            closeInput(null);
+        }
+    });
     
     function updateCounters() {
         todoCounter.textContent = `(${tasks.todo.length})`;
@@ -94,8 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const contextMenu = document.createElement('div');
         contextMenu.className = 'context-menu fixed bg-gray-800 text-white p-2 rounded shadow-lg z-50';
-        contextMenu.style.left = `${e.pageX}px`;
-        contextMenu.style.top = `${e.pageY}px`;
+        contextMenu.style.left = `${e.clientX}px`;
+        contextMenu.style.top = `${e.clientY}px`;
         
         if (status !== 'todo') {
             const moveToTodo = document.createElement('div');
@@ -173,10 +227,10 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTasks();
     }
     
-    function addNewTask(status) {
-        const taskText = prompt('Enter task:');
-        if (taskText && taskText.trim() !== '') {
-            tasks[status].push({ text: taskText.trim(), createdAt: new Date() });
+    async function addNewTask(status) {
+        const taskText = await askText('Add a task', 'What needs to be done?');
+        if (taskText) {
+            tasks[status].push({ text: taskText, createdAt: new Date() });
             renderTasks();
         }
     }
@@ -199,24 +253,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     renderTasks();
     
-    const calendarDates = document.querySelectorAll('.bg-white\\/10, .bg-red-500');
-    calendarDates.forEach(date => {
-        date.addEventListener('click', function() {
-            calendarDates.forEach(d => {
-                d.classList.remove('bg-red-500', 'text-white', 'font-bold');
-                d.classList.add('bg-white/10');
-            });
-            
-            this.classList.remove('bg-white/10');
-            this.classList.add('bg-red-500', 'text-white', 'font-bold');
-            
-            showEventsForDate(this.textContent);
+    const calendarGrid = document.querySelector('#calendarGrid');
+    const calendarMonth = document.querySelector('#calendarMonth');
+    const calendarToday = document.querySelector('#calendarToday');
+    const eventDetails = document.querySelector('#eventDetails');
+
+    function renderCalendar(monthDate = new Date()) {
+        const year = monthDate.getFullYear();
+        const month = monthDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        calendarMonth.textContent = monthDate.toLocaleString(undefined, {
+            month: 'long',
+            year: 'numeric',
         });
-    });
-    
-    function showEventsForDate(date) {
-        alert(`Events for October ${date}, 2025:\n- No events scheduled`);
+        calendarGrid.innerHTML = '';
+
+        for (let cell = 0; cell < 42; cell += 1) {
+            const dayNumber = cell - firstDay + 1;
+
+            if (dayNumber < 1 || dayNumber > daysInMonth) {
+                const spacer = document.createElement('div');
+                spacer.className = 'py-2 text-white/25';
+                calendarGrid.appendChild(spacer);
+                continue;
+            }
+
+            const dateButton = document.createElement('button');
+            dateButton.type = 'button';
+            dateButton.textContent = dayNumber;
+            dateButton.className = 'rounded-md py-2 text-sm transition hover:bg-white/20';
+
+            const isToday =
+                dayNumber === today.getDate() &&
+                month === today.getMonth() &&
+                year === today.getFullYear();
+
+            if (isToday) {
+                dateButton.className += ' bg-red-500 text-white font-bold';
+            }
+
+            dateButton.addEventListener('click', () => {
+                calendarGrid.querySelectorAll('button').forEach((button) => {
+                    button.classList.remove('bg-red-500', 'text-white', 'font-bold');
+                });
+                dateButton.classList.add('bg-red-500', 'text-white', 'font-bold');
+                eventDetails.textContent = `No events scheduled for ${dayNumber} ${monthDate.toLocaleString(undefined, { month: 'long' })} ${year}.`;
+            });
+
+            calendarGrid.appendChild(dateButton);
+        }
     }
+
+    calendarToday.addEventListener('click', () => renderCalendar(new Date()));
+    renderCalendar();
     
     const audioElements = document.querySelectorAll('audio');
     let currentAudio = null;
@@ -233,44 +325,50 @@ document.addEventListener('DOMContentLoaded', function() {
             const source = this.querySelector('source');
             if (source) {
                 const fileName = source.src.split('/').pop().split('.')[0];
-                nowPlaying.textContent = `🎵 Now Playing: ${fileName.replace(/-/g, ' ')}`;
+                nowPlaying.textContent = `Now playing: ${fileName.replace(/-/g, ' ')}`;
             }
         });
     });
     
-    const projectAddButtons = document.querySelectorAll('.ongoing');
+    const projectAddButtons = document.querySelectorAll('.ongoing button');
     projectAddButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             const section = this.closest('.ongoing');
             const sectionTitle = section.querySelector('span').textContent;
             
-            let itemText = '';
             if (sectionTitle === 'ongoing_projects') {
-                itemText = prompt('Enter project name:');
-                if (itemText && itemText.trim() !== '') {
+                const itemText = await askText('Add a project', 'Project name');
+                if (itemText) {
                     const newProject = document.createElement('h1');
-                    newProject.innerHTML = `<i class="ri-computer-fill"></i> ${itemText.trim()}`;
+                    const icon = document.createElement('i');
+                    icon.className = 'ri-computer-fill';
+                    newProject.append(icon, document.createTextNode(` ${itemText}`));
                     section.appendChild(newProject);
                 }
             } else if (sectionTitle === '_directions') {
-                itemText = prompt('Enter direction name:');
-                if (itemText && itemText.trim() !== '') {
+                const itemText = await askText('Add a direction', 'For example: Learning hub');
+                if (itemText) {
                     const newDirection = document.createElement('h1');
+                    const icon = document.createElement('i');
                     let iconClass = 'ri-folder-archive-fill';
                     if (itemText.toLowerCase().includes('problem')) {
                         iconClass = 'ri-lightbulb-flash-fill';
                     } else if (itemText.toLowerCase().includes('learn')) {
                         iconClass = 'ri-graduation-cap-fill';
                     }
-                    newDirection.innerHTML = `<i class="${iconClass}"></i> ${itemText.trim()}`;
+                    icon.className = iconClass;
+                    newDirection.append(icon, document.createTextNode(` ${itemText}`));
                     section.appendChild(newDirection);
                 }
             } else if (sectionTitle === '_notes') {
-                itemText = prompt('Enter note:');
-                if (itemText && itemText.trim() !== '') {
+                const itemText = await askText('Add a note', 'Write a short note');
+                if (itemText) {
+                    const emptyState = document.querySelector('#notesEmpty');
+                    if (emptyState) emptyState.remove();
+
                     const newNote = document.createElement('p');
                     newNote.className = 'px-2 py-1 text-sm';
-                    newNote.textContent = `> ${itemText.trim()}`;
+                    newNote.textContent = `> ${itemText}`;
                     section.appendChild(newNote);
                 }
             }
@@ -287,17 +385,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    const today = new Date();
-    if (today.getMonth() === 9 && today.getFullYear() === 2025) {
-        const todayElement = document.querySelector(`.bg-white\\/10:contains("${today.getDate()}")`);
-        if (todayElement) {
-            todayElement.classList.remove('bg-white/10');
-            todayElement.classList.add('bg-red-500', 'text-white', 'font-bold');
-        }
-    }
 });
-
-Element.prototype.contains = function(text) {
-    return this.textContent.includes(text);
-};
