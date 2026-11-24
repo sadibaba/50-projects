@@ -1,0 +1,38 @@
+name: Feature request
+description: Propose a focused improvement to an existing or planned project
+title: "[Feature]: "
+labels: ["enhancement", "needs triage"]
+body:
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      placeholder: Phase-3/3-ECommerce — VoltNest
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is difficult or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the smallest useful version.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and affected areas
+      description: Pages, API routes, models or docs that may change.
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to work on this.
+        - label: I can help test this.

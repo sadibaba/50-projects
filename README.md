@@ -1,24 +1,106 @@
-# Full-Stack Development Journey
+# 50 Full-Stack Web Development Projects
 
-A record of the projects I have built while learning full-stack development. The
-repository is organised by phase, and each project has its own documentation,
-setup instructions and API reference.
+A public collection of full-stack web development projects built with
+JavaScript, TypeScript, React, Next.js, Node.js, Express and MongoDB. The
+repository covers e-commerce, social media apps, real-time chat, admin
+dashboards, REST APIs, JWT authentication, AI tools and vanilla JavaScript
+mini apps.
 
-## How I work
+Every built project has its own README, setup instructions, API notes where
+relevant, and an honest statement of what is implemented and what is still
+planned.
+
+**24 projects are built.** The remaining roadmap items are marked as planned and
+are not presented as complete.
+
+[Browse the built projects](#built-project-highlights) ·
+[Project status](#status-at-a-glance) ·
+[Contributing](#contributing) ·
+[Phase 1](Phase-1/README.md) ·
+[Phase 2](Phase-2/README.md) ·
+[Phase 3](Phase-3/README.md) ·
+[Phase 4](Phase-4/README.md)
+
+## Start here
+
+| If you want to see | Open |
+| --- | --- |
+| A TypeScript e-commerce store with an admin dashboard | [VoltNest](<Phase-3/3-ECommerce/README.md>) |
+| An Instagram-style social app with stories and reels | [Lumen](<Phase-3/2-InstagramClone/README.md>) |
+| A Pinterest-style board and pin application | [Pinboard](<Phase-3/1-PinterestClone/README.md>) |
+| A MERN task manager with boards and projects | [Task Manager](<Phase-2/1-TaskManager/README.md>) |
+| Real-time chat with Socket.IO | [Chat App](<Phase-2/7-chatApp/README.md>) |
+| Vanilla JavaScript fundamentals | [Phase 1](Phase-1/README.md) |
+
+## Built project highlights
+
+| Project | What it demonstrates | Stack |
+| --- | --- | --- |
+| [VoltNest e-commerce](<Phase-3/3-ECommerce/README.md>) | Storefront, cart, coupons, checkout, order tracking, admin dashboard, CSV export | Next.js 16, TypeScript, MongoDB |
+| [Lumen Instagram clone](<Phase-3/2-InstagramClone/README.md>) | Feed, stories, reels, profiles, comments, notifications, private accounts | Next.js 16, TypeScript, MongoDB |
+| [Pinboard Pinterest clone](<Phase-3/1-PinterestClone/README.md>) | Pins, boards, uploads, profiles, likes, reels | Next.js, Express, MongoDB |
+| [Task Manager](<Phase-2/1-TaskManager/README.md>) | Boards, projects, task statistics and profiles | React, Express, MongoDB |
+| [Blog Platform](<Phase-2/3-BlogPlatform/README.md>) | Posts, comments, likes, categories, uploads and admin tools | React, Express, MongoDB |
+| [Chat App](<Phase-2/7-chatApp/README.md>) | One-to-one messaging and Socket.IO delivery | React, Express, MongoDB, Socket.IO |
+| [Social Media Chat](<Phase-2/8-Social-media/README.md>) | Presence, typing indicators and real-time chat | React, Express, Socket.IO |
+| [Authentication System](<Phase-2/2-Authentication-System/README.md>) | Signup, login, roles and an admin user manager | React, Express, MongoDB, JWT |
+
+## Topics covered
+
+JavaScript, TypeScript, React, Next.js App Router, Node.js, Express, MongoDB,
+Mongoose, REST API design, JWT authentication, role-based authorisation,
+Socket.IO, real-time messaging, e-commerce, admin dashboards, social media
+applications, file uploads, responsive UI, accessibility, API documentation,
+testing and full-stack portfolio projects.
+
+## Contributing
+
+Contributions are welcome: bug fixes, documentation, tests, responsive fixes,
+accessibility improvements and new project ideas. You do not need to be an
+expert to help.
+
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md).
+2. Pick an issue labelled `good first issue` or `documentation`, or open a small
+   issue describing what you want to change.
+3. Comment on the issue so work is not duplicated.
+4. Open a focused pull request with a screenshot for UI changes.
+
+Good first contributions:
+
+- Fix a broken setup command or link in a project README.
+- Add a missing `.env.example` entry.
+- Improve an empty, loading or error state.
+- Fix a mobile layout issue at a specific width.
+- Add a unit test for a validator or helper.
+- Add alt text, form labels or keyboard navigation.
+- Report a bug with exact reproduction steps.
+
+If you are unsure where to start, open an issue and ask. Small, well-tested pull
+requests are reviewed faster than large rewrites.
+
+## Status at a glance
+
+| Phase | Built | Scope | Status |
+| --- | --- | --- | --- |
+| Phase 1 | 13 | Vanilla JavaScript, DOM, public APIs, localStorage | Complete |
+| Phase 2 | 8 | React, Express, MongoDB, REST APIs, authentication | Complete |
+| Phase 3 | 3 of 24 | Next.js, real-time features, larger full-stack systems | In progress |
+| Phase 4 | 0 of 6 | AWS, Docker, microservices | Planned |
+| Extra | 1 | AI SEO Analyzer, outside the original numbered list | Built |
+
+## How this repository is built
 
 I use AI assistants, search engines and official documentation while building.
 That is how most professional developers work. The important part is the
 architecture, the debugging process and the decisions behind each implementation,
-and those are documented per project in this repository.
+and those are documented per project.
 
-## Roadmap
+Honesty rules for this repository:
 
-| Phase | Focus | Status |
-| --- | --- | --- |
-| Phase 1 | Vanilla JavaScript, DOM, public APIs, localStorage | 13 projects |
-| Phase 2 | React, Express, MongoDB, REST APIs, authentication | 8 projects |
-| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress: 3 of 24 built, 21 planned, 1 extra project |
-| Phase 4 | AWS, Docker, microservices | 6 projects planned |
+- A project is marked built only when it runs and has documentation.
+- Planned projects are never listed as complete.
+- Known limitations are written down instead of hidden.
+- Commands and demo credentials are included where they are useful.
 
 ## Phase 1: Vanilla JavaScript
 
@@ -83,9 +165,11 @@ GitHub profile viewer, were not built. They are not listed as complete.
 
 ## Phase 3: Advanced full-stack roadmap
 
-The original Phase 3 plan contains 24 projects (27-50). The full-stack Pinterest
-alternative, [Pinboard](<Phase-3/1-PinterestClone/README.md>), is built. The rest
-remain planned work and are not presented as complete.
+The original Phase 3 plan contains 24 projects (27-50). Three are built:
+[Pinboard](<Phase-3/1-PinterestClone/README.md>),
+[Lumen](<Phase-3/2-InstagramClone/README.md>) and
+[VoltNest](<Phase-3/3-ECommerce/README.md>). The rest remain planned work and
+are not presented as complete.
 
 | # | Project | Core features | Stack | Status |
 | --- | --- | --- | --- | --- |

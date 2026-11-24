@@ -4,9 +4,9 @@ Phase 3 moves from smaller applications to full products: Next.js App Router,
 authentication, persistence, real-time features, uploads and deployment-ready
 structure.
 
-The original plan contains 24 projects, numbered 27-50. Only the Pinterest clone
-is complete. The rest are listed as planned so the roadmap is clear and nothing
-unfinished is presented as done.
+The original plan contains 24 projects, numbered 27-50. Three projects are
+complete: Pinboard, Lumen and VoltNest. The rest are listed as planned so the
+roadmap is clear and nothing unfinished is presented as done.
 
 ## Current projects in this folder
 

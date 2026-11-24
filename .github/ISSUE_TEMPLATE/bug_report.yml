@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible problem in a built project
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+body:
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      description: Folder and project name
+      placeholder: Phase-3/3-ECommerce — VoltNest
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run npm run dev
+        2. Open /shop
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include logs with secrets removed.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Ubuntu 24.04, Node 22, MongoDB 7
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag images here when the issue is visual.
