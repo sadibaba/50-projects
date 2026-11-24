@@ -1,214 +1,126 @@
-# 💻 My Full-Stack Development Journey
+# Full-Stack Development Journey
 
-> From Vanilla JS to AWS Microservices — 50 projects, 4 phases, no shortcuts on learning.
+A record of the projects I have built while learning full-stack development. The
+repository is organised by phase, and each project has its own documentation,
+setup instructions and API reference.
 
-I'm documenting my complete journey as a developer — starting from the basics and working my way up to production-grade, cloud-deployed systems. Every project here is real. Real architecture, real data flow, real problems.
+## How I work
 
----
+I use AI assistants, search engines and official documentation while building.
+That is how most professional developers work. The important part is the
+architecture, the debugging process and the decisions behind each implementation,
+and those are documented per project in this repository.
 
-## ⚡ A Note on How I Work
+## Roadmap
 
-I use **AI tools, Google, and documentation** at every phase — whether it's Vanilla JS or Next.js.
-I'm not ashamed of it. That's how real engineers work.
+| Phase | Focus | Status |
+| --- | --- | --- |
+| Phase 1 | Vanilla JavaScript, DOM, public APIs, localStorage | 13 projects |
+| Phase 2 | React, Express, MongoDB, REST APIs, authentication | 8 projects |
+| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress |
+| Phase 4 | AWS, Docker, microservices | Planned |
 
-What matters isn't whether I Googled something.
-What matters is **how I think**, **how I architect**, and **how I debug when things break**.
-The tools are leverage. The thinking is mine.
+## Phase 1: Vanilla JavaScript
 
----
+The first phase focuses on fundamentals without frameworks.
 
-## 🗺️ The Roadmap
+| # | Project | Main technologies |
+| --- | --- | --- |
+| 1 | To-do list | JavaScript, localStorage |
+| 2 | Calculator | JavaScript |
+| 3 | Quiz web app | JavaScript, questions API |
+| 4 | React pin board | React, CSS |
+| 5 | Weather web app | Public weather API |
+| 6 | Quote generator | Quote API |
+| 7 | Currency converter | Currency API |
+| 8 | Countdown timer | JavaScript, Date |
+| 9 | Image slider | JavaScript, CSS |
+| 10 | Colour picker | HTML, CSS, JavaScript |
+| 11 | Blog frontend | React, static data |
+| 12 | Tip calculator | JavaScript |
+| 13 | BMI calculator | JavaScript |
 
-```
-Phase 1  →  Vanilla JS + Public APIs          ✅ Complete  (12 projects)
-Phase 2  →  React + Node.js + MongoDB         ✅ Complete  (14 projects)
-Phase 3  →  Next.js + Real-Time + Full-Stack  🔨 In Progress
-Phase 4  →  AWS + Microservices               ⏳ Coming Next
-```
+## Phase 2: Full-stack applications
 
----
+Phase 2 is where the full request cycle is practised: React client, Express API,
+MongoDB persistence, JWT authentication and REST conventions. Each project below
+has a separate README and a `docs` folder.
 
-## 📁 Phase 1 — Simple Web Projects (Vanilla JS)
+| # | Project | Description | Stack |
+| --- | --- | --- | --- |
+| 1 | [Task Manager](<Phase-2/1-TaskManager/README.md>) | Task planner with boards, projects, profiles and task statistics | React, Express, MongoDB |
+| 2 | [Authentication System](<Phase-2/2-Authentication-System/README.md>) | Signup, login, roles, profile management and an admin user manager | React, Express, MongoDB, JWT |
+| 3 | [Blog Platform](<Phase-2/3-BlogPlatform/README.md>) | Posts, comments, likes, categories, uploads and an admin dashboard | React, Express, MongoDB |
+| 4 | [Recipe App](<Phase-2/4-Recipe App/README.md>) | Recipe search through TheMealDB with saved favourites | React, Express, MongoDB |
+| 5 | [Movie Browser](<Phase-2/5-movie browser/README.md>) | Movie search through OMDB with watchlists and reviews | React, Express, MongoDB |
+| 6 | [Notes App](<Phase-2/6-NotesApp/README.md>) | Notes with tags, tag filtering and account management | React, Express, MongoDB |
+| 7 | [Chat App](<Phase-2/7-chatApp/README.md>) | One-to-one messaging with REST history and Socket.IO delivery | React, Express, MongoDB, Socket.IO |
+| 8 | [Social Media Chat](<Phase-2/8-Social-media/README.md>) | Real-time chat with online presence and typing indicators | React, Express, MongoDB, Socket.IO |
 
-> **Goal:** Get solid with the fundamentals. DOM, APIs, localStorage, CSS — no frameworks, no crutches.
+The Phase 2 index contains the same projects with more detail about what is
+implemented and what is intentionally left as future work:
 
-| # | Project | Stack |
-|---|---------|-------|
-| 1 | **To-Do List** | Vanilla JS, localStorage |
-| 2 | **Calculator** | Vanilla JS |
-| 3 | **Weather Widget** | Public Weather API |
-| 4 | **Quiz App** | JS + Questions API |
-| 5 | **Random Quote Generator** | Quote API |
-| 6 | **Currency Converter** | Free Currency API |
-| 7 | **Countdown Timer** | JS + Date |
-| 8 | **Image Slider / Carousel** | JS + CSS |
-| 9 | **Simple Blog Frontend** | Static React, dummy posts |
-| 10 | **Color Picker Tool** | JS + HTML + CSS |
-| 11 | **Tip Calculator** | Vanilla JS |
-| 12 | **BMI Calculator** | Vanilla JS |
+[Phase 2 documentation](Phase-2/README.md)
 
----
+Some projects from the original learning list, such as the contact book and
+GitHub profile viewer, were not built. They are not listed as complete.
 
-## 📁 Phase 2 — Intermediate Projects (React + Backend + API)
+## What Phase 2 covers
 
-> **Goal:** Learn the full request cycle. Frontend ↔ Backend ↔ Database. CRUD, auth, REST APIs — the real stuff.
+- REST API design with Express routers, controllers and models
+- MongoDB schemas, indexes and data ownership rules
+- JWT authentication, password hashing and protected routes
+- Role-based authorisation for administrative endpoints
+- File uploads for the blog platform
+- Real-time messaging with Socket.IO
+- Environment-based configuration and `.env.example` files
+- Frontend build verification and production builds
+- Per-project documentation covering architecture, API and limitations
 
-| # | Project | Status | Stack |
-|---|---------|--------|-------|
-| 13 | **Task Manager App** | ✅ | React, Node/Express, MongoDB |
-| 14 | **Authentication System** | ✅ | JWT, SignUp/Login/Logout |
-| 15 | **Blog Platform** | ✅ — handles ~10-15 users, improvements planned | React, Express, MongoDB |
-| 16 | **Recipe App** | ✅ | Public API + own backend |
-| 17 | **Movie Browser** | ✅ | OMDB / TMDB API |
-| 18 | **Notes App with Tags** | ✅ | Tagging system + REST API |
-| 19 | **Contact Book** | ⏳ | Contacts CRUD, backend API |
-| 20 | **Chat App (Basic)** | ✅ | React + polling API |
-| 21 | **File Upload App** | ✅ — integrated in Blog | Express + Multer |
-| 22 | **Expense Tracker** | ✅ — built in Phase 1 | REST API |
-| 23 | **Weather Dashboard** | ✅ — built in Phase 1 | React + backend proxy |
-| 24 | **GitHub Profile Viewer** | ⏳ | GitHub API, React |
-| 25 | **Image Gallery** | ✅ — built in Phase 1 | Unsplash API |
-| 26 | **Blog Comments System** | ✅ — integrated in Blog | Comments API + React |
+## Repository structure
 
----
-
-## 📁 Phase 3 — Advanced Projects (Next.js · Real-Time · Full-Stack)
-
-> **Goal:** Production-level applications. Multi-user systems, real-time features, SSR/SSG, deployment-ready architecture.
-> No tutorial code. Every app is built as if it goes live.
-
-| # | Project | Core Features | Stack |
-|---|---------|---------------|-------|
-| 27 | **Pinterest Clone** | Pins, boards, image upload | Next.js, Full-Stack |
-| 28 | **Instagram Clone** | Photo feed, likes, comments, upload | Next.js, Real-Time |
-| 29 | **E-Commerce Website** | Cart, checkout, payment | Next.js, Full-Stack |
-| 30 | **Admin Dashboard** | Analytics, user stats, charts | React, Full-Stack |
-| 31 | **Social Media App** | Profiles, follow/unfollow, posts | Full-Stack, Real-Time |
-| 32 | **Real-Time Chat App** | Socket.io, rooms, auth | Next.js, WebSockets |
-| 33 | **Video Streaming Platform** | Upload, stream, user profiles | Full-Stack |
-| 34 | **Blog with SSR + SSG** | SEO, Markdown, dynamic routes | Next.js |
-| 35 | **Booking System** | Room/restaurant booking, calendar | Full-Stack |
-| 36 | **LMS Platform** | Courses, quizzes, user roles | Next.js, Full-Stack |
-| 37 | **Job Board Platform** | Post jobs, apply, search, admin | Full-Stack |
-| 38 | **News Aggregator** | APIs, categories, saved favorites | Next.js |
-| 39 | **Forum / Q&A Platform** | Threads, replies, voting | Next.js, Full-Stack |
-| 40 | **Chatbot Interface** | AI + rule-based bot, React + backend | Real-Time |
-| 41 | **Portfolio Generator** | Form → downloadable static portfolio | Full-Stack |
-| 42 | **Podcast Platform** | Episodes, audio player, admin upload | Full-Stack |
-| 43 | **Calendar / Planner App** | Events, reminders, CRUD | Full-Stack |
-| 44 | **Crypto Tracker** | Live prices, charts, watchlist | Next.js, Real-Time |
-| 45 | **Task Automation Dashboard** | Schedule + automate tasks | Full-Stack |
-| 46 | **Multi-Tenant SaaS App** | Separate data per tenant, billing simulation | Next.js, Full-Stack |
-| 47 | **Fitness Tracker** | Workouts, calories, CRUD, charts | Full-Stack |
-| 48 | **Chat Rooms with Auth** | Multiple rooms, public/private | WebSockets |
-| 49 | **Calendar Booking + Payment** | Slot booking, mock payment | Full-Stack |
-| 50 | **Image Editing App** | Filters, crop, rotate — JS + backend | Full-Stack |
-
-**Tech Stack in This Phase:**
-```
-Frontend    →   Next.js (SSR / SSG / App Router)
-Backend     →   Node.js + Express
-Databases   →   MongoDB + PostgreSQL
-Real-Time   →   Socket.io (WebSockets)
-Auth        →   JWT + Session Management
-Caching     →   Redis
-DevOps      →   Docker + CI/CD basics
+```text
+50-projects/
+├── Phase-1/               Vanilla JavaScript projects
+├── Phase-2/               React and Express full-stack projects
+│   ├── 1-TaskManager/
+│   ├── 2-Authentication-System/
+│   ├── 3-BlogPlatform/
+│   ├── 4-Recipe App/
+│   ├── 5-movie browser/
+│   ├── 6-NotesApp/
+│   ├── 7-chatApp/
+│   ├── 8-Social-media/
+│   └── README.md
+├── Phase-3/               Next.js and real-time projects
+├── Phase-4/               AWS and microservices projects (planned)
+├── Production-projects/
+└── README.md
 ```
 
----
+## Running a project
 
-## 📁 Phase 4 — Ultra Advanced (AWS + Microservices)
+Every Phase 2 project follows the same pattern:
 
-> **Goal:** Enterprise-grade systems. Dockerized microservices, cloud deployment, CI/CD pipelines, real DevOps.
+1. Read the project README.
+2. Copy `backend/.env.example` to `backend/.env` and fill in the values.
+3. Install dependencies in `backend` and `frontend`.
+4. Start MongoDB.
+5. Run the API and the React development server in separate terminals.
 
-### 1. 🛒 DevCommerce Hub
+Each project README lists the exact commands, ports and environment variables.
 
-A developer-focused e-commerce platform with embedded productivity layers — what looks like a store is actually a full developer workspace.
+## Security notes
 
-| Surface | Hidden Layer |
-|---------|-------------|
-| Product Pages | Error Log Tracker |
-| Shopping Cart | Developer Vault (snippets, templates) |
-| Order History | Debugging Timeline |
-| Reviews & Ratings | Collaborative Knowledge Base |
+- No real credentials are committed. The `.env.example` files contain
+  placeholders only.
+- Uploaded images and local databases are not part of the source code.
+- The projects are learning applications, not audited production systems. The
+  limitations section of each project README describes the trade-offs.
+- See [SECURITY.md](SECURITY.md) for credential-rotation guidance and notes on
+  values that appeared in earlier commits.
 
-**Core Features:**
-- E-commerce — catalog, cart, checkout, Stripe/PayPal, AWS S3 for images
-- TeamHub — real-time chat, Kanban boards, role-based access
-- Error Logger — Winston/Morgan logs, Chart.js dashboard, Slack/email alerts
-- Developer Vault — notes, cheat sheets, GraphQL search, Markdown editor
-- DevOps — Dockerized microservices, GitHub Actions CI/CD, AWS deployment
+## License
 
-**Stack:** `React + TypeScript + TailwindCSS` · `Node.js + Express + GraphQL` · `PostgreSQL + MongoDB + Redis` · `Socket.io` · `Docker + Kubernetes` · `AWS (EC2, S3, RDS, CloudWatch)`
-
----
-
-### 2. 🌐 EduVerse — Global Learning Hub
-
-A platform where students and developers share courses, cheat sheets, and live coding sessions.
-
-- Real-time classrooms (WebSockets + video integration)
-- Vault system for notes + API docs
-- Error logger for teachers to track student issues
-- E-commerce layer for selling courses and resources
-
-**Stack:** `React + Node.js + GraphQL + MongoDB/PostgreSQL + AWS (Lambda, S3)`
-
----
-
-### 3. 🖥️ WorkOS — Cinematic Workspace OS
-
-A mini operating system that runs inside the browser — manage your team, projects, vaults, and logs without leaving the tab.
-
-- TeamHub-style collaboration (chat, boards)
-- Personal + shared vault
-- Error logger dashboard per project
-- Plugin marketplace
-
-**Stack:** `Next.js + Express + Redis + Docker + Kubernetes + AWS EC2`
-
----
-
-### 4. ☁️ CloudLab — DevOps Playground
-
-A practice cloud where developers deploy, monitor, and debug their own apps.
-
-- Deploy apps in containers (Docker/Kubernetes)
-- Error logger + monitoring dashboard
-- Vault for deployment scripts + cheat sheets
-- Marketplace for sharing deployment templates
-
-**Stack:** `React + Node.js + GraphQL + PostgreSQL + AWS (CloudWatch, ECS)`
-
----
-
-### 5. 🛍️ CollabMart — Social Commerce
-
-A hybrid of social media + e-commerce + team collaboration.
-
-- Product marketplace (SQL + NoSQL hybrid)
-- Real-time chat + community boards
-- Error logger for sellers (track failed orders)
-- Seller vault for documenting strategies
-
-**Stack:** `React + Express + MongoDB/PostgreSQL + AWS S3 + Stripe`
-
----
-
-### 6. 🗄️ CodeVaultX — Developer Legacy Platform
-
-A platform where developers document their entire journey — vaults, projects, logs, APIs, everything in one place.
-
-- Vault system (notes, cheat sheets, API docs)
-- Error logger per project
-- TeamHub-style collaboration
-- E-commerce for selling templates + code snippets
-
-**Stack:** `Next.js + Node.js + GraphQL + MongoDB/PostgreSQL + Docker + AWS`
-
----
-
-<p align="center">
-  Built project by project. Phase by phase.<br/>
-  No shortcuts on understanding — just on speed.
-</p>
+Released under the [MIT License](LICENSE). Individual project READMEs state
+their own license when it differs.

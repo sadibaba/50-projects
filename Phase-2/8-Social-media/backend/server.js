@@ -1,24 +1,37 @@
-import app from "./app.js";
 import http from "http";
-import { initSocket } from "../backend/sockets/socket.js";
+import "dotenv/config";
+import app from "./app.js";
+import connectDB from "./db/mongo.db.js";
+import { initSocket } from "./sockets/socket.js";
 
 const PORT = process.env.PORT || 3000;
-const server = http.createServer(app);
-initSocket(server);
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const missing = ["JWT_SECRET"].filter((key) => !process.env[key]);
+
+if (missing.length) {
+  console.error(`Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
+}
+
+const start = async () => {
+  await connectDB();
+
+  const server = http.createServer(app);
+  initSocket(server);
+
+  server.listen(PORT, () => {
+    console.log(`Chat API listening on http://localhost:${PORT}`);
+  });
+
+  const shutdown = (signal) => {
+    console.log(`${signal} received, closing server`);
+    server.close(() => process.exit(0));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+};
+
+start().catch((error) => {
+  console.error("Failed to start server:", error.message);
+  process.exit(1);
 });
-
-
-
-
-// import app from "./app.js";
-// import http from "http";
-// import {initSocket} from '../backend/sockets/socket.js'
-
-// const PORT = process.env.PORT || 3000;
-// const server = http.createServer(app)
-// initSocket(server)
-// app.listen(PORT, () => {
-//   console.log(`Server is Running on ${PORT}`);
-// });

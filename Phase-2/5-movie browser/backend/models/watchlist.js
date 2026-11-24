@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
 
-const watchlistSchema = new mongoose.Schema({
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
-    default: null 
+const watchlistSchema = new mongoose.Schema(
+  {
+    clientId: { type: String, required: true, index: true },
+    movieId: { type: String, required: true },
   },
-  movieId: { type: String, required: true },  
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-// Add compound index to prevent duplicates
-watchlistSchema.index({ userId: 1, movieId: 1 }, { unique: true });
+watchlistSchema.index({ clientId: 1, movieId: 1 }, { unique: true });
 
 export default mongoose.model("Watchlist", watchlistSchema);

@@ -1,21 +1,36 @@
-import express from 'express';
-import path from 'path';
+import http from "http";
+import dotenv from "dotenv";
 import app from "./app.js";
-import { fileURLToPath } from 'url';
+import connectDB from "./database/db.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
+const missing = ["MONGO_URI", "JWT_SECRET"].filter((key) => !process.env[key]);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'build', 'index.html'));
-  });
+if (missing.length) {
+  console.error(`Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
 }
+
+const start = async () => {
+  await connectDB();
+
+  const server = http.createServer(app);
+  server.listen(PORT, () => {
+    console.log(`Notes API listening on http://localhost:${PORT}`);
+  });
+
+  const shutdown = (signal) => {
+    console.log(`${signal} received, closing server`);
+    server.close(() => process.exit(0));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+};
+
+start().catch((error) => {
+  console.error("Failed to start server:", error.message);
+  process.exit(1);
+});

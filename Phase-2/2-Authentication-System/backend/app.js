@@ -2,38 +2,39 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
+import { notFound, errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
-/* ================= CORS ================= */
-// Simple CORS - still needed for direct API calls (Postman, etc.)
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  credentials: true
-}));
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
 
-/* ================= Core Middlewares ================= */
-app.use(express.json());
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Origin is not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-/* ================= Routes ================= */
+app.get("/", (req, res) => {
+  res.json({ name: "Authentication System API", version: "1.0.0", status: "running" });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use("/api/auth", authRoutes);
 
-/* ================= Health Check ================= */
-app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is running 🚀",
-  });
-});
-
-/* ================= 404 Handler ================= */
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

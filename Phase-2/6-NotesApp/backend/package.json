@@ -1,29 +1,27 @@
 {
-  "name": "notesapp-backend",
+  "name": "notes-app-backend",
   "version": "1.0.0",
-  "description": "Backend for Notes App",
+  "private": true,
+  "description": "Notes and tags REST API with JWT authentication",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "author": "Sadis",
-  "license": "ISC",
-  "type": "module",
   "dependencies": {
-    "axios": "^1.14.0",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.1",
-    "express-validator": "^7.3.1",
-    "helmet": "^8.1.0",
-    "i": "^0.3.7",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.3",
-    "morgan": "^1.10.1",
-    "npm": "^11.12.1"
+    "mongoose": "^9.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

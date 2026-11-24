@@ -1,100 +1,130 @@
-import axios from 'axios';
-import { 
-  getWatchlistFrontend, 
-  addToWatchlistFrontend, 
+import axios from "axios";
+import {
+  getWatchlistFrontend,
+  addToWatchlistFrontend,
   removeFromWatchlistFrontend,
   isInWatchlistFrontend,
   getReviewsFrontend,
-  addReviewFrontend
-} from './storage';
+  addReviewFrontend,
+} from "./storage";
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const CLIENT_KEY = "movie_app_client_id";
+
+const getClientId = () => {
+  let id = localStorage.getItem(CLIENT_KEY);
+  if (!id) {
+    id =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `client-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(CLIENT_KEY, id);
+  }
+  return id;
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { "Content-Type": "application/json" },
+  timeout: 15000,
 });
 
-// Movie endpoints (using backend for OMDB API)
-export const searchMovies = async (keyword) => {
+api.interceptors.request.use((config) => {
+  config.headers["x-client-id"] = getClientId();
+  return config;
+});
+
+const normalizeReview = (review) => ({
+  ...review,
+  id: review.id || review._id,
+});
+
+export const searchMovies = async (keyword, page = 1) => {
   try {
-    const response = await api.get(`/movies?keyword=${keyword}`);
-    return response.data.Search || [];
+    const { data } = await api.get("/movies", { params: { keyword, page } });
+    return data.Search || [];
   } catch (error) {
-    console.error('Error searching movies:', error);
-    return [];
+    if (error.response?.status === 404) return [];
+    throw new Error(
+      error.response?.data?.error || "Could not search the movie database."
+    );
   }
 };
 
-// Get movie details through your backend (same as search)
 export const getMovieDetails = async (imdbID) => {
   try {
-    // Use your backend as a proxy to OMDB API
-    const response = await api.get(`/movies/${imdbID}`);
-    return response.data;
+    const { data } = await api.get(`/movies/${imdbID}`);
+    return data;
   } catch (error) {
-    console.error('Error fetching movie details:', error);
-    throw error;
+    throw new Error(
+      error.response?.data?.error || "Could not load this movie."
+    );
   }
 };
 
-// Review endpoints (using localStorage)
 export const getReviews = async (movieId) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const { data } = await api.get(`/reviews/${movieId}`);
+    return data.map(normalizeReview);
+  } catch {
     return getReviewsFrontend(movieId);
-  } catch (error) {
-    console.error('Error fetching reviews:', error);
-    return [];
   }
 };
 
 export const addReview = async (reviewData) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const newReview = addReviewFrontend(reviewData.movieId, reviewData.rating, reviewData.comment);
-    return newReview;
-  } catch (error) {
-    console.error('Error adding review:', error);
-    return null;
+    const { data } = await api.post("/reviews", reviewData);
+    return normalizeReview(data);
+  } catch {
+    return addReviewFrontend(
+      reviewData.movieId,
+      reviewData.rating,
+      reviewData.comment
+    );
   }
 };
 
-// Watchlist endpoints (using localStorage)
 export const getWatchlist = async () => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const { data } = await api.get("/watchlist");
+    const local = getWatchlistFrontend();
+
+    if (data.length === 0 && local.length > 0) {
+      await Promise.allSettled(
+        local.map((item) => api.post("/watchlist", { movieId: item.movieId }))
+      );
+      return local;
+    }
+
+    return data;
+  } catch {
     return getWatchlistFrontend();
-  } catch (error) {
-    console.error('Error fetching watchlist:', error);
-    return [];
   }
 };
 
 export const addToWatchlist = async (movieId) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    const { data } = await api.post("/watchlist", { movieId });
+    return data;
+  } catch {
     addToWatchlistFrontend(movieId);
-    return { success: true };
-  } catch (error) {
-    console.error('Error adding to watchlist:', error);
-    return null;
+    return { movieId };
   }
 };
 
 export const removeFromWatchlist = async (movieId) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await api.delete(`/watchlist/${movieId}`);
+    return true;
+  } catch {
     removeFromWatchlistFrontend(movieId);
     return true;
-  } catch (error) {
-    console.error('Error removing from watchlist:', error);
-    return false;
   }
 };
 
 export const checkInWatchlist = async (movieId) => {
+  const list = await getWatchlist();
+  if (list.some((item) => item.movieId === movieId)) return true;
   return isInWatchlistFrontend(movieId);
 };

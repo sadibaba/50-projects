@@ -1,31 +1,38 @@
-import Recipe from "../models/Recipe.js";
+import Recipe from "../models/recipe.js";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
-// @desc Get all recipes or search
-// @route GET /api/recipes
-export const getRecipes = async (req, res) => {
-  try {
-    const { search } = req.query;
-    const query = search
-      ? { title: { $regex: search, $options: "i" } }
-      : {};
+export const getRecipes = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+  const query = search
+    ? { title: { $regex: String(search), $options: "i" } }
+    : {};
 
-    const recipes = await Recipe.find(query);
-    res.json(recipes);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching recipes" });
+  const recipes = await Recipe.find(query).sort({ createdAt: -1 }).limit(100);
+  res.json(recipes);
+});
+
+export const getRecipeById = asyncHandler(async (req, res) => {
+  const recipe = await Recipe.findById(req.params.id);
+  if (!recipe) throw new ApiError(404, "Recipe not found");
+  res.json(recipe);
+});
+
+export const createRecipe = asyncHandler(async (req, res) => {
+  const { title, description, ingredients, instructions, image_url, tags } =
+    req.body;
+
+  if (!title || !String(title).trim()) {
+    throw new ApiError(400, "Recipe title is required");
   }
-};
 
-// @desc Get single recipe by ID
-// @route GET /api/recipes/:id
-export const getRecipeById = async (req, res) => {
-  try {
-    const recipe = await Recipe.findById(req.params.id);
-    if (!recipe) {
-      return res.status(404).json({ message: "Recipe not found" });
-    }
-    res.json(recipe);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching recipe" });
-  }
-};
+  const recipe = await Recipe.create({
+    title: String(title).trim(),
+    description: description || "",
+    ingredients: Array.isArray(ingredients) ? ingredients : [],
+    instructions: instructions || "",
+    image_url: image_url || "",
+    tags: Array.isArray(tags) ? tags : [],
+  });
+
+  res.status(201).json(recipe);
+});

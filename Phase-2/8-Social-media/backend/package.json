@@ -1,28 +1,27 @@
 {
+  "name": "chat-hub-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time one-to-one chat API with Socket.IO and JWT",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
   "dependencies": {
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
-    "passport": "^0.7.0",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
   },
-  "name": "auth",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module"
+  "engines": {
+    "node": ">=18"
+  }
 }

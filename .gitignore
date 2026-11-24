@@ -1,0 +1,18 @@
+# Dependencies and build output
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local test and cache data
+.npm-cache/
+.mongo-test/
+*.log
+coverage/
+backend/uploads/
+frontend/.vite/
+**/backend/uploads/

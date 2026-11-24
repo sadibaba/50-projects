@@ -4,6 +4,9 @@ import {
   login,
   logout,
   getProfile,
+  updateProfile,
+  changePassword,
+  getAdminStats,
   getAllUsers,
   deleteUser,
 } from "../controller/auth.controller.js";
@@ -18,14 +21,12 @@ router.post("/login", login);
 router.post("/logout", logout);
 
 router.get("/me", authMiddleware, getProfile);
+router.put("/me", authMiddleware, updateProfile);
+router.put("/me/password", authMiddleware, changePassword);
 
 /* Admin routes */
+router.get("/admin/stats", authMiddleware, adminMiddleware, getAdminStats);
 router.get("/admin/users", authMiddleware, adminMiddleware, getAllUsers);
-router.delete(
-  "/admin/users/:id",
-  authMiddleware,
-  adminMiddleware,
-  deleteUser
-);
+router.delete("/admin/users/:id", authMiddleware, adminMiddleware, deleteUser);
 
 export default router;

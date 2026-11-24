@@ -1,35 +1,41 @@
 import Review from "../models/review.js";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
-export async function addReview(req, res) {
-  try {
-    const { movieId, rating, comment } = req.body;
-    
-    // Validate required fields
-    if (!movieId || !rating || !comment) {
-      return res.status(400).json({ error: "Movie ID, rating, and comment are required" });
-    }
-    
-    const review = new Review({ 
-      movieId, 
-      rating, 
-      comment,
-      userId: null  
-    });
-    await review.save();
-    res.status(201).json(review);
-  } catch (err) {
-    console.error('Error adding review:', err);
-    res.status(500).json({ error: "Failed to add review: " + err.message });
-  }
-}
+export const addReview = asyncHandler(async (req, res) => {
+  const { movieId, rating, comment } = req.body;
+  const numericRating = Number(rating);
 
-export async function getReviews(req, res) {
-  try {
-    const { movieId } = req.params;
-    const reviews = await Review.find({ movieId }).sort({ createdAt: -1 });
-    res.json(reviews);
-  } catch (err) {
-    console.error('Error fetching reviews:', err);
-    res.status(500).json({ error: "Failed to fetch reviews" });
+  if (!movieId || !comment || !String(comment).trim()) {
+    throw new ApiError(400, "Movie ID, rating and comment are required");
   }
-}
+
+  if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 10) {
+    throw new ApiError(400, "Rating must be between 1 and 10");
+  }
+
+  const review = await Review.create({
+    clientId: req.clientId,
+    movieId: String(movieId),
+    rating: numericRating,
+    comment: String(comment).trim(),
+  });
+
+  res.status(201).json(review);
+});
+
+export const getReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({ movieId: String(req.params.movieId) }).sort({
+    createdAt: -1,
+  });
+  res.json(reviews);
+});
+
+export const deleteReview = asyncHandler(async (req, res) => {
+  const review = await Review.findOneAndDelete({
+    _id: req.params.id,
+    clientId: req.clientId,
+  });
+
+  if (!review) throw new ApiError(404, "Review not found");
+  res.json({ message: "Review deleted" });
+});

@@ -1,159 +1,115 @@
-#  Performance Docs
+# Performance Documentation
 
-> **What is this folder?**
-> This folder contains the complete performance, optimization, and testing documentation for all projects in this repository. Writing code is not enough — a good developer also knows **how fast their code runs, how much load it can handle, and how to make it better.**
+This folder records the performance work done on the projects in this
+repository: load tests, database query analysis, index changes and bundle-size
+checks. The goal is to measure behaviour instead of guessing, and to keep a
+before-and-after record for each change.
 
----
+## Folder layout
 
-##  Folder Structure
-
-```
+```text
 performance-docs/
-├── README.md          ← You are here
-├── phase-2/           ← React projects (ongoing)
-│   └── ...
-├── phase-3/           ← Next.js projects (upcoming)
-│   └── ...
+├── README.md
+└── phase-2/
+    ├── 01-TaskManager/
+    │   ├── 01-project-Overview.md
+    │   ├── backend_final.md
+    │   ├── task-results.md
+    │   └── tests/
+    └── 02-auth-system/
+        ├── 01-project-Overview.md
+        ├── 02-load-test-results.md
+        └── 03-db-query-analysis.md
 ```
 
-> **Note:** As new phases are added (Phase 4 — AWS, Phase 5 — and beyond), their folders will be added here as well.
+## What is measured
 
----
+### 1. Load testing
 
-##  What Do We Test?
+Tools: k6, with the scripts kept next to each project.
 
-For every project, we measure **4 things**:
+Scenarios used during the Task Manager tests:
 
-### 1.  Load Testing — How Many Users Can It Handle?
-We check what happens when a large number of users access the application at the same time:
-- **Target:** Stay stable under 100 concurrent users
-- **Acceptable response time:** Under 200ms
-- **Tool:** [k6](https://k6.io/) (free & open source)
+| Scenario | Virtual users | Purpose |
+| --- | --- | --- |
+| Baseline | 10 | Confirm the API is stable under light traffic |
+| Normal | 50 | Check response time under expected use |
+| Target | 100 | Measure the intended capacity |
+| Stress | 200 or more | Find the point where the service degrades |
 
-```
-Scenario A →  10 users  → Application must be perfectly stable
-Scenario B →  50 users  → Response time must stay under 200ms
-Scenario C → 100 users  → Maximum target — this is our benchmark
-Scenario D → 200+ users → Stress test — see where it breaks
-```
+Metrics recorded:
 
-### 2.  Database Query Optimization
-Slow database queries are the biggest cause of a slow application. We:
-- Identify slow queries
-- Diagnose them using `EXPLAIN ANALYZE`
-- Add indexes where needed
-- Compare Before & After response times
+- request duration (average, minimum, maximum, p95)
+- failed request rate
+- requests per second
+- server wait time versus receiving time
 
-**Target:** No query should take longer than 50ms
+The results are stored in each project's `tests/load` folder with the k6 summary
+and any screenshots that were captured.
 
-### 3.  Bundle Size & Module Performance
-In React/Next.js, a larger bundle means slower loading. We check:
-- Total JS bundle size
-- Where lazy loading has been applied
-- Whether code splitting is working effectively
-- Lighthouse score (Performance, Accessibility, SEO)
+### 2. Database query analysis
 
-**Target:** Lighthouse Performance score of 85+
+For each slow query:
 
-### 4.  Testing Coverage
-We test at three levels:
+1. Record the query and the collection size.
+2. Run `explain("executionStats")`.
+3. Check the number of documents examined versus returned.
+4. Add or adjust an index.
+5. Repeat the measurement and record the difference.
 
-| Test Type         | Tool                | What It Tests 
-|-----------        |------               |---------------
-| Unit Tests        | Vitest / Jest       | Individual functions & components 
-| Integration       | Supertest           | API endpoints 
-| E2E | Playwright  | Complete user flows |
+The Task Manager analysis covers the task-by-user and user-by-email lookups. The
+Authentication System analysis covers login and user listing queries.
 
-**Target:** 70%+ test coverage on core features
+### 3. Bundle size
 
----
+React production builds are inspected for:
 
-##  Overall Benchmark Targets
+- total JavaScript and CSS size,
+- the largest chunks,
+- whether route-level lazy loading is working,
+- opportunities for code splitting.
 
-| Metric                | Minimum Acceptable | Good     | Excellent 
-|--------               |--------------------|------    |-----------
-| Concurrent Users      | 50                 | 100      | 200+ 
-| API Response Time     | < 500ms            | < 200ms  | < 100ms 
-| Page Load Time        | < 3s               | < 1.5s   | < 1s 
-| Lighthouse Score      | 70+                | 85+      | 95+ 
-| Test Coverage         | 50%                | 70%      | 90%+ 
-| Bundle Size (JS)      | < 500KB            | < 300KB  | < 150KB 
+### 4. Test coverage
 
----
+The Blog Platform has a Jest unit suite. The other projects use manual API
+checks and build verification. This folder records the checks that were run; it
+does not claim coverage that does not exist.
 
-##  Phases Overview
+## Record format
 
-###  Phase 1 — Vanilla JS (HTML, CSS, JavaScript)
-No performance docs — this phase was purely for learning fundamentals. All projects were static pages with no backend.
+Each result document should contain:
 
-###  Phase 2 — React (Current & Ongoing)
-Optimization docs for React projects can be found here:
- [`phase-2/`](./phase-2/)
+- date and environment,
+- command used to run the test,
+- test data size,
+- raw metrics,
+- interpretation,
+- any change made as a result.
 
-Focus areas:
-- Component re-render optimization (React.memo, useMemo, useCallback)
-- API call caching
-- Bundle size reduction
-- Load testing results
+## Current status
 
-###  Phase 3 — Next.js (Upcoming)
-Docs for Next.js projects will be added here:
- [`phase-3/`](./phase-3/)
+| Project | Load test | Query analysis | Bundle check | Automated tests |
+| --- | --- | --- | --- | --- |
+| Task Manager | Recorded | Recorded | Build verified | No |
+| Authentication System | Recorded | Recorded | Build verified | No |
+| Blog Platform | Not recorded | Not recorded | Build verified | Unit tests |
+| Recipe App | Not recorded | Not recorded | Build verified | No |
+| Movie Browser | Not recorded | Not recorded | Build verified | No |
+| Notes App | Not recorded | Not recorded | Build verified | No |
+| Chat App | Not recorded | Not recorded | Build verified | No |
+| Social Media Chat | Not recorded | Not recorded | Build verified | No |
 
-Focus areas:
-- SSR vs SSG vs ISR comparison
-- Server Components performance
-- Image optimization (next/image)
-- Edge functions vs serverless latency
+## Reproducing a load test
 
----
+```bash
+# Start the API and MongoDB first
+cd Phase-2/1-TaskManager/backend
+npm run dev
 
-##  Tools We Use
-
-| Tool                    | Purpose                                 | Link | Status |
-|------                   |---------                                |-------|--------|
-| k6                      | Load testing                            | [k6.io](https://k6.io) |  Active |
-| Lighthouse              | Performance audit                       | Chrome DevTools (built-in) |  Active |
-| Webpack Bundle Analyzer | Bundle size analysis                    | [npm](https://www.npmjs.com/package/webpack-bundle-analyzer) |  Active 
-| Vitest | Unit testing   | [vitest.dev](https://vitest.dev)        |  Active 
-| Playwright | E2E testing| [playwright.dev](https://playwright.dev)|  Active 
-| React DevTools Profiler | Component performance | Chrome extension|  Active 
-
-> **Note:** This tools list will be updated as the project grows. If a new tool is adopted in any phase, it will be added here with its purpose, link, and the phase it was introduced in.
-
----
-
-##  How to Read These Docs
-
-Inside each phase folder, every project has its own markdown file:
-
-```
-phase-2/
-├── 01-todo-app.md
-├── 02-auth-system.md
-└── 03-dashboard.md
+# In another terminal
+cd Phase-2/1-TaskManager/backend/tests
+k6 run k6-load-test.js
 ```
 
-Each file follows this structure:
-
-1. **Project Overview** — What was built
-2. **Load Test Results** — How many users it handled
-3. **DB Query Analysis** — Before/After query time
-4. **Bundle Size Report** — Lighthouse score
-5. **Test Coverage** — What was tested
-6. **Key Learnings** — What was learned during optimization
-7. **What's Next** — What can still be improved
-
----
-
-##  Why This Matters
-
-> A junior developer writes code.
-> A mid-level developer writes working code.
-> A senior developer writes **fast, tested, and scalable** code — and keeps **proof** of it.
-
-This documentation is that proof. 
-
----
-
-*Last Updated: June 2026 | Maintained by [@sadibaba](https://github.com/sadibaba)*
+The k6 scripts use `http://localhost:5000` and create test users. Run them
+against a development database, never against data you need to keep.

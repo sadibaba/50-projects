@@ -1,95 +1,96 @@
+import mongoose from "mongoose";
 import Note from "../models/Note.js";
+import Tag from "../models/Tag.js";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
-// @desc    Create new note
-// @route   POST /api/notes
-export const createNote = async (req, res) => {
+const ownedNote = async (id, userId) => {
+  const note = await Note.findOne({ _id: id, user: userId }).populate("tags");
+  if (!note) throw new ApiError(404, "Note not found");
+  return note;
+};
+
+const cleanTags = async (tags, userId) => {
+  if (!Array.isArray(tags)) return undefined;
+
+  const ids = tags.filter((tag) => mongoose.isValidObjectId(tag));
+  const owned = await Tag.find({ _id: { $in: ids }, user: userId }).select("_id");
+  return owned.map((tag) => tag._id);
+};
+
+export const createNote = asyncHandler(async (req, res) => {
   const { title, content, tags } = req.body;
 
-  try {
-    const note = await Note.create({
-      title,
-      content,
+  if (!title || !String(title).trim()) {
+    throw new ApiError(400, "Note title is required");
+  }
+  if (!content || !String(content).trim()) {
+    throw new ApiError(400, "Note content is required");
+  }
+
+  const note = await Note.create({
+    title: String(title).trim(),
+    content,
+    user: req.user._id,
+    tags: (await cleanTags(tags, req.user._id)) || [],
+  });
+
+  res.status(201).json(await note.populate("tags"));
+});
+
+export const getNotes = asyncHandler(async (req, res) => {
+  const filter = { user: req.user._id };
+
+  if (req.query.tag) {
+    const tag = await Tag.findOne({
+      name: String(req.query.tag),
       user: req.user._id,
-      tags,
     });
-
-    res.status(201).json(note);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (!tag) return res.json([]);
+    filter.tags = tag._id;
   }
-};
 
-// @desc    Get all notes (optionally filter by tag)
-// @route   GET /api/notes
-export const getNotes = async (req, res) => {
-  const { tag } = req.query;
-
-  try {
-    let notes;
-    if (tag) {
-      notes = await Note.find({ user: req.user._id, tags: tag }).populate("tags");
-    } else {
-      notes = await Note.find({ user: req.user._id }).populate("tags");
-    }
-
-    res.json(notes);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (req.query.search) {
+    filter.$or = [
+      { title: { $regex: String(req.query.search), $options: "i" } },
+      { content: { $regex: String(req.query.search), $options: "i" } },
+    ];
   }
-};
 
-// @desc    Get single note
-// @route   GET /api/notes/:id
-export const getNoteById = async (req, res) => {
-  try {
-    const note = await Note.findById(req.params.id).populate("tags");
+  const notes = await Note.find(filter)
+    .populate("tags")
+    .sort({ updatedAt: -1 });
 
-    if (note && note.user.toString() === req.user._id.toString()) {
-      res.json(note);
-    } else {
-      res.status(404).json({ message: "Note not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  res.json(notes);
+});
 
-// @desc    Update note
-// @route   PUT /api/notes/:id
-export const updateNote = async (req, res) => {
+export const getNoteById = asyncHandler(async (req, res) => {
+  res.json(await ownedNote(req.params.id, req.user._id));
+});
+
+export const updateNote = asyncHandler(async (req, res) => {
+  const note = await ownedNote(req.params.id, req.user._id);
   const { title, content, tags } = req.body;
 
-  try {
-    const note = await Note.findById(req.params.id);
-
-    if (note && note.user.toString() === req.user._id.toString()) {
-      note.title = title || note.title;
-      note.content = content || note.content;
-      note.tags = tags || note.tags;
-
-      const updatedNote = await note.save();
-      res.json(updatedNote);
-    } else {
-      res.status(404).json({ message: "Note not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (title !== undefined) {
+    if (!String(title).trim()) throw new ApiError(400, "Title cannot be empty");
+    note.title = String(title).trim();
   }
-};
 
-// @desc    Delete note
-// @route   DELETE /api/notes/:id
-export const deleteNote = async (req, res) => {
-  try {
-    const note = await Note.findById(req.params.id);
-
-    if (note && note.user.toString() === req.user._id.toString()) {
-      await note.deleteOne();
-      res.json({ message: "Note removed" });
-    } else {
-      res.status(404).json({ message: "Note not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (content !== undefined) {
+    if (!String(content).trim()) throw new ApiError(400, "Content cannot be empty");
+    note.content = content;
   }
-};
+
+  if (tags !== undefined) {
+    note.tags = (await cleanTags(tags, req.user._id)) || [];
+  }
+
+  await note.save();
+  res.json(await note.populate("tags"));
+});
+
+export const deleteNote = asyncHandler(async (req, res) => {
+  const note = await ownedNote(req.params.id, req.user._id);
+  await note.deleteOne();
+  res.json({ message: "Note removed" });
+});

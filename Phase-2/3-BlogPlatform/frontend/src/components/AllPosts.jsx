@@ -181,6 +181,14 @@ const AllPosts = () => {
 
   const isAdmin = user?.role === 'admin';
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('create') === '1' && isAdmin) {
+      setShowCreateModal(true);
+      navigate('/posts', { replace: true });
+    }
+  }, [isAdmin, navigate]);
+
   return (
     <div ref={containerRef} className="min-h-screen bg-primary pt-32 pb-20 relative overflow-hidden">
       {/* ============ CINEMATIC BACKGROUND (theme-aware) ============ */}

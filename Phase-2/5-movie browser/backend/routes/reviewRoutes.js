@@ -1,9 +1,17 @@
 import express from "express";
-import { addReview, getReviews } from "../controllers/reviewController.js";
+import {
+  addReview,
+  getReviews,
+  deleteReview,
+} from "../controllers/reviewController.js";
+import clientId from "../middlewares/clientId.js";
 
 const router = express.Router();
 
-router.post("/", addReview);
+router.use(clientId);
+
+router.route("/").post(addReview);
 router.get("/:movieId", getReviews);
+router.delete("/:id", deleteReview);
 
 export default router;

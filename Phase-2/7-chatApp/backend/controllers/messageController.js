@@ -1,46 +1,54 @@
+import mongoose from "mongoose";
 import Message from "../models/Message.js";
+import User from "../models/User.js";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
-export const sendMessage = async (req, res) => {
-  try {
-    console.log("Send message request body:", req.body);
-    const { sender, receiver, text } = req.body;
-    
-    // Validate required fields
-    if (!sender || !receiver || !text) {
-      return res.status(400).json({ error: "Sender, receiver, and text are required" });
-    }
+export const sendMessage = asyncHandler(async (req, res) => {
+  const { receiver, text } = req.body;
+  const sender = req.user.id;
 
-    const message = new Message({ sender, receiver, text });
-    await message.save();
-    
-    console.log("Message saved:", message._id);
-    res.status(201).json(message);
-  } catch (err) {
-    console.error("Send message error:", err);
-    res.status(500).json({ error: err.message || "Server error" });
+  if (!receiver || !text || !String(text).trim()) {
+    throw new ApiError(400, "Receiver and message text are required");
   }
-};
 
-export const getMessages = async (req, res) => {
-  try {
-    const { sender, receiver } = req.query;
-    console.log("Get messages for sender:", sender, "receiver:", receiver);
-    
-    if (!sender || !receiver) {
-      return res.status(400).json({ error: "Sender and receiver are required" });
-    }
-
-    const messages = await Message.find({
-      $or: [
-        { sender, receiver },
-        { sender: receiver, receiver: sender }
-      ]
-    }).sort({ createdAt: 1 });
-    
-    console.log(`Found ${messages.length} messages`);
-    res.json(messages);
-  } catch (err) {
-    console.error("Get messages error:", err);
-    res.status(500).json({ error: err.message || "Server error" });
+  if (!mongoose.isValidObjectId(receiver)) {
+    throw new ApiError(400, "Invalid receiver");
   }
-};
+
+  if (receiver === sender) {
+    throw new ApiError(400, "You cannot send a message to yourself");
+  }
+
+  const recipient = await User.findById(receiver).select("_id");
+  if (!recipient) throw new ApiError(404, "Receiver not found");
+
+  const message = await Message.create({
+    sender,
+    receiver,
+    text: String(text).trim().slice(0, 4000),
+  });
+
+  res.status(201).json(message);
+});
+
+export const getMessages = asyncHandler(async (req, res) => {
+  const { receiver } = req.query;
+  const sender = req.user.id;
+
+  if (!receiver) {
+    throw new ApiError(400, "A receiver id is required");
+  }
+
+  if (!mongoose.isValidObjectId(receiver)) {
+    throw new ApiError(400, "Invalid receiver");
+  }
+
+  const messages = await Message.find({
+    $or: [
+      { sender, receiver },
+      { sender: receiver, receiver: sender },
+    ],
+  }).sort({ createdAt: 1 });
+
+  res.json(messages);
+});

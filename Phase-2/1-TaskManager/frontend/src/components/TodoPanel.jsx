@@ -67,7 +67,6 @@ export default function TodoPanel({ todos, setTodos, activeFilter }) {
           title="Unplanned"
           droppableId="unplanned"
           todos={filteredTodos.filter((t) => t.category === "unplanned")}
-          todos={todos.filter((t) => t.category === "unplanned")}
           toggleDone={toggleDone}
           deleteTodo={deleteTodo}
         />

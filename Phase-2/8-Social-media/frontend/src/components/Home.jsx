@@ -226,7 +226,11 @@ function Home() {
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-white/10">
                 <span className="text-gray-400">Member Since</span>
-                <span className="text-white">{new Date().toLocaleDateString()}</span>
+                <span className="text-white">
+                  {currentUser?.createdAt
+                    ? new Date(currentUser.createdAt).toLocaleDateString()
+                    : "Not available"}
+                </span>
               </div>
               <div className="flex justify-between py-2 border-b border-white/10">
                 <span className="text-gray-400">Status</span>

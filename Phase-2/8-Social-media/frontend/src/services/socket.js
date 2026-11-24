@@ -4,7 +4,8 @@ let socket = null
 
 export const connectSocket = (token) =>{
     if(!token) return null
-    socket = io('http://localhost:3000',{
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000'
+    socket = io(socketUrl,{
         auth:{token},
     })
     return socket

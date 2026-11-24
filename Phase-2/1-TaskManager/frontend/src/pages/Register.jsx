@@ -1,7 +1,7 @@
 import { useState } from "react";
 import AuthForm from "../components/authForm";
 
-export default function Register() {
+export default function Register({ setToken }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -13,6 +13,7 @@ export default function Register() {
       type="register"
       formData={formData}
       setFormData={setFormData}
+      setToken={setToken}
     />
   );
 }

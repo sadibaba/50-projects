@@ -34,12 +34,15 @@ function Chat({ token, setToken }) {
   // Connect to socket
   useEffect(() => {
     if (currentUser) {
-      socketRef.current = io('http://localhost:5000', {
-        transports: ['websocket', 'polling']
+      const socketUrl =
+        import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+      socketRef.current = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        auth: { token },
       });
 
-      socketRef.current.on('connect', () => {
-        console.log('Socket connected');
+      socketRef.current.on('connect_error', (error) => {
+        console.error('Socket connection failed:', error.message);
       });
 
       socketRef.current.on('receiveMessage', (messageData) => {
@@ -53,20 +56,18 @@ function Chat({ token, setToken }) {
       return () => {
         if (socketRef.current) {
           socketRef.current.disconnect();
+          socketRef.current = null;
         }
       };
     }
-  }, [currentUser, selectedUser]);
+  }, [currentUser, selectedUser, token]);
 
   // Join room when user is selected
   useEffect(() => {
     if (selectedUser && currentUser && socketRef.current) {
-      const roomId = [currentUser.id, selectedUser._id].sort().join('_');
       socketRef.current.emit('joinRoom', {
-        senderId: currentUser.id,
-        receiverId: selectedUser._id
+        receiverId: selectedUser._id,
       });
-      console.log(`Joined room: ${roomId}`);
     }
   }, [selectedUser, currentUser]);
 
@@ -127,7 +128,10 @@ function Chat({ token, setToken }) {
     setNewMessage('');
 
     try {
-      const savedMessage = await messageService.sendMessage(messageData);
+      const savedMessage = await messageService.sendMessage({
+        receiver: selectedUser._id,
+        text: messageData.text,
+      });
       // Update with real message data
       setMessages(prev => prev.map(msg => 
         msg._id === tempId ? savedMessage : msg

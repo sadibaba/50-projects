@@ -1,47 +1,81 @@
+import http from "http";
 import dotenv from "dotenv";
+import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 import app from "./app.js";
 import connectDB from "./config/db.js";
-import { createServer } from "http";
-import { Server } from "socket.io";
 
 dotenv.config();
-connectDB();
 
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
 
-// HTTP server wrap
-const httpServer = createServer(app);
+const missing = ["MONGO_URI", "JWT_SECRET"].filter((key) => !process.env[key]);
+if (missing.length) {
+  console.error(`Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
+}
 
-// Socket.IO server
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*", // React frontend ka URL dalna better hai
-    methods: ["GET", "POST"]
-  }
-});
+const start = async () => {
+  await connectDB();
 
-// Socket.IO events
-io.on("connection", (socket) => {
-  console.log("⚡ New client connected:", socket.id);
-
-  // join room (conversation)
-  socket.on("joinRoom", ({ senderId, receiverId }) => {
-    const roomId = [senderId, receiverId].sort().join("_");
-    socket.join(roomId);
-    console.log(`User joined room: ${roomId}`);
+  const httpServer = http.createServer(app);
+  const io = new Server(httpServer, {
+    cors: { origin: allowedOrigins, credentials: true },
   });
 
-  // send message
-  socket.on("sendMessage", (messageData) => {
-    const roomId = [messageData.sender, messageData.receiver].sort().join("_");
-    io.to(roomId).emit("receiveMessage", messageData);
+  io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error("Authentication required"));
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.userId = decoded.id;
+      next();
+    } catch {
+      next(new Error("Invalid token"));
+    }
   });
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
-  });
-});
+  const roomFor = (a, b) => [a, b].sort().join("_");
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  io.on("connection", (socket) => {
+    socket.join(`user:${socket.userId}`);
+
+    socket.on("joinRoom", ({ receiverId }) => {
+      if (!receiverId) return;
+      socket.join(roomFor(socket.userId, receiverId));
+    });
+
+    socket.on("sendMessage", (message) => {
+      if (!message || String(message.sender) !== String(socket.userId)) return;
+      if (!message.receiver) return;
+
+      const room = roomFor(socket.userId, message.receiver);
+      socket.to(room).emit("receiveMessage", message);
+      io.to(`user:${message.receiver}`).emit("receiveMessage", message);
+    });
+
+    socket.on("disconnect", () => {});
+  });
+
+  httpServer.listen(PORT, () => {
+    console.log(`Chat API listening on http://localhost:${PORT}`);
+  });
+
+  const shutdown = (signal) => {
+    console.log(`${signal} received, closing server`);
+    io.close();
+    httpServer.close(() => process.exit(0));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+};
+
+start().catch((error) => {
+  console.error("Failed to start server:", error.message);
+  process.exit(1);
 });

@@ -1,74 +1,129 @@
-import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import Note from "../models/Note.js";
+import Tag from "../models/Tag.js";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
-// Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
-};
+const generateToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
-// @desc    Register new user
-// @route   POST /api/users/register
-export const registerUser = async (req, res, next) => {
+const publicUser = (user) => ({
+  _id: user._id,
+  username: user.username,
+  email: user.email,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+});
+
+export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    const user = await User.create({ username, email, password });
-
-    res.status(201).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      token: generateToken(user._id),
-    });
-  } catch (error) {
-    next(error); // ✅ errorMiddleware handle karega
+  if (!username || !email || !password) {
+    throw new ApiError(400, "Username, email and password are required");
   }
-};
 
-// @desc    Login user
-// @route   POST /api/users/login
-export const loginUser = async (req, res, next) => {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new ApiError(400, "Enter a valid email address");
+  }
+
+  if (String(password).length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters");
+  }
+
+  const existing = await User.findOne({
+    $or: [{ email: email.toLowerCase() }, { username: username.trim() }],
+  });
+
+  if (existing) {
+    throw new ApiError(
+      409,
+      existing.email === email.toLowerCase()
+        ? "An account with this email already exists"
+        : "This username is already taken"
+    );
+  }
+
+  const user = await User.create({
+    username: username.trim(),
+    email: email.toLowerCase().trim(),
+    password,
+  });
+
+  res.status(201).json({ ...publicUser(user), token: generateToken(user._id) });
+});
+
+export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
-    }
-  } catch (error) {
-    next(error);
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
   }
-};
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-export const getUserProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user._id);
+  const user = await User.findOne({ email: email.toLowerCase() }).select(
+    "+password"
+  );
 
-    if (user) {
-      res.json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-      });
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    next(error);
+  if (!user || !(await user.matchPassword(password))) {
+    throw new ApiError(401, "Invalid email or password");
   }
-};
+
+  res.json({ ...publicUser(user), token: generateToken(user._id) });
+});
+
+export const getUserProfile = asyncHandler(async (req, res) => {
+  res.json(publicUser(req.user));
+});
+
+export const updateProfile = asyncHandler(async (req, res) => {
+  const { username } = req.body;
+
+  if (!username || !String(username).trim()) {
+    throw new ApiError(400, "Username cannot be empty");
+  }
+
+  const taken = await User.findOne({
+    username: String(username).trim(),
+    _id: { $ne: req.user._id },
+  });
+
+  if (taken) throw new ApiError(409, "This username is already taken");
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { username: String(username).trim() },
+    { new: true, runValidators: true }
+  );
+
+  res.json(publicUser(user));
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ApiError(400, "Current and new password are required");
+  }
+
+  if (String(newPassword).length < 8) {
+    throw new ApiError(400, "Password must be at least 8 characters");
+  }
+
+  const user = await User.findById(req.user._id).select("+password");
+  if (!(await user.matchPassword(currentPassword))) {
+    throw new ApiError(401, "Current password is incorrect");
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  res.json({ message: "Password changed successfully" });
+});
+
+export const deleteAccount = asyncHandler(async (req, res) => {
+  await Promise.all([
+    Note.deleteMany({ user: req.user._id }),
+    Tag.deleteMany({ user: req.user._id }),
+  ]);
+  await User.findByIdAndDelete(req.user._id);
+  res.json({ message: "Account and all notes were deleted" });
+});

@@ -1,15 +1,19 @@
 import jwt from "jsonwebtoken";
+import { ApiError } from "../utils/http.js";
 
-export default (req, res, next) => {
-  const token = req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) return res.status(401).json({ msg: "No token, auth denied" });
+export default function auth(req, res, next) {
+  const header = req.header("Authorization") || "";
+  const [scheme, token] = header.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    return next(new ApiError(401, "Authentication required"));
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.id;  
-
+    req.userId = decoded.id;
     next();
-  } catch (err) {
-    res.status(400).json({ msg: "Token invalid" });
+  } catch {
+    next(new ApiError(401, "Session is invalid or has expired"));
   }
-};
+}

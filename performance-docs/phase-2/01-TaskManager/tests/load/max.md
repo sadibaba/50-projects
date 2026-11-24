@@ -19,10 +19,10 @@ GitHub\50-projects\Phase-2\1-TaskManager\backend> k6 run k6-find-max-users.js
   █ THRESHOLDS
 
     http_req_duration
-    ✗ 'p(95)<500' p(95)=3.88s
+     'p(95)<500' p(95)=3.88s
 
     http_req_failed
-    ✓ 'rate<0.05' rate=0.00%
+     'rate<0.05' rate=0.00%
 
 
   █ TOTAL RESULTS
@@ -31,13 +31,13 @@ GitHub\50-projects\Phase-2\1-TaskManager\backend> k6 run k6-find-max-users.js
     checks_succeeded...: 99.48% 5635 out of 5664
     checks_failed......: 0.51%  29 out of 5664
 
-    ✓ Register
-    ✓ Create
-    ✓ Get
-    ✗ Fast
-      ↳  96% — ✓ 915 / ✗ 29
-    ✓ Update
-    ✓ Delete
+     Register
+     Create
+     Get
+     Fast
+      ↳  96% —  915 /  29
+     Update
+     Delete
 
     HTTP
     http_req_duration..............: avg=600.79ms min=536.9µs med=26.35ms max=6s    p(90)=2.96s p(95)=3.88s
@@ -59,7 +59,7 @@ GitHub\50-projects\Phase-2\1-TaskManager\backend> k6 run k6-find-max-users.js
 
 
 running (2m40.7s), 00/50 VUs, 944 complete and 0 interrupted iterations
-default ✓ [======================================] 00/50 VUs  2m40s
+default  [======================================] 00/50 VUs  2m40s
 
 
 30 users par fail (p95 3.88s), max capacity = 20-25 users

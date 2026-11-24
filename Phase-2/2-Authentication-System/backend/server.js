@@ -1,23 +1,36 @@
+import http from "http";
 import dotenv from "dotenv";
 import app from "./app.js";
 import connectDB from "./database/db.js";
-import  cors from 'cors';
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5000'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.use(cors({
-  origin: true, 
-  credentials: true
-}));
+
 dotenv.config();
 
-connectDB(); 
-
 const PORT = process.env.PORT || 5000;
+const missing = ["MONGO_URI", "JWT_SECRET"].filter((key) => !process.env[key]);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+if (missing.length) {
+  console.error(`Missing required environment variables: ${missing.join(", ")}`);
+  process.exit(1);
+}
+
+const start = async () => {
+  await connectDB();
+
+  const server = http.createServer(app);
+  server.listen(PORT, () => {
+    console.log(`Authentication API listening on http://localhost:${PORT}`);
+  });
+
+  const shutdown = (signal) => {
+    console.log(`${signal} received, closing server`);
+    server.close(() => process.exit(0));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+};
+
+start().catch((error) => {
+  console.error("Failed to start server:", error.message);
+  process.exit(1);
 });

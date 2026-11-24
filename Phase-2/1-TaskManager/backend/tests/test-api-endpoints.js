@@ -1,96 +1,84 @@
-import axios from 'axios';
+const BASE_URL = "http://localhost:5000/api";
 
-const BASE_URL = 'http://localhost:5000/api';
-let token = '';
+let token = "";
+let email = "";
 
-async function testEndpoints() {
-  console.log('========================================');
-  console.log('  API ENDPOINT PERFORMANCE TEST');
-  console.log('========================================\n');
-
-  // 1. REGISTER
-  console.log('📊 1. POST /users/register');
-  const start1 = Date.now();
-  const regRes = await axios.post(`${BASE_URL}/users/register`, {
-    name: 'TestUser',
-    email: `test_${Date.now()}@example.com`,
-    password: 'password123',
+const request = async (path, options = {}) => {
+  const response = await fetch(`${BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
   });
-  const time1 = Date.now() - start1;
-  console.log(`   Status: ${regRes.status}`);
-  console.log(`   Time: ${time1}ms`);
-  console.log(`   ✅ ${time1 < 200 ? 'FAST' : 'SLOW'}\n`);
-  token = regRes.data.token;
 
-  // 2. LOGIN
-  console.log('📊 2. POST /users/login');
-  const start2 = Date.now();
-  const loginRes = await axios.post(`${BASE_URL}/users/login`, {
-    email: 'test@example.com',
-    password: 'password123',
-  });
-  const time2 = Date.now() - start2;
-  console.log(`   Status: ${loginRes.status}`);
-  console.log(`   Time: ${time2}ms`);
-  console.log(`   ✅ ${time2 < 200 ? 'FAST' : 'SLOW'}\n`);
+  const body = await response.json().catch(() => ({}));
+  return { status: response.status, body };
+};
 
-  // 3. CREATE TASK (with auth)
-  console.log('📊 3. POST /tasks (with auth)');
-  const start3 = Date.now();
-  const taskRes = await axios.post(
-    `${BASE_URL}/tasks`,
-    { title: 'Test API', description: 'Testing', status: 'pending' },
-    { headers: { Authorization: `Bearer ${token}` } }
+const timed = async (label, fn) => {
+  const startedAt = Date.now();
+  const result = await fn();
+  console.log(`${label}: ${result.status} in ${Date.now() - startedAt}ms`);
+  return result;
+};
+
+async function run() {
+  email = `test_${Date.now()}@example.com`;
+
+  const register = await timed("POST /users/register", () =>
+    request("/users/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Test User",
+        email,
+        password: "password123",
+      }),
+    })
   );
-  const time3 = Date.now() - start3;
-  console.log(`   Status: ${taskRes.status}`);
-  console.log(`   Time: ${time3}ms`);
-  console.log(`   ✅ ${time3 < 200 ? 'FAST' : 'SLOW'}\n`);
-  const taskId = taskRes.data._id;
+  token = register.body.token;
 
-  // 4. GET TASKS
-  console.log('📊 4. GET /tasks');
-  const start4 = Date.now();
-  const getRes = await axios.get(`${BASE_URL}/tasks`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const time4 = Date.now() - start4;
-  console.log(`   Status: ${getRes.status}`);
-  console.log(`   Time: ${time4}ms`);
-  console.log(`   ✅ ${time4 < 200 ? 'FAST' : 'SLOW'}`);
-  console.log(`   Tasks: ${getRes.data.length}\n`);
-
-  // 5. UPDATE TASK
-  console.log('📊 5. PUT /tasks/:id');
-  const start5 = Date.now();
-  const updateRes = await axios.put(
-    `${BASE_URL}/tasks/${taskId}`,
-    { status: 'completed' },
-    { headers: { Authorization: `Bearer ${token}` } }
+  await timed("POST /users/login", () =>
+    request("/users/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password: "password123" }),
+    })
   );
-  const time5 = Date.now() - start5;
-  console.log(`   Status: ${updateRes.status}`);
-  console.log(`   Time: ${time5}ms`);
-  console.log(`   ✅ ${time5 < 200 ? 'FAST' : 'SLOW'}\n`);
 
-  // 6. DELETE TASK
-  console.log('📊 6. DELETE /tasks/:id');
-  const start6 = Date.now();
-  const delRes = await axios.delete(`${BASE_URL}/tasks/${taskId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const time6 = Date.now() - start6;
-  console.log(`   Status: ${delRes.status}`);
-  console.log(`   Time: ${time6}ms`);
-  console.log(`   ✅ ${time6 < 200 ? 'FAST' : 'SLOW'}\n`);
+  const auth = { Authorization: `Bearer ${token}` };
 
-  // SUMMARY
-  console.log('========================================');
-  console.log('  SUMMARY');
-  console.log('========================================');
-  const avg = (time1 + time2 + time3 + time4 + time5 + time6) / 6;
-  console.log(`Average Response: ${avg.toFixed(0)}ms`);
-  console.log(`✅ ${avg < 200 ? 'GOOD' : 'NEEDS OPTIMIZATION'}`);
+  const created = await timed("POST /tasks", () =>
+    request("/tasks", {
+      method: "POST",
+      headers: auth,
+      body: JSON.stringify({
+        title: "API test task",
+        description: "Created by tests/test-api-endpoints.js",
+        priority: "medium",
+      }),
+    })
+  );
+
+  await timed("GET /tasks", () => request("/tasks", { headers: auth }));
+
+  const taskId = created.body._id;
+
+  if (taskId) {
+    await timed("PUT /tasks/:id", () =>
+      request(`/tasks/${taskId}`, {
+        method: "PUT",
+        headers: auth,
+        body: JSON.stringify({ status: "completed" }),
+      })
+    );
+
+    await timed("DELETE /tasks/:id", () =>
+      request(`/tasks/${taskId}`, { method: "DELETE", headers: auth })
+    );
+  }
 }
 
-testEndpoints().catch(console.error);
+run().catch((error) => {
+  console.error("API test failed:", error.message);
+  process.exit(1);
+});

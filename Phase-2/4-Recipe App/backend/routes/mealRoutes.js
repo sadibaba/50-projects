@@ -1,92 +1,94 @@
 import express from "express";
 import axios from "axios";
+import { ApiError, asyncHandler } from "../utils/http.js";
 
 const router = express.Router();
 const BASE_URL = "https://www.themealdb.com/api/json/v1/1";
 
-// Search meal by name
-router.get("/search", async (req, res) => {
+const fetchMealDb = async (path, params = {}) => {
   try {
-    const { q } = req.query;
-    const response = await axios.get(`${BASE_URL}/search.php?s=${q}`);
-    res.json(response.data);
+    const response = await axios.get(`${BASE_URL}/${path}`, {
+      params,
+      timeout: 10000,
+    });
+    return response.data;
   } catch (error) {
-    res.status(500).json({ message: "Error fetching meals" });
+    throw new ApiError(
+      502,
+      "TheMealDB is not reachable right now. Try again in a moment."
+    );
   }
-});
+};
 
-// Search meal by first letter
-router.get("/letter", async (req, res) => {
-  try {
-    const { f } = req.query;
-    const response = await axios.get(`${BASE_URL}/search.php?f=${f}`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching meals" });
+const requireParam = (value, name) => {
+  if (!value || !String(value).trim()) {
+    throw new ApiError(400, `${name} is required`);
   }
-});
+  return String(value).trim();
+};
 
-// Lookup meal by ID
-router.get("/lookup/:id", async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/lookup.php?i=${req.params.id}`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching meal" });
-  }
-});
+router.get(
+  "/search",
+  asyncHandler(async (req, res) => {
+    const q = requireParam(req.query.q, "Search query");
+    res.json(await fetchMealDb("search.php", { s: q }));
+  })
+);
 
-// Random meal
-router.get("/random", async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/random.php`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching random meal" });
-  }
-});
+router.get(
+  "/letter",
+  asyncHandler(async (req, res) => {
+    const f = requireParam(req.query.f, "Letter");
+    if (!/^[a-zA-Z]$/.test(f)) {
+      throw new ApiError(400, "Letter must be a single character");
+    }
+    res.json(await fetchMealDb("search.php", { f }));
+  })
+);
 
-// List categories
-router.get("/categories", async (req, res) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/categories.php`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching categories" });
-  }
-});
+router.get(
+  "/lookup/:id",
+  asyncHandler(async (req, res) => {
+    res.json(await fetchMealDb("lookup.php", { i: req.params.id }));
+  })
+);
 
-// Filter by ingredient
-router.get("/filter/ingredient", async (req, res) => {
-  try {
-    const { i } = req.query;
-    const response = await axios.get(`${BASE_URL}/filter.php?i=${i}`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error filtering meals" });
-  }
-});
+router.get(
+  "/random",
+  asyncHandler(async (req, res) => {
+    res.json(await fetchMealDb("random.php"));
+  })
+);
 
-// Filter by category
-router.get("/filter/category", async (req, res) => {
-  try {
-    const { c } = req.query;
-    const response = await axios.get(`${BASE_URL}/filter.php?c=${c}`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error filtering meals" });
-  }
-});
+router.get(
+  "/categories",
+  asyncHandler(async (req, res) => {
+    res.json(await fetchMealDb("categories.php"));
+  })
+);
 
-// Filter by area
-router.get("/filter/area", async (req, res) => {
-  try {
-    const { a } = req.query;
-    const response = await axios.get(`${BASE_URL}/filter.php?a=${a}`);
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ message: "Error filtering meals" });
-  }
-});
+router.get(
+  "/filter/ingredient",
+  asyncHandler(async (req, res) => {
+    const i = requireParam(req.query.i, "Ingredient");
+    res.json(await fetchMealDb("filter.php", { i }));
+  })
+);
+
+router.get(
+  "/filter/category",
+  asyncHandler(async (req, res) => {
+    const c = requireParam(req.query.c, "Category");
+    res.json(await fetchMealDb("filter.php", { c }));
+  })
+);
+
+router.get(
+  "/filter/area",
+  asyncHandler(async (req, res) => {
+    const a = requireParam(req.query.a, "Area");
+    res.json(await fetchMealDb("filter.php", { a }));
+  })
+);
 
 export default router;

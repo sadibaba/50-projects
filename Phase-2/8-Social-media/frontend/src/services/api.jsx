@@ -86,7 +86,7 @@ export const getMessage = async (userId) =>{
 export const sendMessageAPI = async (receiverId,message) =>{
   try{
     const token = localStorage.getItem('token')
-    const res = await fetch(`${BASE_URL}/message`,{
+    const res = await fetch(`${BASE_URL}/messages`,{
       method:'POST',
       headers:{
         'Content-type':'application/json',

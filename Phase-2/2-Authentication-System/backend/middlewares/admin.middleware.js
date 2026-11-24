@@ -1,6 +1,8 @@
+import { ApiError } from "../utils/http.js";
+
 const adminMiddleware = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Admin access only" });
+  if (req.user?.role !== "admin") {
+    return next(new ApiError(403, "Administrator access required"));
   }
   next();
 };

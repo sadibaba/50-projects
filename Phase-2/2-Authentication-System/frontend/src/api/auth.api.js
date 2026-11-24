@@ -1,39 +1,27 @@
 import API from "./api";
 
-/* ===== Signup ===== */
-export const signup = (data) => {
-  return API.post("/auth/signup", data);
-};
+export const signup = (data) => API.post("/auth/signup", data);
 
-/* ===== Login ===== */
 export const login = async (data) => {
   const res = await API.post("/auth/login", data);
-
-  // token ko store karo
-  if (res.data.token) {
-    localStorage.setItem("token", res.data.token);
-  }
-
+  if (res.data.token) localStorage.setItem("token", res.data.token);
   return res;
 };
 
-/* ===== Logout ===== */
 export const logout = () => {
   localStorage.removeItem("token");
   return API.post("/auth/logout");
 };
 
-/* ===== Get Profile ===== */
-export const getProfile = () => {
-  return API.get("/auth/me");
-};
+export const getProfile = () => API.get("/auth/me");
 
-/* ===== Admin: Get All Users ===== */
-export const getAllUsers = () => {
-  return API.get("/auth/admin/users");
-};
+export const updateProfile = (data) => API.put("/auth/me", data);
 
-/* ===== Admin: Delete User ===== */
-export const deleteUser = (id) => {
-  return API.delete(`/auth/admin/users/${id}`);
-};
+export const changePassword = (data) => API.put("/auth/me/password", data);
+
+export const getAdminStats = () => API.get("/auth/admin/stats");
+
+export const getAllUsers = (params = {}) =>
+  API.get("/auth/admin/users", { params });
+
+export const deleteUser = (id) => API.delete(`/auth/admin/users/${id}`);

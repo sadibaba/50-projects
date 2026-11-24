@@ -498,63 +498,8 @@ export const uploadAvatar = async (file, retryCount = 0) => {
   }
 };
 
-// Follow/Unfollow endpoints
-export const followUser = async (userId) => {
-  try {
-    return await postData(`users/${userId}/follow`, {});
-  } catch (error) {
-    console.error('Follow user error:', error);
-    throw new Error(error.message || 'Failed to follow user');
-  }
-};
-
-export const unfollowUser = async (userId) => {
-  try {
-    return await postData(`users/${userId}/unfollow`, {});
-  } catch (error) {
-    console.error('Unfollow user error:', error);
-    throw new Error(error.message || 'Failed to unfollow user');
-  }
-};
-
-export const getFollowers = async (userId) => {
-  try {
-    return await getData(`users/${userId}/followers`);
-  } catch (error) {
-    console.error('Get followers error:', error);
-    throw error;
-  }
-};
-
-export const getFollowing = async (userId) => {
-  try {
-    return await getData(`users/${userId}/following`);
-  } catch (error) {
-    console.error('Get following error:', error);
-    throw error;
-  }
-};
-
-export const checkFollowing = async (userId) => {
-  try {
-    return await getData(`users/${userId}/is-following`);
-  } catch (error) {
-    console.error('Check following error:', error);
-    return { following: false };
-  }
-};
-
-
-
-export const getUserByUsername = async (username) => {
-  try {
-    return await getData(`users/by-username/${username}`);
-  } catch (error) {
-    console.error('Get user by username error:', error);
-    throw error;
-  }
-};
-
+// Follow, follower and public-profile endpoints are not part of the current
+// backend, so they are intentionally not exposed by this client.
 
 export const markTutorialSeen = async () => {
   try {
