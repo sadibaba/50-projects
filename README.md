@@ -17,7 +17,7 @@ and those are documented per project in this repository.
 | --- | --- | --- |
 | Phase 1 | Vanilla JavaScript, DOM, public APIs, localStorage | 13 projects |
 | Phase 2 | React, Express, MongoDB, REST APIs, authentication | 8 projects |
-| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress: 1 of 24 built, 23 planned, 1 extra project |
+| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress: 2 of 24 built, 22 planned, 1 extra project |
 | Phase 4 | AWS, Docker, microservices | 6 projects planned |
 
 ## Phase 1: Vanilla JavaScript
@@ -90,7 +90,7 @@ remain planned work and are not presented as complete.
 | # | Project | Core features | Stack | Status |
 | --- | --- | --- | --- | --- |
 | 27 | [Pinterest Clone / Pinboard](<Phase-3/1-PinterestClone/README.md>) | Pins, boards, uploads, profiles, likes, notifications, reels | Next.js, Express, MongoDB | Built |
-| 28 | Instagram Clone | Photo feed, likes, comments, uploads | Next.js, real-time | Planned |
+| 28 | [Instagram Clone / Lumen](<Phase-3/2-InstagramClone/README.md>) | Photo feed, stories, reels, profiles, likes, comments, uploads | Next.js, TypeScript, MongoDB | Built |
 | 29 | E-Commerce Website | Cart, checkout, payment | Next.js, full-stack | Planned |
 | 30 | Admin Dashboard | Analytics, user statistics, charts | React, full-stack | Planned |
 | 31 | Social Media App | Profiles, follow, posts | Full-stack, real-time | Planned |

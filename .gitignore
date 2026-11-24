@@ -16,3 +16,6 @@ coverage/
 backend/uploads/
 frontend/.vite/
 **/backend/uploads/
+
+# Local package caches created during setup
+.npm-cache-*/

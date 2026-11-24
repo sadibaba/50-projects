@@ -13,6 +13,7 @@ unfinished is presented as done.
 | Project | Status | Stack |
 | --- | --- | --- |
 | [1-PinterestClone](<1-PinterestClone/README.md>) | Built | Next.js 16, Express, MongoDB, TypeScript |
+| [2-InstagramClone](<2-InstagramClone/README.md>) | Built | Next.js 16, TypeScript, MongoDB |
 | [2-AI-SEO-Analyzer-](<2-AI-SEO-Analyzer-/>) | Additional project, separate from the 27-50 list | Next.js, TypeScript |
 
 The Pinterest clone is documented in detail, including its API and product notes:
@@ -26,7 +27,7 @@ The Pinterest clone is documented in detail, including its API and product notes
 | # | Project | Core features | Stack |
 | --- | --- | --- | --- |
 | 27 | Pinterest Clone | Pins, boards, uploads, profiles, likes, notifications, reels | Next.js, Express, MongoDB |
-| 28 | Instagram Clone | Photo feed, likes, comments, uploads | Next.js, real-time |
+| 28 | Instagram Clone | Photo feed, stories, reels, profiles, likes, comments, uploads | Next.js, MongoDB |
 | 29 | E-Commerce Website | Cart, checkout, payment | Next.js, full-stack |
 | 30 | Admin Dashboard | Analytics, user statistics, charts | React, full-stack |
 | 31 | Social Media App | Profiles, follow, posts | Full-stack, real-time |
