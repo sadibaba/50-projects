@@ -17,8 +17,8 @@ and those are documented per project in this repository.
 | --- | --- | --- |
 | Phase 1 | Vanilla JavaScript, DOM, public APIs, localStorage | 13 projects |
 | Phase 2 | React, Express, MongoDB, REST APIs, authentication | 8 projects |
-| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress |
-| Phase 4 | AWS, Docker, microservices | Planned |
+| Phase 3 | Next.js, real-time features, larger full-stack systems | In progress: 1 of 24 built, 23 planned, 1 extra project |
+| Phase 4 | AWS, Docker, microservices | 6 projects planned |
 
 ## Phase 1: Vanilla JavaScript
 
@@ -80,6 +80,147 @@ GitHub profile viewer, were not built. They are not listed as complete.
 - Environment-based configuration and `.env.example` files
 - Frontend build verification and production builds
 - Per-project documentation covering architecture, API and limitations
+
+## Phase 3: Advanced full-stack roadmap
+
+The original Phase 3 plan contains 24 projects (27-50). The full-stack Pinterest
+alternative, [Pinboard](<Phase-3/1-PinterestClone/README.md>), is built. The rest
+remain planned work and are not presented as complete.
+
+| # | Project | Core features | Stack | Status |
+| --- | --- | --- | --- | --- |
+| 27 | [Pinterest Clone / Pinboard](<Phase-3/1-PinterestClone/README.md>) | Pins, boards, uploads, profiles, likes, notifications, reels | Next.js, Express, MongoDB | Built |
+| 28 | Instagram Clone | Photo feed, likes, comments, uploads | Next.js, real-time | Planned |
+| 29 | E-Commerce Website | Cart, checkout, payment | Next.js, full-stack | Planned |
+| 30 | Admin Dashboard | Analytics, user statistics, charts | React, full-stack | Planned |
+| 31 | Social Media App | Profiles, follow, posts | Full-stack, real-time | Planned |
+| 32 | Real-Time Chat App | Socket.IO rooms and auth | Next.js, WebSockets | Planned |
+| 33 | Video Streaming Platform | Upload, stream, profiles | Full-stack | Planned |
+| 34 | Blog with SSR and SSG | SEO, Markdown, dynamic routes | Next.js | Planned |
+| 35 | Booking System | Room and restaurant booking, calendar | Full-stack | Planned |
+| 36 | LMS Platform | Courses, quizzes, roles | Next.js, full-stack | Planned |
+| 37 | Job Board Platform | Job posts, applications, search, admin | Full-stack | Planned |
+| 38 | News Aggregator | APIs, categories, saved favourites | Next.js | Planned |
+| 39 | Forum / Q&A Platform | Threads, replies, voting | Next.js, full-stack | Planned |
+| 40 | Chatbot Interface | AI and rule-based bot | React, backend, real-time | Planned |
+| 41 | Portfolio Generator | Form to downloadable static portfolio | Full-stack | Planned |
+| 42 | Podcast Platform | Episodes, audio player, admin upload | Full-stack | Planned |
+| 43 | Calendar / Planner App | Events, reminders, CRUD | Full-stack | Planned |
+| 44 | Crypto Tracker | Live prices, charts, watchlist | Next.js, real-time | Planned |
+| 45 | Task Automation Dashboard | Scheduled and automated tasks | Full-stack | Planned |
+| 46 | Multi-Tenant SaaS App | Tenant data isolation, billing simulation | Next.js, full-stack | Planned |
+| 47 | Fitness Tracker | Workouts, calories, charts | Full-stack | Planned |
+| 48 | Chat Rooms with Auth | Public and private rooms | WebSockets | Planned |
+| 49 | Calendar Booking with Payment | Slot booking, mock payment | Full-stack | Planned |
+| 50 | Image Editing App | Filters, crop, rotate | JavaScript, backend | Planned |
+
+### Phase 3 technology targets
+
+```text
+Frontend    Next.js App Router with SSR, SSG and client components
+Backend     Node.js and Express
+Databases   MongoDB and PostgreSQL
+Real-time   Socket.IO / WebSockets
+Auth        JWT and session management
+Caching     Redis
+DevOps      Docker and CI/CD basics
+```
+
+The repository also contains [2-AI-SEO-Analyzer-](<Phase-3/2-AI-SEO-Analyzer-/>),
+an extra Next.js project that is not part of the original 27-50 list. It is kept
+separate from the Phase 3 status table above.
+
+[Phase 3 documentation and status](Phase-3/README.md)
+
+## Phase 4: Cloud and microservices roadmap
+
+Phase 4 is planned. None of these six products is built yet. They are listed so
+the direction of the roadmap is explicit.
+
+| # | Product | Focus |
+| --- | --- | --- |
+| 1 | DevCommerce Hub | Developer e-commerce with collaboration, logging and a developer vault |
+| 2 | EduVerse | Learning platform with live classrooms, courses and resource sales |
+| 3 | WorkOS | Browser-based workspace OS with teams, vaults and plugins |
+| 4 | CloudLab | DevOps playground with container deployment and monitoring |
+| 5 | CollabMart | Social commerce with real-time chat and seller tools |
+| 6 | CodeVaultX | Developer legacy platform for projects, APIs, logs and templates |
+
+### DevCommerce Hub
+
+A developer-focused e-commerce platform with productivity layers behind the
+storefront.
+
+| Surface | Hidden layer |
+| --- | --- |
+| Product pages | Error log tracker |
+| Shopping cart | Developer vault for snippets and templates |
+| Order history | Debugging timeline |
+| Reviews and ratings | Collaborative knowledge base |
+
+Core scope: catalog, cart, checkout, Stripe/PayPal, AWS S3 images, TeamHub chat
+and Kanban, error logging with Winston/Morgan and charts, GraphQL search and
+Dockerised deployment.
+
+Stack: React, TypeScript, Tailwind, Node.js, Express, GraphQL, PostgreSQL,
+MongoDB, Redis, Socket.IO, Docker, Kubernetes, AWS EC2/S3/RDS/CloudWatch.
+
+### EduVerse
+
+A learning hub for courses, cheat sheets and live coding sessions.
+
+- Real-time classrooms with WebSockets and video integration
+- Notes and API documentation vault
+- Error logger for teachers to track student issues
+- E-commerce for selling courses and resources
+
+Stack: React, Node.js, GraphQL, MongoDB or PostgreSQL, AWS Lambda and S3.
+
+### WorkOS
+
+A cinematic workspace that runs in the browser.
+
+- Team collaboration with chat and boards
+- Personal and shared vaults
+- Per-project error logger dashboard
+- Plugin marketplace
+
+Stack: Next.js, Express, Redis, Docker, Kubernetes, AWS EC2.
+
+### CloudLab
+
+A practice cloud for deploying, monitoring and debugging applications.
+
+- Container deployment with Docker and Kubernetes
+- Error logger and monitoring dashboard
+- Vault for deployment scripts and cheat sheets
+- Marketplace for deployment templates
+
+Stack: React, Node.js, GraphQL, PostgreSQL, AWS CloudWatch and ECS.
+
+### CollabMart
+
+Social commerce combined with team collaboration.
+
+- Product marketplace with SQL and NoSQL data
+- Real-time chat and community boards
+- Error logger for sellers tracking failed orders
+- Seller vault for documenting strategies
+
+Stack: React, Express, MongoDB and PostgreSQL, AWS S3, Stripe.
+
+### CodeVaultX
+
+A developer legacy platform for documenting an entire journey.
+
+- Vault for notes, cheat sheets and API documentation
+- Per-project error logger
+- Team collaboration
+- E-commerce for templates and code snippets
+
+Stack: Next.js, Node.js, GraphQL, MongoDB and PostgreSQL, Docker, AWS.
+
+[Phase 4 documentation](Phase-4/README.md)
 
 ## Repository structure
 
